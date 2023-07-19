@@ -6,6 +6,7 @@ export enum HTTP_STATUSES {
     "NOT_FOUND_404" = 404,
 }
 
-export enum SEARCH_RESULTS {
-    "NOT_FOUND" = "element not found"
+export enum DB_RESULTS {
+    "NOT_FOUND" = "element not found",
+    "SUCCESSFULLY_COMPLETED" = "element action completed",
 }

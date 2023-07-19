@@ -1,18 +1,19 @@
 import {videosRepository} from "../repositories/videosRepository";
 import {VideoOutput} from "../types/videosTypes";
-import {SEARCH_RESULTS} from "../common/constants";
+import {DB_RESULTS} from "../common/constants";
 
 export const videosService = {
-    getAllVideos() {
+    getAllVideos(): VideoOutput[] {
         return videosRepository.getAllVideos()
     },
-    getVideoById(id: string): VideoOutput | SEARCH_RESULTS.NOT_FOUND {
+    getVideoById(id: string): VideoOutput | DB_RESULTS.NOT_FOUND {
         const numberId: number = parseInt(id)
-        const video: VideoOutput | undefined = videosRepository.getVideoById(numberId)
-        if(video === undefined) {
-            return SEARCH_RESULTS.NOT_FOUND
-        } else {
-            return video
-        }
+        const video: VideoOutput | DB_RESULTS.NOT_FOUND = videosRepository.getVideoById(numberId)
+        return video === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : video
+    },
+    deleteVideoById(id: string): DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED {
+        const numberId: number = parseInt(id)
+        const deletionResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = videosRepository.deleteVideoById(numberId)
+        return deletionResult === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }
