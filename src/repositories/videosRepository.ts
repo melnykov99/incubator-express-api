@@ -20,9 +20,9 @@ export const videosRepository = {
         return foundVideo
 
     },
-    createVideo(newVideo: VideoOutput) {
+    createVideo(newVideo: VideoOutput): DB_RESULTS.SUCCESSFULLY_COMPLETED {
         videosDB.push(newVideo)
-        return videosDB
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     updateVideo() {
 

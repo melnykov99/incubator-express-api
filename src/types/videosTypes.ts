@@ -3,10 +3,10 @@ export type VideoOutput = {
     title: string,
     author: string,
     canBeDownloaded: boolean,
-    minAgeRestriction: boolean,
+    minAgeRestriction: number | null,
     createdAt: string,
     publicationDate: string,
-    availableResolutions: [availableResolutions]
+    availableResolutions: availableResolutions[]
 }
 
 export enum availableResolutions {
