@@ -22,7 +22,7 @@ videosRouter.get('/:id', (req: RequestWithParams<GetVideoById>, res: Response) =
 })
 
 videosRouter.delete('/:id', (req: RequestWithParams<DeleteVideoById>, res: Response) => {
-    const deletionResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = videosService.deleteVideoById(req.params.id as string)
+    const deletionResult: DB_RESULTS = videosService.deleteVideoById(req.params.id as string)
     if (deletionResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return

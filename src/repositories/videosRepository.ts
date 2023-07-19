@@ -27,7 +27,7 @@ export const videosRepository = {
     updateVideo() {
 
     },
-    deleteVideoById(id: number): DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED {
+    deleteVideoById(id: number): DB_RESULTS {
         const videoIndex: number = videosDB.findIndex(v => v.id === id)
         if (videoIndex === -1) {
             return DB_RESULTS.NOT_FOUND

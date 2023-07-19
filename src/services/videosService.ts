@@ -11,9 +11,9 @@ export const videosService = {
         const video: VideoOutput | DB_RESULTS.NOT_FOUND = videosRepository.getVideoById(numberId)
         return video === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : video
     },
-    deleteVideoById(id: string): DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED {
+    deleteVideoById(id: string): DB_RESULTS {
         const numberId: number = parseInt(id)
-        const deletionResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = videosRepository.deleteVideoById(numberId)
+        const deletionResult: DB_RESULTS = videosRepository.deleteVideoById(numberId)
         return deletionResult === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }
