@@ -1,8 +1,9 @@
 import {videosRepository} from "../repositories/videosRepository";
-import {VideoOutput} from "../types/videosTypes";
+import {availableResolutions, VideoOutput} from "../types/videosTypes";
 import {DB_RESULTS} from "../common/constants";
-import {RequestWithBody} from "../types/commonTypes";
-import {CreateVideo} from "../dto/videos/CreateVideo";
+import {RequestWithBody, RequestWithParamsAndBody} from "../types/commonTypes";
+import {CreateUpdateVideo} from "../dto/videos/CreateVideo";
+import {GetVideoById} from "../dto/videos/GetVideoById";
 
 export const videosService = {
     getAllVideos(): VideoOutput[] {
@@ -13,7 +14,7 @@ export const videosService = {
         const video: VideoOutput | DB_RESULTS.NOT_FOUND = videosRepository.getVideoById(numberId)
         return video === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : video
     },
-    createVideo(req: RequestWithBody<CreateVideo>): VideoOutput {
+    createVideo(req: RequestWithBody<CreateUpdateVideo>): VideoOutput {
         const newVideo: VideoOutput = {
             id: Date.now(),
             title: req.body.title,
@@ -22,10 +23,29 @@ export const videosService = {
             minAgeRestriction: req.body.minAgeRestriction ?? null,
             createdAt: (new Date().toISOString()),
             publicationDate: req.body.publicationDate ?? (new Date(new Date().setDate(new Date().getDate() + 1))).toISOString(),
-            availableResolutions: req.body.availableResolutions
+            availableResolutions: req.body.availableResolutions ?? [availableResolutions.P144, availableResolutions.P240, availableResolutions.P360, availableResolutions.P480, availableResolutions.P720, availableResolutions.P1080, availableResolutions.P1440, availableResolutions.P2160]
         }
         videosRepository.createVideo(newVideo)
         return newVideo
+    },
+    updateVideo(req: RequestWithParamsAndBody<GetVideoById, CreateUpdateVideo>): DB_RESULTS {
+        const numberId: number = parseInt(req.params.id)
+        const foundVideo: VideoOutput | DB_RESULTS.NOT_FOUND = videosRepository.getVideoById(numberId)
+        if (foundVideo === DB_RESULTS.NOT_FOUND) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        const updatedVideo: VideoOutput = {
+            id: foundVideo.id,
+            title: req.body.title,
+            author: req.body.author,
+            canBeDownloaded: req.body.canBeDownloaded ?? foundVideo.canBeDownloaded,
+            minAgeRestriction: req.body.minAgeRestriction ?? foundVideo.minAgeRestriction,
+            createdAt: foundVideo.createdAt,
+            publicationDate: req.body.publicationDate ?? foundVideo.publicationDate,
+            availableResolutions: req.body.availableResolutions ?? foundVideo.availableResolutions
+        }
+        videosRepository.updateVideo(updatedVideo, numberId)
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     deleteVideoById(id: string): DB_RESULTS {
         const numberId: number = parseInt(id)

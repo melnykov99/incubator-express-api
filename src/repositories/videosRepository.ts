@@ -24,8 +24,10 @@ export const videosRepository = {
         videosDB.push(newVideo)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
-    updateVideo() {
-
+    updateVideo(updatedVideo: VideoOutput, id: number): DB_RESULTS {
+        const videoIndex: number = videosDB.findIndex(v => v.id === id)
+        videosDB[videoIndex] = updatedVideo
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     deleteVideoById(id: number): DB_RESULTS {
         const videoIndex: number = videosDB.findIndex(v => v.id === id)
