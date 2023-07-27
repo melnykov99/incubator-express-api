@@ -6,10 +6,10 @@ export type VideoOutput = {
     minAgeRestriction: number | null,
     createdAt: string,
     publicationDate: string,
-    availableResolutions: availableResolutions[]
+    availableResolutions: AvailableResolutions[]
 }
 
-export enum availableResolutions {
+export enum AvailableResolutions {
     P144 = "P144",
     P240 = "P240",
     P360 = "P360",

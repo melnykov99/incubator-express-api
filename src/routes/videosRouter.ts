@@ -1,16 +1,19 @@
 import {Request, Response, Router} from "express";
 import {DB_RESULTS, HTTP_STATUSES} from "../common/constants";
 import {videosService} from "../services/videosService";
-import {VideoOutput} from "../types/videosTypes";
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/commonTypes";
+import {VideoOutput} from "../types/videos";
+import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/generics";
 import {GetVideoById} from "../dto/videos/GetVideoById";
 import {CreateUpdateVideo} from "../dto/videos/CreateVideo";
+import {videoCreateValidation, videosValidator, videoUpdateValidation} from "../validators/videosValidator";
 
 export const videosRouter = Router()
 
+//TODO: JSON parser добавить. Иначе 500 при запросе
+
 videosRouter.get('/', (req: Request, res: Response) => {
     const videos: VideoOutput[] = videosService.getAllVideos()
-    res.status(HTTP_STATUSES.OK_200).send(videos)
+    res.status(HTTP_STATUSES.CREATED_201).send(videos)
 })
 
 videosRouter.get('/:id', (req: RequestWithParams<GetVideoById>, res: Response) => {
@@ -27,7 +30,7 @@ videosRouter.post('/', (req: RequestWithBody<CreateUpdateVideo>, res: Response) 
     res.status(HTTP_STATUSES.CREATED_201).send(createdVideo)
 })
 
-videosRouter.put('/:id', (req: RequestWithParamsAndBody<GetVideoById, CreateUpdateVideo>, res: Response) => {
+videosRouter.put('/:id', videosValidator(videoUpdateValidation), (req: RequestWithParamsAndBody<GetVideoById, CreateUpdateVideo>, res: Response) => {
     const updateResult: DB_RESULTS = videosService.updateVideo(req)
     if (updateResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

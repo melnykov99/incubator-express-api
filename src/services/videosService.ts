@@ -1,7 +1,7 @@
 import {videosRepository} from "../repositories/videosRepository";
-import {availableResolutions, VideoOutput} from "../types/videosTypes";
+import {AvailableResolutions, VideoOutput} from "../types/videos";
 import {DB_RESULTS} from "../common/constants";
-import {RequestWithBody, RequestWithParamsAndBody} from "../types/commonTypes";
+import {RequestWithBody, RequestWithParamsAndBody} from "../types/generics";
 import {CreateUpdateVideo} from "../dto/videos/CreateVideo";
 import {GetVideoById} from "../dto/videos/GetVideoById";
 
@@ -15,6 +15,7 @@ export const videosService = {
         return video === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : video
     },
     createVideo(req: RequestWithBody<CreateUpdateVideo>): VideoOutput {
+        console.log(req.body)
         const newVideo: VideoOutput = {
             id: Date.now(),
             title: req.body.title,
@@ -23,7 +24,7 @@ export const videosService = {
             minAgeRestriction: req.body.minAgeRestriction ?? null,
             createdAt: (new Date().toISOString()),
             publicationDate: req.body.publicationDate ?? (new Date(new Date().setDate(new Date().getDate() + 1))).toISOString(),
-            availableResolutions: req.body.availableResolutions ?? [availableResolutions.P144, availableResolutions.P240, availableResolutions.P360, availableResolutions.P480, availableResolutions.P720, availableResolutions.P1080, availableResolutions.P1440, availableResolutions.P2160]
+            availableResolutions: req.body.availableResolutions ?? [AvailableResolutions.P144, AvailableResolutions.P240, AvailableResolutions.P360, AvailableResolutions.P480, AvailableResolutions.P720, AvailableResolutions.P1080, AvailableResolutions.P1440, AvailableResolutions.P2160]
         }
         videosRepository.createVideo(newVideo)
         return newVideo
