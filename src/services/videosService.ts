@@ -15,7 +15,6 @@ export const videosService = {
         return video === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : video
     },
     createVideo(req: RequestWithBody<CreateUpdateVideo>): VideoOutput {
-        console.log(req.body)
         const newVideo: VideoOutput = {
             id: Date.now(),
             title: req.body.title,

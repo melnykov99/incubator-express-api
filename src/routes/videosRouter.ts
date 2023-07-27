@@ -9,8 +9,6 @@ import {videoCreateValidation, videosValidator, videoUpdateValidation} from "../
 
 export const videosRouter = Router()
 
-//TODO: JSON parser добавить. Иначе 500 при запросе
-
 videosRouter.get('/', (req: Request, res: Response) => {
     const videos: VideoOutput[] = videosService.getAllVideos()
     res.status(HTTP_STATUSES.CREATED_201).send(videos)
@@ -25,7 +23,7 @@ videosRouter.get('/:id', (req: RequestWithParams<GetVideoById>, res: Response) =
     res.status(HTTP_STATUSES.OK_200).send(video)
 })
 
-videosRouter.post('/', (req: RequestWithBody<CreateUpdateVideo>, res: Response) => {
+videosRouter.post('/', videosValidator(videoCreateValidation), (req: RequestWithBody<CreateUpdateVideo>, res: Response) => {
     const createdVideo: VideoOutput = videosService.createVideo(req)
     res.status(HTTP_STATUSES.CREATED_201).send(createdVideo)
 })

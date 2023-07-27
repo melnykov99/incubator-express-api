@@ -8,6 +8,6 @@ export const app = express()
 app.get('/', (req: Request, res: Response) => {
     res.status(HTTP_STATUSES.OK_200).send('Main Page')
 })
-
+app.use(express.json())
 app.use('/testing/all-data', deleteDataRouter)
 app.use('/videos', videosRouter)

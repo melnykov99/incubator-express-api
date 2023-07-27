@@ -23,6 +23,7 @@ export const videosValidator = (validations: ValidationChain[]) => {
 
 
 //TODO: для availableResolutions сделать кастомную валидацию
+//TODO: сообщение об ошибке выводить согласно документации
 export const videoCreateValidation: ValidationChain[] = [
     body('title').isString().isLength({min: 1, max: 40}).withMessage(videosErrors.title),
     body('author').isString().isLength({min: 1, max: 20}).withMessage(videosErrors.author),
