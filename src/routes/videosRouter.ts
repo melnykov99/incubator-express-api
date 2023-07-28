@@ -1,8 +1,8 @@
 import {Request, Response, Router} from "express";
 import {DB_RESULTS, HTTP_STATUSES} from "../common/constants";
 import {videosService} from "../services/videosService";
-import {VideoOutput} from "../types/videos";
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/generics";
+import {VideoOutput} from "../types/videosTypes";
+import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/requestGenerics";
 import {GetVideoById} from "../dto/videos/GetVideoById";
 import {CreateUpdateVideo} from "../dto/videos/CreateVideo";
 import {videoCreateValidation, videosValidator, videoUpdateValidation} from "../validators/videosValidator";

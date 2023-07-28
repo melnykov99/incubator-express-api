@@ -1,4 +1,4 @@
-import {AvailableResolutions, VideoOutput} from "../types/videos";
+import {AvailableResolutions, VideoOutput} from "../types/videosTypes";
 import {DB_RESULTS} from "../common/constants";
 
 //Пока нет базы данных объявляем просто массив с видео

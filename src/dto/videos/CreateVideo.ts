@@ -1,4 +1,4 @@
-import {AvailableResolutions} from "../../types/videos";
+import {AvailableResolutions} from "../../types/videosTypes";
 
 export type CreateUpdateVideo = {
     title: string,

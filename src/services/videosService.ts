@@ -1,7 +1,7 @@
 import {videosRepository} from "../repositories/videosRepository";
-import {AvailableResolutions, VideoOutput} from "../types/videos";
+import {AvailableResolutions, VideoOutput} from "../types/videosTypes";
 import {DB_RESULTS} from "../common/constants";
-import {RequestWithBody, RequestWithParamsAndBody} from "../types/generics";
+import {RequestWithBody, RequestWithParamsAndBody} from "../types/requestGenerics";
 import {CreateUpdateVideo} from "../dto/videos/CreateVideo";
 import {GetVideoById} from "../dto/videos/GetVideoById";
 

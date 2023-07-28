@@ -1,4 +1,4 @@
-import {ErrorsObject} from "../../types/errors";
+import {ErrorsObject} from "../../types/errorsTypes";
 
 export const videosErrors: ErrorsObject = {
     title: {
@@ -33,7 +33,7 @@ export const videosErrors: ErrorsObject = {
     },
     availableResolutions: {
         'errorsMessages': [{
-            message: 'availableResolutions must be a string with a maximum length of 20 characters',
+            message: 'availableResolutions must be an array of strings with these values: P144, P240, P360, P480, P720, P1080, P1440, P2160',
             field: 'availableResolutions'
         }]
     }
