@@ -11,7 +11,7 @@ export const videosRouter = Router()
 
 videosRouter.get('/', (req: Request, res: Response) => {
     const videos: VideoOutput[] = videosService.getAllVideos()
-    res.status(HTTP_STATUSES.CREATED_201).send(videos)
+    res.status(HTTP_STATUSES.OK_200).send(videos)
 })
 
 videosRouter.get('/:id', (req: RequestWithParams<GetVideoById>, res: Response) => {
