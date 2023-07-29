@@ -15,7 +15,7 @@ export const videosErrors: ErrorsObject = {
     },
     canBeDownloaded: {
       'errorsMessages': [{
-          message: 'canBeDownloaded must be boolean, by default false',
+          message: 'canBeDownloaded must be boolean',
           field: 'canBeDownloaded'
       }]
     },
