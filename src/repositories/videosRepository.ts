@@ -1,19 +1,8 @@
-import {AvailableResolutions, VideoOutput} from "../types/videosTypes";
+import {VideoOutput} from "../types/videosTypes";
 import {DB_RESULTS} from "../common/constants";
 
 //Пока нет базы данных объявляем просто массив с видео
-export let videosDB: VideoOutput[] = [
-    {
-        id: 1,
-        title: 'title',
-        author: 'author',
-        canBeDownloaded: true,
-        minAgeRestriction: 18,
-        createdAt: '2023-07-27T05:07:50.901Z',
-        publicationDate: '2023-07-28T05:07:50.901Z',
-        availableResolutions: [AvailableResolutions.P480, AvailableResolutions.P720, AvailableResolutions.P1080]
-    }
-]
+export let videosDB: VideoOutput[] = []
 
 export const videosRepository = {
     deleteAllVideos(): DB_RESULTS.SUCCESSFULLY_COMPLETED {
