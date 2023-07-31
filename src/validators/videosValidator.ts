@@ -17,8 +17,7 @@ const checkISOPublicationDate: CustomValidator = (value: string) => {
 export const videosValidator = (validations: ValidationChain[]) => {
     return async (req: RequestWithBody<CreateUpdateVideo>, res: Response, next: NextFunction) => {
         for (let validation of validations) {
-            const result: Result<ValidationError> = await validation.run(req);
-            if (!result.isEmpty()) break;
+            await validation.run(req);
         }
 
         const errors: Result<ValidationError> = validationResult(req);
@@ -31,19 +30,20 @@ export const videosValidator = (validations: ValidationChain[]) => {
 };
 export const videosValidation: ValidationChain[] = [
     body('title')
-        .isString().withMessage(videosErrors.title)
-        .trim().notEmpty().withMessage(videosErrors.title)
+        .isString().withMessage(videosErrors.title).bail()
+        .trim().notEmpty().withMessage(videosErrors.title).bail()
         .isLength({min: 1, max: 40}).withMessage(videosErrors.title),
     body('author')
-        .isString().withMessage(videosErrors.author)
-        .trim().notEmpty().withMessage(videosErrors.author)
+        .isString().withMessage(videosErrors.author).bail()
+        .trim().notEmpty().withMessage(videosErrors.author).bail()
         .isLength({min: 1, max: 20}).withMessage(videosErrors.author),
     body('canBeDownloaded').optional().isBoolean().withMessage(videosErrors.canBeDownloaded),
     body('minAgeRestriction').optional().isInt({min: 1, max: 18}).withMessage(videosErrors.minAgeRestriction),
-    body('publicationDate').optional().isString().withMessage(videosErrors.publicationDate)
+    body('publicationDate')
+        .optional().isString().withMessage(videosErrors.publicationDate).bail()
         .custom(checkISOPublicationDate).withMessage(videosErrors.publicationDate),
     body('availableResolutions')
-        .isArray().withMessage(videosErrors.availableResolutions)
+        .isArray().withMessage(videosErrors.availableResolutions).bail()
         .custom(matchAvailableResolutions).withMessage(videosErrors.availableResolutions)
 ];
 
