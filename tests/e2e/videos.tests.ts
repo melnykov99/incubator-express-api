@@ -1,43 +1,17 @@
 import request from 'supertest'
 import {app} from "../../src/setting"
 import {HTTP_STATUSES} from "../../src/common/constants";
-import {AvailableResolutions, VideoOutput} from "../../src/types/videosTypes";
+import {VideoOutput} from "../../src/types/videosTypes";
 import {videosErrors} from "../../src/validators/errors/videosErrors";
-import {regexDateCheckISO8601, regexId} from "../../src/common/regex";
-
-let createdVideo: VideoOutput
-beforeAll(async () => {
-    await request(app)
-        .delete('/testing/all-data')
-    const response = await request(app)
-        .post('/videos')
-        .send({
-            title: 'title',
-            author: 'author',
-            canBeDownloaded: true,
-            minAgeRestriction: 18,
-            createdAt: '2024-01-01T02:00:00.901Z',
-            publicationDate: '2024-01-02T02:00:00.901Z',
-            availableResolutions: [AvailableResolutions.P480, AvailableResolutions.P720, AvailableResolutions.P1080]
-        })
-    createdVideo = response.body
-})
+import {regexDateCheckISO8601} from "../../src/common/regex";
+import {videosDB} from "../../src/repositories/videosRepository";
 
 describe('GET ALL VIDEOS', () => {
     it('should return 200 and array videos ', async () => {
         const response = await request(app)
             .get('/videos')
         expect(response.status).toBe(HTTP_STATUSES.OK_200)
-        expect(response.body).toMatchObject({
-            id: regexId,
-            title: 'title',
-            author: 'author',
-            canBeDownloaded: true,
-            minAgeRestriction: 18,
-            createdAt: '2024-01-01T02:00:00.901Z',
-            publicationDate: '2024-01-02T02:00:00.901Z',
-            availableResolutions: [AvailableResolutions.P480, AvailableResolutions.P720, AvailableResolutions.P1080]
-        })
+        expect(response.body).toStrictEqual(videosDB)
     })
 })
 describe('POST /videos', () => {
@@ -119,29 +93,41 @@ describe('POST /videos', () => {
     })
 
     describe('CREATE VIDEO', () => {
-        let createdNewVideo: VideoOutput;
+        let createdVideo: VideoOutput;
         it('create video with valid values, return 201 and new video', async () => {
             const response = await request(app)
                 .post('/videos')
                 .send({title: 'test_title', author: 'test_author', availableResolutions: ['P720', 'P1080']})
                 .expect(HTTP_STATUSES.CREATED_201)
-            createdNewVideo = response.body
+            createdVideo = response.body
         })
-        it('get video by id after creation, should return default values', async () => {
+        it('should return 200 and created video after creates', async () => {
             const response = await request(app)
-                .get(`/videos/${createdNewVideo.id}`)
+                .get(`/videos/${createdVideo.id}`)
             expect(response.status).toBe(HTTP_STATUSES.OK_200)
             expect(response.body).toMatchObject({
-                title: createdNewVideo.title,
-                author: createdNewVideo.author,
+                title: createdVideo.title,
+                author: createdVideo.author,
                 canBeDownloaded: false,
                 minAgeRestriction: null,
                 createdAt: regexDateCheckISO8601,
                 publicationDate: regexDateCheckISO8601,
-                availableResolutions: createdNewVideo.availableResolutions
+                availableResolutions: createdVideo.availableResolutions
             })
         })
     })
+})
+
+let createdVideo: VideoOutput;
+beforeAll(async () => {
+    await request(app)
+        .delete('/testing/all-data')
+        .expect(HTTP_STATUSES.NO_CONTENT_204)
+    const postResponse = await request(app)
+        .post('/videos')
+        .send({title: 'test title', author: 'test author', availableResolutions: ['P144']})
+        .expect(HTTP_STATUSES.CREATED_201)
+    createdVideo = postResponse.body
 })
 describe('GET VIDEO BY ID', () => {
     it('should return 404 with a nonexistent id', async () => {
@@ -150,17 +136,9 @@ describe('GET VIDEO BY ID', () => {
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
     it('should return 200 and founded video after creation', async () => {
-        //create video
-        let newVideo: VideoOutput;
-        const postResponse = await request(app)
-            .post('/videos')
-            .send({title: 'test title', author: 'test author', availableResolutions: ['P144']})
-            .expect(HTTP_STATUSES.CREATED_201)
-        newVideo = postResponse.body
-        //get by id
         await request(app)
-            .get(`/videos/${newVideo.id}`)
-            .expect(HTTP_STATUSES.OK_200, newVideo)
+            .get(`/videos/${createdVideo.id}`)
+            .expect(HTTP_STATUSES.OK_200, createdVideo)
     })
 })
 describe('UPDATE VIDEO', () => {
@@ -253,9 +231,11 @@ describe('DELETE VIDEO', () => {
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
     it('should return 204 when delete, after when get by id return 404', async () => {
+        console.log(createdVideo)
         await request(app)
             .delete(`/videos/${createdVideo.id}`)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
+        console.log(createdVideo)
         await request(app)
             .get(`/videos/${createdVideo.id}`)
             .expect(HTTP_STATUSES.NOT_FOUND_404)

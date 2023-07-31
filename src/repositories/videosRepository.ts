@@ -34,7 +34,7 @@ export const videosRepository = {
         if (videoIndex === -1) {
             return DB_RESULTS.NOT_FOUND
         }
-        videosDB.splice(1, videoIndex)
+        videosDB.splice(videoIndex, 1)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }
