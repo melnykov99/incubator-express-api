@@ -25,7 +25,7 @@ export const videosValidator = (validations: ValidationChain[]) => {
             return next();
         }
         const outputErrorsMsg: ErrorsMessage[] = errors.array().map((error) => error.msg)
-        res.status(HTTP_STATUSES.BAD_REQUEST_400).send({errorsMessage: outputErrorsMsg});
+        res.status(HTTP_STATUSES.BAD_REQUEST_400).send({errorsMessages: outputErrorsMsg});
     };
 };
 export const videosValidation: ValidationChain[] = [

@@ -184,7 +184,7 @@ describe('UPDATE VIDEO', () => {
                     availableResolutions: ['P144'],
                     minAgeRestriction: 19
                 })
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.minAgeRestriction]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorMessages: [videosErrors.minAgeRestriction]})
         })
         it('if publicationDate is not a string type should return 400 and publicationDate error', async () => {
             await request(app)
@@ -195,7 +195,7 @@ describe('UPDATE VIDEO', () => {
                     availableResolutions: ['P144'],
                     publicationDate: 2023
                 })
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.publicationDate]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorMessages: [videosErrors.publicationDate]})
         })
         it('if publicationDate non-ISO8601 format should return 400 and publicationDate error', async () => {
             await request(app)
@@ -206,7 +206,7 @@ describe('UPDATE VIDEO', () => {
                     availableResolutions: ['P144'],
                     publicationDate: '2023-01-01'
                 })
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.publicationDate]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.publicationDate]})
         })
     })
     describe('UPDATE VIDEO BY ID', () => {
