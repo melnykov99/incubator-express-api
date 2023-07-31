@@ -1,10 +1,6 @@
-export type ErrorsObject = {[key: string]: ErrorsMessage}
+export type ErrorsObject = { [key: string]: ErrorsMessage }
 
 export type ErrorsMessage = {
-    "errorsMessages": [
-        {
-            message: string,
-            field: string
-        }
-    ]
+    message: string,
+    field: string
 }
