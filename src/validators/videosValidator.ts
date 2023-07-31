@@ -6,6 +6,7 @@ import {RequestWithBody} from "../types/requestGenerics";
 import {CreateUpdateVideo} from "../dto/videos/CreateVideo";
 import {AvailableResolutions} from "../types/videosTypes";
 import {regexDateCheckISO8601} from "../common/regex";
+import {ErrorsMessage} from "../types/errorsTypes";
 
 const matchAvailableResolutions: CustomValidator = (value: string[]) => {
     return value.every(el => el in AvailableResolutions)
@@ -24,8 +25,8 @@ export const videosValidator = (validations: ValidationChain[]) => {
         if (errors.isEmpty()) {
             return next();
         }
-
-        res.status(HTTP_STATUSES.BAD_REQUEST_400).send(errors.array()[0].msg);
+        const outputErrorsMsg: ErrorsMessage[] = errors.array().map((error) => error.msg)
+        res.status(HTTP_STATUSES.BAD_REQUEST_400).send(outputErrorsMsg);
     };
 };
 export const videosValidation: ValidationChain[] = [
