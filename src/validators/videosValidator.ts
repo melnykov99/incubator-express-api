@@ -3,7 +3,7 @@ import {body, validationResult, ValidationChain, ValidationError, Result, Custom
 import {videosErrors} from "./errors/videosErrors";
 import {HTTP_STATUSES} from "../common/constants";
 import {RequestWithBody} from "../types/requestGenerics";
-import {CreateUpdateVideo} from "../dto/videos/CreateVideo";
+import {CreateUpdateVideo} from "../dto/videos/CreateUodateVideo";
 import {AvailableResolutions} from "../types/videosTypes";
 import {regexDateCheckISO8601} from "../common/regex";
 import {ErrorsMessage} from "../types/errorsTypes";
@@ -45,7 +45,8 @@ export const videosValidator = (validations: ValidationChain[]) => {
     };
 };
 /**
- * Содержит цепочку значений для проверки из req.body и условия валидации
+ * Содержит цепочки валидаций для проверки значений из req.body
+ * В каждом условии bail() для прерывания цепочки валидации, чтобы не было дублей ошибок при несоблюдении нескольких условий у значения
  */
 export const videosValidation: ValidationChain[] = [
     body('title')

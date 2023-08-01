@@ -2,8 +2,8 @@ import {videosRepository} from "../repositories/videosRepository";
 import {AvailableResolutions, VideoOutput} from "../types/videosTypes";
 import {DB_RESULTS} from "../common/constants";
 import {RequestWithBody, RequestWithParamsAndBody} from "../types/requestGenerics";
-import {CreateUpdateVideo} from "../dto/videos/CreateVideo";
-import {GetVideoById} from "../dto/videos/GetVideoById";
+import {CreateUpdateVideo} from "../dto/videos/CreateUodateVideo";
+import {GetDeleteVideoById} from "../dto/videos/GetDeleteVideoById";
 
 export const videosService = {
     /**
@@ -49,7 +49,7 @@ export const videosService = {
      * @param req в запросе id в параметрах и значения для обновления в body
      * @return возвращаем константу NOT_FOUND, если видео не найдено или константу SUCCESSFULLY_COMPLETED, если видео нашли и обновили
      */
-    updateVideo(req: RequestWithParamsAndBody<GetVideoById, CreateUpdateVideo>): DB_RESULTS {
+    updateVideo(req: RequestWithParamsAndBody<GetDeleteVideoById, CreateUpdateVideo>): DB_RESULTS {
         const numberId: number = parseInt(req.params.id)
         const foundVideo: VideoOutput | DB_RESULTS.NOT_FOUND = videosRepository.getVideoById(numberId)
         if (foundVideo === DB_RESULTS.NOT_FOUND) {

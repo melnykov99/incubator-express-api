@@ -2,6 +2,7 @@ import express, {Request, Response} from 'express';
 import {HTTP_STATUSES} from "./common/constants";
 import {videosRouter} from "./routes/videosRouter";
 import {deleteDataRouter} from "./routes/deleteDataRouter";
+import {blogsRouter} from "./routes/blogsRouter";
 
 export const app = express()
 
@@ -11,3 +12,4 @@ app.get('/', (req: Request, res: Response) => {
 app.use(express.json())
 app.use('/testing/all-data', deleteDataRouter)
 app.use('/videos', videosRouter)
+app.use('/blogs', blogsRouter)
