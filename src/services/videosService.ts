@@ -6,14 +6,27 @@ import {CreateUpdateVideo} from "../dto/videos/CreateVideo";
 import {GetVideoById} from "../dto/videos/GetVideoById";
 
 export const videosService = {
+    /**
+     * Обращаемся к videosRepository, чтобы достать все видео из БД
+     */
     getAllVideos(): VideoOutput[] {
         return videosRepository.getAllVideos()
     },
+    /**
+     * Преобразуем id из строки в число и обращаемся к videosRepository
+     * @param id строчный id видео из параметров запроса
+     * @return возвращаем константу NOT_FOUND, если видео по id не было найдено. Если найдено - возвращаем это видео
+     */
     getVideoById(id: string): VideoOutput | DB_RESULTS.NOT_FOUND {
         const numberId: number = parseInt(id)
         const video: VideoOutput | DB_RESULTS.NOT_FOUND = videosRepository.getVideoById(numberId)
         return video === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : video
     },
+    /**
+     * Создаем объект нового видео в который прокидываем значения видео из объекта или выставляем по дефолту для необязательных значений.
+     * @param req запрос в теле которого значения для создания видео
+     * @return возвращаем новое видео
+     */
     createVideo(req: RequestWithBody<CreateUpdateVideo>): VideoOutput {
         const newVideo: VideoOutput = {
             id: Date.now(),
@@ -28,6 +41,14 @@ export const videosService = {
         videosRepository.createVideo(newVideo)
         return newVideo
     },
+    /**
+     * Преобразуем строковый id в числовой, обращаемся к функции getVideoById в videosRepository, находим нужное нам видео
+     * Если видео с таким id нет, то выходим из функции, возвращая соответствующую константу
+     * Создаем объект updatedVideo, подставляем в него значения из req.body. Если значения необязательные и их нет, то оставляем те, что были.
+     * Обращаемся к videosRepository.updateVideo и передаем новый объект видео обновленный и id
+     * @param req в запросе id в параметрах и значения для обновления в body
+     * @return возвращаем константу NOT_FOUND, если видео не найдено или константу SUCCESSFULLY_COMPLETED, если видео нашли и обновили
+     */
     updateVideo(req: RequestWithParamsAndBody<GetVideoById, CreateUpdateVideo>): DB_RESULTS {
         const numberId: number = parseInt(req.params.id)
         const foundVideo: VideoOutput | DB_RESULTS.NOT_FOUND = videosRepository.getVideoById(numberId)
@@ -47,6 +68,11 @@ export const videosService = {
         videosRepository.updateVideo(updatedVideo, numberId)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
+    /**
+     * Преобразуем id из строки в число и обращаемся к videosRepository
+     * @param id строчный id видео из параметров запроса
+     * @return возвращаем константу NOT_FOUND, если видео по id не было найдено. Иначе константу об успешном выполнении удаления
+     */
     deleteVideoById(id: string): DB_RESULTS {
         const numberId: number = parseInt(id)
         const deletionResult: DB_RESULTS = videosRepository.deleteVideoById(numberId)

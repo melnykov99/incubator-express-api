@@ -4,7 +4,9 @@ import {videosRepository} from "../repositories/videosRepository";
 
 export const deleteDataRouter = Router()
 
-//Удаляем все данные
+/**
+ * Обращаемся к videosRepository чтобы удалить все данные о videos
+ */
 deleteDataRouter.delete('/', (req: Request, res: Response) => {
     videosRepository.deleteAllVideos()
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
