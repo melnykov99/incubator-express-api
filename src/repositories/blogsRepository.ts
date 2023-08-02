@@ -17,11 +17,11 @@ export const blogsRepository = {
         return newBlog
     },
     getBlogById(id: string): BlogOutput | DB_RESULTS.NOT_FOUND {
-        const foundVideo: BlogOutput | undefined = blogsDB.find(b => b.id === id)
-        if (foundVideo === undefined) {
+        const foundBLog: BlogOutput | undefined = blogsDB.find(b => b.id === id)
+        if (foundBLog === undefined) {
             return DB_RESULTS.NOT_FOUND
         }
-        return foundVideo
+        return foundBLog
     },
     /**
      * Обновляем блог по id. findIndex точно найдет блог потому что до этого в service искали блог. Сюда не дошли, если бы не было
@@ -29,16 +29,16 @@ export const blogsRepository = {
      * @param updatedBlog
      */
     updateBlogById(id: string, updatedBlog: BlogOutput): DB_RESULTS.SUCCESSFULLY_COMPLETED {
-        const videoIndex: number = blogsDB.findIndex(b => b.id === id)
-        blogsDB[videoIndex] = updatedBlog
+        const blogIndex: number = blogsDB.findIndex(b => b.id === id)
+        blogsDB[blogIndex] = updatedBlog
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     deleteBlogById(id: string): DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED {
-        const videoIndex: number = blogsDB.findIndex(b => b.id === id)
-        if(videoIndex === -1) {
+        const blogIndex: number = blogsDB.findIndex(b => b.id === id)
+        if(blogIndex === -1) {
             return DB_RESULTS.NOT_FOUND
         }
-        blogsDB.splice(videoIndex, 1)
+        blogsDB.splice(blogIndex, 1)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }
