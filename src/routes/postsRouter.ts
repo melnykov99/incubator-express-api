@@ -43,6 +43,7 @@ postsRouter.delete('/:id', basicAuth, (req: RequestWithParams<GetDeletePostById>
     const deleteResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = postsService.deletePostById(req.params.id)
     if (deleteResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        return
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
