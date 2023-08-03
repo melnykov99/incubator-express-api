@@ -5,7 +5,9 @@ import {VideoOutput} from "../types/videosTypes";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/requestGenerics";
 import {GetDeleteVideoById} from "../dto/videos/GetDeleteVideoById";
 import {CreateUpdateVideo} from "../dto/videos/CreateUodateVideo";
-import {videosValidation, videosValidator} from "../validators/videosValidator";
+import {videosValidation} from "../validators/videosValidation";
+import {validator} from "../validators/validator";
+import {basicAuth} from "../middlewares/basicAuth";
 
 export const videosRouter = Router()
 
@@ -23,12 +25,12 @@ videosRouter.get('/:id', (req: RequestWithParams<GetDeleteVideoById>, res: Respo
     res.status(HTTP_STATUSES.OK_200).send(video)
 })
 
-videosRouter.post('/', videosValidator(videosValidation), (req: RequestWithBody<CreateUpdateVideo>, res: Response) => {
+videosRouter.post('/', basicAuth, validator(videosValidation), (req: RequestWithBody<CreateUpdateVideo>, res: Response) => {
     const createdVideo: VideoOutput = videosService.createVideo(req)
     res.status(HTTP_STATUSES.CREATED_201).send(createdVideo)
 })
 
-videosRouter.put('/:id', videosValidator(videosValidation), (req: RequestWithParamsAndBody<GetDeleteVideoById, CreateUpdateVideo>, res: Response) => {
+videosRouter.put('/:id', basicAuth, validator(videosValidation), (req: RequestWithParamsAndBody<GetDeleteVideoById, CreateUpdateVideo>, res: Response) => {
     const updateResult: DB_RESULTS = videosService.updateVideo(req)
     if (updateResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -37,7 +39,7 @@ videosRouter.put('/:id', videosValidator(videosValidation), (req: RequestWithPar
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 
-videosRouter.delete('/:id', (req: RequestWithParams<GetDeleteVideoById>, res: Response) => {
+videosRouter.delete('/:id', basicAuth, (req: RequestWithParams<GetDeleteVideoById>, res: Response) => {
     const deleteResult: DB_RESULTS = videosService.deleteVideoById(req.params.id as string)
     if (deleteResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

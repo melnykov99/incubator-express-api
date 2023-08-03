@@ -22,19 +22,19 @@ describe('POST /videos', () => {
             await request(app)
                 .post('/videos')
                 .send({author: 'test_author', availableResolutions: ['P144']})
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.title]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.title]})
         })
         it('if title is not a string type should return 400 and title error', async () => {
             await request(app)
                 .post('/videos')
                 .send({title: ['title1'], author: 'test_author', availableResolutions: ['P144']})
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.title]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.title]})
         })
         it('if title is empty should return 400 and title error', async () => {
             await request(app)
                 .post('/videos')
                 .send({title: ' ', author: 'test_author', availableResolutions: ['P144']})
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.title]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.title]})
         })
         it('if title longer than 40 characters should return 400 and title error', async () => {
             await request(app)
@@ -44,51 +44,51 @@ describe('POST /videos', () => {
                     author: 'test_author',
                     availableResolutions: ['P144']
                 })
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.title]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.title]})
         })
         //author
         it('if author missing should return 400 and author error', async () => {
             await request(app)
                 .post('/videos')
                 .send({title: 'test_title', availableResolutions: ['P144']})
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.author]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.author]})
         })
         it('if author is not a string type should return 400 and author error', async () => {
             await request(app)
                 .post('/videos')
                 .send({title: 'test_title', author: 123, availableResolutions: ['P144']})
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.author]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.author]})
         })
         it('if author is empty should return 400 and author error', async () => {
             await request(app)
                 .post('/videos')
                 .send({title: 'test_title', author: ' ', availableResolutions: ['P144']})
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.author]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.author]})
         })
         it('if author longer than 20 characters should return 400 and author error', async () => {
             await request(app)
                 .post('/videos')
                 .send({title: 'test_title', author: 'author_longer_than_20', availableResolutions: ['P144']})
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.author]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.author]})
         })
         //availableResolutions
         it('if availableResolutions missing should return 400 and availableResolutions error', async () => {
             await request(app)
                 .post('/videos')
                 .send({title: 'test_title', author: 'test_author'})
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.availableResolutions]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.availableResolutions]})
         })
         it('if availableResolutions is not an array should return 400 and availableResolutions error', async () => {
             await request(app)
                 .post('/videos')
                 .send({title: 'test_title', author: 'test_author', availableResolutions: 'P144'})
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.availableResolutions]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.availableResolutions]})
         })
         it('if availableResolutions do not match enum-values should return 400 and availableResolutions error', async () => {
             await request(app)
                 .post('/videos')
                 .send({title: 'test_title', author: 'test_author', availableResolutions: ['P144', 'P240', 'P361']})
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.availableResolutions]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.availableResolutions]})
         })
     })
 
@@ -152,7 +152,7 @@ describe('UPDATE VIDEO', () => {
                     availableResolutions: ['P144'],
                     canBeDownloaded: 'hello'
                 })
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.canBeDownloaded]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.canBeDownloaded]})
         })
         it('if minAgeRestriction is not a number type should return 400 and minAgeRestriction error', async () => {
             await request(app)
@@ -163,7 +163,7 @@ describe('UPDATE VIDEO', () => {
                     availableResolutions: ['P144'],
                     minAgeRestriction: 'hello'
                 })
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.minAgeRestriction]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.minAgeRestriction]})
         })
         it('if minAgeRestriction less 1 or more 18 should return 400 and minAgeRestriction error', async () => {
             await request(app)
@@ -174,7 +174,7 @@ describe('UPDATE VIDEO', () => {
                     availableResolutions: ['P144'],
                     minAgeRestriction: -1
                 })
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessage: [videosErrors.minAgeRestriction]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.minAgeRestriction]})
 
             await request(app)
                 .put(`/videos/${createdVideo.id}`)
@@ -184,7 +184,7 @@ describe('UPDATE VIDEO', () => {
                     availableResolutions: ['P144'],
                     minAgeRestriction: 19
                 })
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorMessages: [videosErrors.minAgeRestriction]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.minAgeRestriction]})
         })
         it('if publicationDate is not a string type should return 400 and publicationDate error', async () => {
             await request(app)
@@ -195,7 +195,7 @@ describe('UPDATE VIDEO', () => {
                     availableResolutions: ['P144'],
                     publicationDate: 2023
                 })
-                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorMessages: [videosErrors.publicationDate]})
+                .expect(HTTP_STATUSES.BAD_REQUEST_400, {errorsMessages: [videosErrors.publicationDate]})
         })
         it('if publicationDate non-ISO8601 format should return 400 and publicationDate error', async () => {
             await request(app)
@@ -231,13 +231,12 @@ describe('DELETE VIDEO', () => {
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
     it('should return 204 when delete, after when get by id return 404', async () => {
-        console.log(createdVideo)
         await request(app)
             .delete(`/videos/${createdVideo.id}`)
             .expect(HTTP_STATUSES.NO_CONTENT_204)
-        console.log(createdVideo)
         await request(app)
             .get(`/videos/${createdVideo.id}`)
             .expect(HTTP_STATUSES.NOT_FOUND_404)
     })
 })
+

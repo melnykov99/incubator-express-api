@@ -16,12 +16,8 @@ export const blogsRepository = {
         blogsDB.push(newBlog)
         return newBlog
     },
-    getBlogById(id: string): BlogOutput | DB_RESULTS.NOT_FOUND {
-        const foundBLog: BlogOutput | undefined = blogsDB.find(b => b.id === id)
-        if (foundBLog === undefined) {
-            return DB_RESULTS.NOT_FOUND
-        }
-        return foundBLog
+    getBlogById(id: string): BlogOutput | undefined {
+        return blogsDB.find(b => b.id === id)
     },
     /**
      * Обновляем блог по id. findIndex точно найдет блог потому что до этого в service искали блог. Сюда не дошли, если бы не было

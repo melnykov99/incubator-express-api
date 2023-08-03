@@ -19,12 +19,16 @@ export const blogsService = {
         return blogsRepository.createBlog(newBlog)
     },
     getBlogById(id: string): BlogOutput | DB_RESULTS.NOT_FOUND {
-        return blogsRepository.getBlogById(id)
+        const foundBlog: BlogOutput | undefined = blogsRepository.getBlogById(id)
+        if (foundBlog === undefined) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        return foundBlog
     },
     updateBlogById(req: RequestWithParamsAndBody<GetDeleteBlogById, CreateUpdateBlog>) {
         const blogId: string = req.params.id
-        const foundBlog: BlogOutput | DB_RESULTS.NOT_FOUND = blogsRepository.getBlogById(blogId)
-        if (foundBlog === DB_RESULTS.NOT_FOUND) {
+        const foundBlog: BlogOutput | undefined = blogsRepository.getBlogById(blogId)
+        if (foundBlog === undefined) {
             return DB_RESULTS.NOT_FOUND
         }
         const updatedBlog: BlogOutput = {

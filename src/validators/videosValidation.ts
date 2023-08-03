@@ -1,12 +1,7 @@
-import {Response, NextFunction} from 'express';
-import {body, validationResult, ValidationChain, ValidationError, Result, CustomValidator} from 'express-validator';
+import {body, ValidationChain, CustomValidator} from 'express-validator';
 import {videosErrors} from "./errors/videosErrors";
-import {HTTP_STATUSES} from "../common/constants";
-import {RequestWithBody} from "../types/requestGenerics";
-import {CreateUpdateVideo} from "../dto/videos/CreateUodateVideo";
 import {AvailableResolutions} from "../types/videosTypes";
 import {regexDateCheckISO8601} from "../common/regex";
-import {ErrorsMessage} from "../types/errorsTypes";
 
 /**
  *
@@ -23,26 +18,6 @@ const matchAvailableResolutions: CustomValidator = (value: string[]) => {
  */
 const checkISOPublicationDate: CustomValidator = (value: string) => {
     return value.match(regexDateCheckISO8601)
-};
-/**
- * Циклом проходится по ValidationChain и запускает каждую проверку. Если были ошибки при валидации, то запишет их в массив errors.
- * Если errors пуст, то заканчивает валидацию и отдает запрос далее. Если ошибки были, то отдает 400 и выводит msg этих ошибок в объекте errorsMessage
- * @param validations массив значений для проверки из req.body и условия валидации
- * @return если ошибок нет, то отдает запрос дальше. Если ошибки есть, то 400 статус и выводит msg этих ошибок
- */
-export const videosValidator = (validations: ValidationChain[]) => {
-    return async (req: RequestWithBody<CreateUpdateVideo>, res: Response, next: NextFunction) => {
-        for (let validation of validations) {
-            await validation.run(req);
-        }
-
-        const errors: Result<ValidationError> = validationResult(req);
-        if (errors.isEmpty()) {
-            return next();
-        }
-        const outputErrorsMsg: ErrorsMessage[] = errors.array().map((error) => error.msg)
-        res.status(HTTP_STATUSES.BAD_REQUEST_400).send({errorsMessages: outputErrorsMsg});
-    };
 };
 /**
  * Содержит цепочки валидаций для проверки значений из req.body
