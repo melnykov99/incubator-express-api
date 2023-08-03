@@ -27,7 +27,7 @@ blogsRouter.get('/:id', (req: RequestWithParams<GetDeleteBlogById>, res: Respons
     }
     res.status(HTTP_STATUSES.OK_200).send(foundBlog)
 })
-blogsRouter.put('/', basicAuth, validator(blogsValidation), (req: RequestWithParamsAndBody<GetDeleteBlogById, CreateUpdateBlog>, res: Response) => {
+blogsRouter.put('/:id', basicAuth, validator(blogsValidation), (req: RequestWithParamsAndBody<GetDeleteBlogById, CreateUpdateBlog>, res: Response) => {
     const updateResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = blogsService.updateBlogById(req)
     if (updateResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -35,7 +35,7 @@ blogsRouter.put('/', basicAuth, validator(blogsValidation), (req: RequestWithPar
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
-blogsRouter.delete('/', basicAuth, (req: RequestWithParams<GetDeleteBlogById>, res: Response) => {
+blogsRouter.delete('/:id', basicAuth, (req: RequestWithParams<GetDeleteBlogById>, res: Response) => {
     const deleteResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = blogsService.deleteBlogById(req.params.id)
     if (deleteResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
