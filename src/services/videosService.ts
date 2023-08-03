@@ -75,7 +75,7 @@ export const videosService = {
      */
     deleteVideoById(id: string): DB_RESULTS {
         const numberId: number = parseInt(id)
-        const deletionResult: DB_RESULTS = videosRepository.deleteVideoById(numberId)
-        return deletionResult === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : DB_RESULTS.SUCCESSFULLY_COMPLETED
+        const deleteResult: DB_RESULTS = videosRepository.deleteVideoById(numberId)
+        return deleteResult === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }

@@ -38,8 +38,8 @@ videosRouter.put('/:id', videosValidator(videosValidation), (req: RequestWithPar
 })
 
 videosRouter.delete('/:id', (req: RequestWithParams<GetDeleteVideoById>, res: Response) => {
-    const deletionResult: DB_RESULTS = videosService.deleteVideoById(req.params.id as string)
-    if (deletionResult === DB_RESULTS.NOT_FOUND) {
+    const deleteResult: DB_RESULTS = videosService.deleteVideoById(req.params.id as string)
+    if (deleteResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
     }
