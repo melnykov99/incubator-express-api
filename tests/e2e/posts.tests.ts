@@ -5,6 +5,7 @@ import {postsDB} from "../../src/repositories/postsRepository";
 import {BlogOutput} from "../../src/types/blogsTypes";
 import {PostOutput} from "../../src/types/postsTypes";
 
+// Перед каждым тестом создаем новый блог и пост. После каждого теста удаляем все данные.
 let createdBlog: BlogOutput;
 let createdPost: PostOutput;
 
@@ -31,6 +32,7 @@ beforeEach(async () => {
 afterEach(async () => {
     await request(app).delete('/testing/all-data').expect(HTTP_STATUSES.NO_CONTENT_204)
 })
+//start testing
 describe('basic auth check', () => {
     it('should return 401 when requested without headers', async () => {
         await request(app)

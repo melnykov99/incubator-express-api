@@ -1,6 +1,10 @@
 import {body, ValidationChain} from "express-validator";
 import {blogsErrors} from "./errors/blogsErrors";
 
+/**
+ * Содержит цепочки валидаций для проверки значений из req.body
+ * В каждом условии bail() для прерывания цепочки валидации, чтобы не было дублей ошибок при несоблюдении нескольких условий у значения
+ */
 export const blogsValidation: ValidationChain[] = [
     body('name')
         .isString().withMessage(blogsErrors.name).bail()

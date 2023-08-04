@@ -3,11 +3,19 @@ import {postsErrors} from "./errors/postsErrors";
 import {blogsRepository} from "../repositories/blogsRepository";
 import {BlogOutput} from "../types/blogsTypes";
 
+/**
+ * Проверяем существует ли блог в БД с переданным id. Если не существует, то blogsRepository вернет undefined
+ * @param value blogId
+ */
 const checkAvailableBlog = (value: string): boolean => {
     const foundBLog: undefined | BlogOutput = blogsRepository.getBlogById(value)
     return foundBLog !== undefined
 }
 
+/**
+ * Содержит цепочки валидаций для проверки значений из req.body
+ * В каждом условии bail() для прерывания цепочки валидации, чтобы не было дублей ошибок при несоблюдении нескольких условий у значения
+ */
 export const postsValidation: ValidationChain[] = [
     body('title')
         .isString().withMessage(postsErrors.title).bail()
