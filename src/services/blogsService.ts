@@ -22,7 +22,9 @@ export const blogsService = {
             id: Date.now().toString(),
             name: req.body.name,
             description: req.body.description,
-            websiteUrl: req.body.websiteUrl
+            websiteUrl: req.body.websiteUrl,
+            createdAt: (new Date().toISOString()),
+            isMembership: false
         }
         return blogsRepository.createBlog(newBlog)
     },
@@ -54,7 +56,9 @@ export const blogsService = {
             id: foundBlog.id,
             name: req.body.name,
             description: req.body.description,
-            websiteUrl: req.body.websiteUrl
+            websiteUrl: req.body.websiteUrl,
+            createdAt: foundBlog.createdAt,
+            isMembership: foundBlog.isMembership
         }
         return blogsRepository.updateBlogById(updatedBlog)
     },

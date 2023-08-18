@@ -29,7 +29,8 @@ export const postsService = {
             shortDescription: req.body.shortDescription,
             content: req.body.content,
             blogId: req.body.blogId,
-            blogName: foundBlog!.name
+            blogName: foundBlog!.name,
+            createdAt: (new Date().toISOString()),
         }
         postsRepository.createPost(newPost)
         return newPost
@@ -62,7 +63,8 @@ export const postsService = {
             shortDescription: req.body.shortDescription,
             content: req.body.content,
             blogId: req.body.blogId,
-            blogName: foundBlog!.name
+            blogName: foundBlog!.name,
+            createdAt: foundPost.createdAt
         }
         postsRepository.updatePostById(updatedPost)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
