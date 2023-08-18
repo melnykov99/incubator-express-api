@@ -9,17 +9,17 @@ export const videosService = {
     /**
      * Обращаемся к videosRepository, чтобы достать все видео из БД
      */
-    getAllVideos(): VideoOutput[] {
-        return videosRepository.getAllVideos()
+    async getAllVideos(): Promise<VideoOutput[]> {
+        return await videosRepository.getAllVideos()
     },
     /**
      * Преобразуем id из строки в число и обращаемся к videosRepository
      * @param id строчный id видео из параметров запроса
      * @return возвращаем константу NOT_FOUND, если видео по id не было найдено. Если найдено - возвращаем это видео
      */
-    getVideoById(id: string): VideoOutput | DB_RESULTS.NOT_FOUND {
+    async getVideoById(id: string): Promise<VideoOutput | DB_RESULTS.NOT_FOUND> {
         const numberId: number = parseInt(id)
-        const video: VideoOutput | DB_RESULTS.NOT_FOUND = videosRepository.getVideoById(numberId)
+        const video: VideoOutput | DB_RESULTS.NOT_FOUND = await videosRepository.getVideoById(numberId)
         return video === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : video
     },
     /**
@@ -27,7 +27,7 @@ export const videosService = {
      * @param req запрос в теле которого значения для создания видео
      * @return возвращаем новое видео
      */
-    createVideo(req: RequestWithBody<CreateUpdateVideo>): VideoOutput {
+    async createVideo(req: RequestWithBody<CreateUpdateVideo>): Promise<VideoOutput> {
         const newVideo: VideoOutput = {
             id: Date.now(),
             title: req.body.title,
@@ -38,7 +38,7 @@ export const videosService = {
             publicationDate: req.body.publicationDate ?? (new Date(new Date().setDate(new Date().getDate() + 1))).toISOString(),
             availableResolutions: req.body.availableResolutions ?? [AvailableResolutions.P144, AvailableResolutions.P240, AvailableResolutions.P360, AvailableResolutions.P480, AvailableResolutions.P720, AvailableResolutions.P1080, AvailableResolutions.P1440, AvailableResolutions.P2160]
         }
-        videosRepository.createVideo(newVideo)
+        await videosRepository.createVideo(newVideo)
         return newVideo
     },
     /**
@@ -49,9 +49,9 @@ export const videosService = {
      * @param req в запросе id в параметрах и значения для обновления в body
      * @return возвращаем константу NOT_FOUND, если видео не найдено или константу SUCCESSFULLY_COMPLETED, если видео нашли и обновили
      */
-    updateVideo(req: RequestWithParamsAndBody<GetDeleteVideoById, CreateUpdateVideo>): DB_RESULTS {
+    async updateVideo(req: RequestWithParamsAndBody<GetDeleteVideoById, CreateUpdateVideo>): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         const numberId: number = parseInt(req.params.id)
-        const foundVideo: VideoOutput | DB_RESULTS.NOT_FOUND = videosRepository.getVideoById(numberId)
+        const foundVideo: VideoOutput | DB_RESULTS.NOT_FOUND = await videosRepository.getVideoById(numberId)
         if (foundVideo === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
@@ -65,7 +65,7 @@ export const videosService = {
             publicationDate: req.body.publicationDate ?? foundVideo.publicationDate,
             availableResolutions: req.body.availableResolutions ?? foundVideo.availableResolutions
         }
-        videosRepository.updateVideo(updatedVideo, numberId)
+        await videosRepository.updateVideo(updatedVideo, numberId)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
@@ -73,9 +73,9 @@ export const videosService = {
      * @param id строчный id видео из параметров запроса
      * @return возвращаем константу NOT_FOUND, если видео по id не было найдено. Иначе константу об успешном выполнении удаления
      */
-    deleteVideoById(id: string): DB_RESULTS {
+    async deleteVideoById(id: string): Promise<DB_RESULTS> {
         const numberId: number = parseInt(id)
-        const deleteResult: DB_RESULTS = videosRepository.deleteVideoById(numberId)
+        const deleteResult: DB_RESULTS = await videosRepository.deleteVideoById(numberId)
         return deleteResult === DB_RESULTS.NOT_FOUND ? DB_RESULTS.NOT_FOUND : DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }
