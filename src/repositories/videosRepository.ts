@@ -12,10 +12,10 @@ export const videosRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Отдаем все видео из БД
+     * Отдаем все видео из БД. Отдаем без монговского _id
      */
     async getAllVideos(): Promise<VideoOutput[]> {
-        return await db.videosCollection.find({}).toArray()
+        return await db.videosCollection.find({}, {projection: {_id: 0}}).toArray();
     },
     /**
      * Ищем видео в базе по id
@@ -23,7 +23,7 @@ export const videosRepository = {
      * @return если видео по id не нашли в базе, то возвращаем константу NOT_FOUND. Иначе возвращаем найденное видео
      */
     async getVideoById(id: number): Promise<DB_RESULTS.NOT_FOUND | VideoOutput> {
-        const foundVideo: VideoOutput | null = await db.videosCollection.findOne({id})
+        const foundVideo: VideoOutput | null = await db.videosCollection.findOne({id}, {projection: {_id: 0}})
         if (foundVideo === null) {
             return DB_RESULTS.NOT_FOUND
         }
@@ -40,14 +40,15 @@ export const videosRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Принимаем новый объект и id. По id нахдим видео и заменяем его на присланный объект. Видео всегда найдем потому что искали ранее в сервисе по id.
+     * Принимаем новый объект и id. По id находим видео и заменяем его на присланный объект. Видео всегда найдем потому что искали ранее в сервисе по id.
      * Не дошли бы сюда, если бы видео не было
      * @param updatedVideo обновленный объект видео
      * @param id числовой id видео, который нужно обновить
      * @return возвращаем константу об успешном выполнении
      */
     async updateVideo(updatedVideo: VideoOutput, id: number): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
-        await db.videosCollection.updateOne({id}, updatedVideo)
+        const updateResult = await db.videosCollection.updateOne({id}, {$set: updatedVideo})
+        console.log(updateResult)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**

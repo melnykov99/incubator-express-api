@@ -4,6 +4,8 @@ import {HTTP_STATUSES} from "../../src/common/constants";
 import {blogsDB} from "../../src/repositories/blogsRepository";
 import {BlogOutput} from "../../src/types/blogsTypes";
 
+//TODO: переписать тесты под монгу
+
 //Перед каждым тестом создаем новый блог. После каждого теста удаляем все данные.
 let createdBlog: BlogOutput;
 beforeEach(async () => {

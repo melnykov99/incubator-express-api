@@ -5,6 +5,8 @@ import {postsDB} from "../../src/repositories/postsRepository";
 import {BlogOutput} from "../../src/types/blogsTypes";
 import {PostOutput} from "../../src/types/postsTypes";
 
+//TODO: переписать тесты под монгу
+
 // Перед каждым тестом создаем новый блог и пост. После каждого теста удаляем все данные.
 let createdBlog: BlogOutput;
 let createdPost: PostOutput;

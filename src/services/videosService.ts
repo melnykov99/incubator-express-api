@@ -38,7 +38,11 @@ export const videosService = {
             publicationDate: req.body.publicationDate ?? (new Date(new Date().setDate(new Date().getDate() + 1))).toISOString(),
             availableResolutions: req.body.availableResolutions ?? [AvailableResolutions.P144, AvailableResolutions.P240, AvailableResolutions.P360, AvailableResolutions.P480, AvailableResolutions.P720, AvailableResolutions.P1080, AvailableResolutions.P1440, AvailableResolutions.P2160]
         }
-        await videosRepository.createVideo(newVideo)
+        //здесь создаем новую константу newVideoForDB и прокидываем в нее значения из newVideo.
+        //иначе MongoDB добавляет в newVideo ключ _id при выполнении функции createVideo и мы возвращаем неправильные данные
+        const newVideoForDB = {...newVideo}
+        //здесь mongoDB под капотом добавляет передаваемому объекту ключ _id
+        await videosRepository.createVideo(newVideoForDB)
         return newVideo
     },
     /**

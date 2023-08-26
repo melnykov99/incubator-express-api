@@ -5,6 +5,8 @@ import {VideoOutput} from "../../src/types/videosTypes";
 import {videosErrors} from "../../src/validators/errors/videosErrors";
 import {regexDateCheckISO8601} from "../../src/common/regex";
 
+const videosDB: any[] = []
+
 //TODO: переписать тесты под монгу
 
 let createdVideo: VideoOutput;
