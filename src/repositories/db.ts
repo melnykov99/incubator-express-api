@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 
 dotenv.config()
 
-//Значение mongoURL должно определяться в переменной process.env.MONGODB, если его нет, то передаем строку-заглушку с которой подключения не произойдет
+//Значение mongoURL должно определяться в переменной process.env.MONGODB, если его нет, то передаем строку-заглушку с которой подключения не произойдет.
 const mongoURL: string = process.env.MONGOURL || 'mongodb+srv://<username>:<password>@<clusterName>.mongodb.net/?retryWrites=true&w=majority"'
 const client: MongoClient = new MongoClient(mongoURL);
 
