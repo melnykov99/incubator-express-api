@@ -9,15 +9,15 @@ export const blogsService = {
     /**
      * обращаемся к blogsRepository, чтобы достать все блоги из БД
      */
-    getAllBlogs(): BlogOutput[] {
-        return blogsRepository.getAllBlogs()
+    async getAllBlogs(): Promise<BlogOutput[]> {
+        return await blogsRepository.getAllBlogs()
     },
     /**
      * Принимаем весь запрос и из его body достаем инфу для нового объекта blog. Созданный объект передаем в blogsRepository для создания
      * Возвращаем созданный блог
      * @param req запрос в теле которого значения для создания блога
      */
-    createBlog(req: RequestWithBody<CreateUpdateBlog>): BlogOutput {
+    async createBlog(req: RequestWithBody<CreateUpdateBlog>): Promise<BlogOutput> {
         const newBlog: BlogOutput = {
             id: Date.now().toString(),
             name: req.body.name,
@@ -26,16 +26,21 @@ export const blogsService = {
             createdAt: (new Date().toISOString()),
             isMembership: false
         }
-        return blogsRepository.createBlog(newBlog)
+        //здесь создаем новую константу newBlogForDB и прокидываем в нее значения из newBlog.
+        //иначе MongoDB добавляет в newBlog ключ _id при выполнении функции createBlog и мы возвращаем неправильные данные
+        const newBlogForDB: BlogOutput = {...newBlog}
+        //здесь mongoDB под капотом добавляет передаваемому объекту ключ _id
+        await blogsRepository.createBlog(newBlogForDB)
+        return newBlog
     },
     /**
-     * Передаем в blogsRepository id блога для поиска. Если от БД приходит undefined, то возвращаем константу, что сущность не найдена
+     * Передаем в blogsRepository id блога для поиска. Если от БД приходит null, то возвращаем константу, что сущность не найдена
      * Если блог нашли по id, то возаращем его
      * @param id id блога
      */
-    getBlogById(id: string): BlogOutput | DB_RESULTS.NOT_FOUND {
-        const foundBlog: BlogOutput | undefined = blogsRepository.getBlogById(id)
-        if (foundBlog === undefined) {
+    async getBlogById(id: string): Promise<BlogOutput | DB_RESULTS.NOT_FOUND> {
+        const foundBlog: BlogOutput | null = await blogsRepository.getBlogById(id)
+        if (foundBlog === null) {
             return DB_RESULTS.NOT_FOUND
         }
         return foundBlog
@@ -46,10 +51,10 @@ export const blogsService = {
      * Если блог есть, то создаем новый объект с его id + значениями из запроса и передаем это в blogsRepository для обновления
      * @param req запрос в теле которого значения для обновления блога
      */
-    updateBlogById(req: RequestWithParamsAndBody<GetDeleteBlogById, CreateUpdateBlog>): DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED {
+    async updateBlogById(req: RequestWithParamsAndBody<GetDeleteBlogById, CreateUpdateBlog>): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         const blogId: string = req.params.id
-        const foundBlog: BlogOutput | undefined = blogsRepository.getBlogById(blogId)
-        if (foundBlog === undefined) {
+        const foundBlog: BlogOutput | null = await blogsRepository.getBlogById(blogId)
+        if (foundBlog === null) {
             return DB_RESULTS.NOT_FOUND
         }
         const updatedBlog: BlogOutput = {
@@ -60,7 +65,7 @@ export const blogsService = {
             createdAt: foundBlog.createdAt,
             isMembership: foundBlog.isMembership
         }
-        return blogsRepository.updateBlogById(updatedBlog)
+        return await blogsRepository.updateBlogById(blogId, updatedBlog)
     },
     /**
      * Передаем id блога в blogsRepository для поиска и удаления, если есть.
@@ -68,7 +73,7 @@ export const blogsService = {
      * Если блог есть, то удалим его в репозитории и вернется DB_RESULTS.SUCCESSFULLY_COMPLETED
      * @param id id блога
      */
-    deleteBlogById(id: string): DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED {
-        return blogsRepository.deleteBlogById(id)
+    async deleteBlogById(id: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        return await blogsRepository.deleteBlogById(id)
     }
 }

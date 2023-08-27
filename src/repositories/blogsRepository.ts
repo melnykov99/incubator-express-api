@@ -1,58 +1,56 @@
 import {BlogOutput} from "../types/blogsTypes";
 import {DB_RESULTS} from "../common/constants";
-
-//Пока нет базы данных объявляем массив с блогами
-export let blogsDB: BlogOutput[] = []
+import {db} from "./db";
+import {DeleteResult} from "mongodb";
 
 export const blogsRepository = {
     /**
-     * Делаем массив пустым, удаляя все данные
+     * Обращаемся к коллеакции блогов в БД и удаляем все данные
      */
-    deleteAllBlogs(): DB_RESULTS.SUCCESSFULLY_COMPLETED {
-        blogsDB = []
+    async deleteAllBlogs(): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        await db.blogsCollection.deleteMany({})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Отдаем весь массив с блогами
+     * Отдаем все блоги из БД. Отдаем без монговского _id
      */
-    getAllBlogs(): BlogOutput[] {
-        return blogsDB
+    async getAllBlogs(): Promise<BlogOutput[]> {
+        return await db.blogsCollection.find({}, {projection: {_id: 0}}).toArray()
     },
     /**
-     * Добавляем объект блога в массив
+     * Добавляем объект блога в БД
      * @param newBlog объект блога, который сформировали в blogsService из присланных данных в запросе
      */
-    createBlog(newBlog: BlogOutput): BlogOutput {
-        blogsDB.push(newBlog)
-        return newBlog
-    },
-    /**
-     * Находим блог по id и возвращаем его или undefined
-     * @param id id блога
-     */
-    getBlogById(id: string): BlogOutput | undefined {
-        return blogsDB.find(b => b.id === id)
-    },
-    /**
-     * Обновляем блог по id. findIndex точно найдет блог потому что до этого в service искали блог. Сюда не дошли, если бы не было
-     * @param updatedBlog объект блога с обновленными значениями, его нужно занести в БД вместо текущего блога
-     */
-    updateBlogById(updatedBlog: BlogOutput): DB_RESULTS.SUCCESSFULLY_COMPLETED {
-        const blogIndex: number = blogsDB.findIndex(b => b.id === updatedBlog.id)
-        blogsDB[blogIndex] = updatedBlog
+    async createBlog(newBlog: BlogOutput): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        await db.blogsCollection.insertOne(newBlog)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Ищем индекс блога, который совпадает по id. Если не находим, то возвращаем DB_RESULTS.NOT_FOUND
-     * Если блог есть, то по индексу удаляем его из массива
+     * Находим блог по id и возвращаем его или null
      * @param id id блога
      */
-    deleteBlogById(id: string): DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED {
-        const blogIndex: number = blogsDB.findIndex(b => b.id === id)
-        if(blogIndex === -1) {
+    async getBlogById(id: string): Promise<BlogOutput | null> {
+        return await db.blogsCollection.findOne({id})
+    },
+    /**
+     * Обновляем блог по id. Блон точно будет найден потому что до этого в service искали блог. Сюда не дошли, если бы не было
+     * Поэтому возвращаем всегда константу об успешном выполнении
+     * @param id id блога
+     * @param updatedBlog объект блога с обновленными значениями, его нужно занести в БД вместо текущего блога
+     */
+    async updateBlogById(id: string, updatedBlog: BlogOutput): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        await db.blogsCollection.updateOne({id}, updatedBlog)
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    /**
+     * Удаляем блог по id. Если блога нет, то в deletedCount будте 0. В таком случае вернем NOT_FOUND
+     * @param id id блога
+     */
+    async deleteBlogById(id: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        const deleteResult: DeleteResult = await db.blogsCollection.deleteOne({id})
+        if (deleteResult.deletedCount === 0) {
             return DB_RESULTS.NOT_FOUND
         }
-        blogsDB.splice(blogIndex, 1)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }
