@@ -9,7 +9,9 @@ import {BlogOutput} from "../types/blogsTypes";
  */
 const checkAvailableBlog = async (value: string): Promise<boolean> => {
     const foundBLog: null | BlogOutput = await blogsRepository.getBlogById(value)
-    return foundBLog !== null
+    console.log(foundBLog)
+    console.log(foundBLog !== null)
+    return (foundBLog !== null)
 }
 
 /**
@@ -31,5 +33,11 @@ export const postsValidation: ValidationChain[] = [
         .isLength({min: 1, max: 1000}).withMessage(postsErrors.content),
     body('blogId')
         .isString().withMessage(postsErrors.blogId).bail()
-        .custom(checkAvailableBlog).withMessage(postsErrors.blogIdNotFound)
+        .custom(async (value) => {
+            const isBlogAvailable: boolean = await checkAvailableBlog(value);
+            if (!isBlogAvailable) {
+                return Promise.reject(postsErrors.blogIdNotFound);
+            }
+        })
+
 ]

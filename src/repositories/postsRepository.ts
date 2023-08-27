@@ -40,7 +40,7 @@ export const postsRepository = {
      * @param updatedPost объект поста с обновленными значениями, его нужно занести в БД вместо текущего поста
      */
     async updatePostById(id: string, updatedPost: PostOutput): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
-        await db.postsCollection.updateOne({id}, updatedPost)
+        await db.postsCollection.updateOne({id}, {$set: updatedPost})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**

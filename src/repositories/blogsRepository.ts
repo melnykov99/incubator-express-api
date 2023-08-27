@@ -39,7 +39,7 @@ export const blogsRepository = {
      * @param updatedBlog объект блога с обновленными значениями, его нужно занести в БД вместо текущего блога
      */
     async updateBlogById(id: string, updatedBlog: BlogOutput): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
-        await db.blogsCollection.updateOne({id}, updatedBlog)
+        await db.blogsCollection.updateOne({id}, {$set: updatedBlog})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
