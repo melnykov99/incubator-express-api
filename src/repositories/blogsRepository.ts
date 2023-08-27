@@ -30,7 +30,7 @@ export const blogsRepository = {
      * @param id id блога
      */
     async getBlogById(id: string): Promise<BlogOutput | null> {
-        return await db.blogsCollection.findOne({id})
+        return await db.blogsCollection.findOne({id}, {projection: {_id: 0}})
     },
     /**
      * Обновляем блог по id. Блон точно будет найден потому что до этого в service искали блог. Сюда не дошли, если бы не было

@@ -31,7 +31,7 @@ export const postsRepository = {
      * @param id id поста
      */
     async getPostById(id: string): Promise<PostOutput | null> {
-        return await db.postsCollection.findOne({id})
+        return await db.postsCollection.findOne({id}, {projection: {_id: 0}})
     },
     /**
      * Обновляем пост по id. Пост точно будет найден потому что до этого в service искали его. Сюда не дошли, если бы не было
