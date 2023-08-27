@@ -4,12 +4,12 @@ import {blogsRepository} from "../repositories/blogsRepository";
 import {BlogOutput} from "../types/blogsTypes";
 
 /**
- * Проверяем существует ли блог в БД с переданным id. Если не существует, то blogsRepository вернет undefined
+ * Проверяем существует ли блог в БД с переданным id. Если не существует, то blogsRepository вернет null
  * @param value blogId
  */
-const checkAvailableBlog = (value: string): boolean => {
-    const foundBLog: undefined | BlogOutput = blogsRepository.getBlogById(value)
-    return foundBLog !== undefined
+const checkAvailableBlog = async (value: string): Promise<boolean> => {
+    const foundBLog: null | BlogOutput = await blogsRepository.getBlogById(value)
+    return foundBLog !== null
 }
 
 /**

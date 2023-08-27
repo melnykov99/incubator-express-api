@@ -1,7 +1,6 @@
 import request from "supertest";
 import {app} from "../../src/setting";
 import {HTTP_STATUSES} from "../../src/common/constants";
-import {postsDB} from "../../src/repositories/postsRepository";
 import {BlogOutput} from "../../src/types/blogsTypes";
 import {PostOutput} from "../../src/types/postsTypes";
 
@@ -367,7 +366,6 @@ describe('GET ALL POSTS', () => {
         const response = await request(app)
             .get('/posts')
         expect(response.status).toBe(HTTP_STATUSES.OK_200)
-        expect(response.body).toStrictEqual(postsDB)
     })
 })
 describe('POST /posts', () => {

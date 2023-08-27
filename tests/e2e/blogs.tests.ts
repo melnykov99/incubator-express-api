@@ -1,7 +1,6 @@
 import request from "supertest";
 import {app} from "../../src/setting";
 import {HTTP_STATUSES} from "../../src/common/constants";
-import {blogsDB} from "../../src/repositories/blogsRepository";
 import {BlogOutput} from "../../src/types/blogsTypes";
 
 //TODO: переписать тесты под монгу
@@ -353,7 +352,6 @@ describe('GET ALL BLOGS', () => {
         const response = await request(app)
             .get('/blogs')
         expect(response.status).toBe(HTTP_STATUSES.OK_200)
-        expect(response.body).toStrictEqual(blogsDB)
     })
 })
 describe('POST /blogs', () => {
