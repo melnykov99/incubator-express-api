@@ -1,4 +1,3 @@
-// Пока нет базы данных объявляем массив с постами
 import {PostOutput} from "../types/postsTypes";
 import {DB_RESULTS} from "../common/constants";
 import {db} from "./db";
@@ -19,8 +18,8 @@ export const postsRepository = {
         return await db.postsCollection.find({}, {projection: {_id: 0}}).toArray()
     },
     /**
-     * Добавляем объект поста в массив
-     * @param newPost объект поста, который сформировали в postsService из присланных данных в запросе
+     * Добавляем объект поста в БД
+     * @param newPost объект поста, который сформировали из присланных данных в запросе
      */
     async createPost(newPost: PostOutput): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.postsCollection.insertOne(newPost)
@@ -53,5 +52,13 @@ export const postsRepository = {
             return DB_RESULTS.NOT_FOUND
         }
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    /**
+     * Ищем посты которые привязаны к конкретному блогу
+     * Если такого блога нет или у блога нет постов, то отдадим пустой массив
+     * @param blogId id блога к которому привязаны посты
+     */
+    async getPostsByBlogId(blogId: string): Promise<PostOutput[]> {
+        return await db.postsCollection.find({blogId}).toArray()
     }
 }

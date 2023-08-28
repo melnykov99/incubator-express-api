@@ -8,6 +8,9 @@ import {GetDeleteBlogById} from "../dto/blogs/GetDeleteBlogById";
 import {validator} from "../validators/validator";
 import {blogsValidation} from "../validators/blogsValidation";
 import {basicAuth} from "../middlewares/basicAuth";
+import {PostOutput} from "../types/postsTypes";
+import {createPostByBlogIdValidation} from "../validators/postsValidation";
+import {CreatePostByBlogId} from "../dto/posts/CreatePostByBlogId";
 
 export const blogsRouter = Router()
 
@@ -42,4 +45,20 @@ blogsRouter.delete('/:id', basicAuth, async (req: RequestWithParams<GetDeleteBlo
         return
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+})
+blogsRouter.get('/:id/posts', async (req: RequestWithParams<GetDeleteBlogById>, res: Response) => {
+    const foundPosts: DB_RESULTS.NOT_FOUND | PostOutput[] = await blogsService.getPostsByBlogId(req.params.id)
+    if (foundPosts === DB_RESULTS.NOT_FOUND) {
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        return
+    }
+    res.status(HTTP_STATUSES.OK_200).send(foundPosts)
+})
+blogsRouter.post('/:id/posts', basicAuth, validator(createPostByBlogIdValidation), async (req: RequestWithParamsAndBody<GetDeleteBlogById, CreatePostByBlogId>, res: Response) => {
+    const newPost: DB_RESULTS.NOT_FOUND | PostOutput = await blogsService.createPostByBlogId(req)
+    if (newPost === DB_RESULTS.NOT_FOUND) {
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        return
+    }
+    res.status(HTTP_STATUSES.CREATED_201).send()
 })

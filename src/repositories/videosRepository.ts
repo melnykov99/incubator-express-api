@@ -47,8 +47,7 @@ export const videosRepository = {
      * @return возвращаем константу об успешном выполнении
      */
     async updateVideo(updatedVideo: VideoOutput, id: number): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
-        const updateResult = await db.videosCollection.updateOne({id}, {$set: updatedVideo})
-        console.log(updateResult)
+        await db.videosCollection.updateOne({id}, {$set: updatedVideo})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**

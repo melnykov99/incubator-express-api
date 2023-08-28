@@ -6,6 +6,7 @@ import {ErrorsMessage} from "../types/errorsTypes";
 import {HTTP_STATUSES} from "../common/constants";
 import {CreateUpdateBlog} from "../dto/blogs/CreateUpdateBlog";
 import {CreateUpdatePost} from "../dto/posts/CreateUpdatePost";
+import {CreatePostByBlogId} from "../dto/posts/CreatePostByBlogId";
 
 /**
  * Циклом проходится по ValidationChain и запускает каждую проверку. Если были ошибки при валидации, то запишет их в массив errors.
@@ -14,7 +15,7 @@ import {CreateUpdatePost} from "../dto/posts/CreateUpdatePost";
  * @return если ошибок нет, то отдает запрос дальше. Если ошибки есть, то 400 статус и выводит msg этих ошибок
  */
 export const validator = (validations: ValidationChain[]) => {
-    return async (req: RequestWithBody<CreateUpdateVideo> | RequestWithBody<CreateUpdateBlog> | RequestWithBody<CreateUpdatePost>, res: Response, next: NextFunction) => {
+    return async (req: RequestWithBody<CreateUpdateVideo | CreateUpdateBlog | CreateUpdatePost | CreatePostByBlogId>, res: Response, next: NextFunction) => {
         for (let validation of validations) {
             await validation.run(req);
         }
