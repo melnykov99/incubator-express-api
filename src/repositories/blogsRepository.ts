@@ -1,7 +1,11 @@
-import {BlogOutput} from "../types/blogsTypes";
+import {BlogOutput, BlogViewModel} from "../types/blogsTypes";
 import {DB_RESULTS} from "../common/constants";
 import {db} from "./db";
 import {DeleteResult} from "mongodb";
+import {RequestWithQuery} from "../types/requestGenerics";
+import {GetBlogsWithQuery} from "../dto/blogs/GetBlogsWithQuery";
+import {pagination} from "../common/pagination";
+import {PaginationValues} from "../types/commonTypes";
 
 export const blogsRepository = {
     /**
@@ -12,10 +16,21 @@ export const blogsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Отдаем все блоги из БД. Отдаем без монговского _id
+     * Обращаемся к функции пагинации, передавая query параметры из запроса и название коллекции
+     * Функция возвращает paginationValues к которым обращаемся для формирования объекта, который будем возвращать
+     * Возвращаем информацию о страницах и в объекте items возвращаем массив с блогами
+     * Блоги из БД отдаем без монговского _id
+     * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
      */
-    async getAllBlogs(): Promise<BlogOutput[]> {
-        return await db.blogsCollection.find({}, {projection: {_id: 0}}).toArray()
+    async getAllBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
+        const paginationValues: PaginationValues = await pagination(req.query.pageNumber, req.query.pageSize, 'blogsCollection')
+        return {
+            pagesCount: paginationValues.pagesCount,
+            page: paginationValues.pageNumber,
+            pageSize: paginationValues.pageSize,
+            totalCount: paginationValues.totalCount,
+            items: await db.blogsCollection.find({}, {projection: {_id: 0}}).skip(paginationValues.skip).limit(paginationValues.limit).toArray()
+        }
     },
     /**
      * Добавляем объект блога в БД

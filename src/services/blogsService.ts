@@ -1,19 +1,27 @@
 import {blogsRepository} from "../repositories/blogsRepository";
-import {BlogOutput} from "../types/blogsTypes";
+import {BlogOutput, BlogViewModel} from "../types/blogsTypes";
 import {DB_RESULTS} from "../common/constants";
-import {RequestWithBody, RequestWithParamsAndBody} from "../types/requestGenerics";
+import {
+    RequestWithBody,
+    RequestWithParamsAndBody,
+    RequestWithParamsAndQuery,
+    RequestWithQuery
+} from "../types/requestGenerics";
 import {CreateUpdateBlog} from "../dto/blogs/CreateUpdateBlog";
 import {GetDeleteBlogById} from "../dto/blogs/GetDeleteBlogById";
-import {PostOutput} from "../types/postsTypes";
+import {PostOutput, PostViewModel} from "../types/postsTypes";
 import {postsRepository} from "../repositories/postsRepository";
 import {CreatePostByBlogId} from "../dto/posts/CreatePostByBlogId";
+import {GetBlogsWithQuery} from "../dto/blogs/GetBlogsWithQuery";
+import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 
 export const blogsService = {
     /**
-     * обращаемся к blogsRepository, чтобы достать все блоги из БД
+     * обращаемся к blogsRepository, чтобы достать все блоги из БД. Передаем весь запрос
+     * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
      */
-    async getAllBlogs(): Promise<BlogOutput[]> {
-        return await blogsRepository.getAllBlogs()
+    async getAllBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
+        return await blogsRepository.getAllBlogs(req)
     },
     /**
      * Принимаем весь запрос и из его body достаем инфу для нового объекта blog. Созданный объект передаем в blogsRepository для создания
@@ -82,11 +90,11 @@ export const blogsService = {
     /**
      * Ищем посты которые привязаны к конкретному блогу.
      * Обращаемся к postsRepository для этого. Если блога нет или постов у этого блога нет, то придет пустой массив
-     * @param blogId id блога к которому привязаны посты
+     * @param req запрос в котором id блога в params и параметры пагинации в query
      */
-    async getPostsByBlogId(blogId: string): Promise<DB_RESULTS.NOT_FOUND | PostOutput[]> {
-        const foundPosts: PostOutput[] = await postsRepository.getPostsByBlogId(blogId)
-        if (!foundPosts.length) {
+    async getPostsByBlogId(req: RequestWithParamsAndQuery<GetDeleteBlogById, GetPostsWithQuery>): Promise<DB_RESULTS.NOT_FOUND | PostViewModel> {
+        const foundPosts: PostViewModel = await postsRepository.getPostsByBlogId(req)
+        if (!foundPosts.items.length) {
             return DB_RESULTS.NOT_FOUND
         }
         return foundPosts

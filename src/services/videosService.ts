@@ -1,16 +1,18 @@
 import {videosRepository} from "../repositories/videosRepository";
-import {AvailableResolutions, VideoOutput} from "../types/videosTypes";
+import {AvailableResolutions, VideoOutput, VideoViewModel} from "../types/videosTypes";
 import {DB_RESULTS} from "../common/constants";
-import {RequestWithBody, RequestWithParamsAndBody} from "../types/requestGenerics";
-import {CreateUpdateVideo} from "../dto/videos/CreateUodateVideo";
+import {RequestWithBody, RequestWithParamsAndBody, RequestWithQuery} from "../types/requestGenerics";
+import {CreateUpdateVideo} from "../dto/videos/CreateUpdateVideo";
 import {GetDeleteVideoById} from "../dto/videos/GetDeleteVideoById";
+import {GetVideosWithQuery} from "../dto/videos/GetVideosWithQuery";
 
 export const videosService = {
     /**
-     * Обращаемся к videosRepository, чтобы достать все видео из БД
+     * Обращаемся к videosRepository, чтобы достать все видео из БД. Отдаем весь запрос
+     * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
      */
-    async getAllVideos(): Promise<VideoOutput[]> {
-        return await videosRepository.getAllVideos()
+    async getAllVideos(req: RequestWithQuery<GetVideosWithQuery>): Promise<VideoViewModel> {
+        return await videosRepository.getAllVideos(req)
     },
     /**
      * Преобразуем id из строки в число и обращаемся к videosRepository

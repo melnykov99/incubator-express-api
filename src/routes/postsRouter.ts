@@ -1,18 +1,19 @@
-import {Request, Response, Router} from "express";
+import {Response, Router} from "express";
 import {postsService} from "../services/postsService";
-import {PostOutput} from "../types/postsTypes";
+import {PostOutput, PostViewModel} from "../types/postsTypes";
 import {DB_RESULTS, HTTP_STATUSES} from "../common/constants";
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/requestGenerics";
+import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody, RequestWithQuery} from "../types/requestGenerics";
 import {CreateUpdatePost} from "../dto/posts/CreateUpdatePost";
 import {GetDeletePostById} from "../dto/posts/GetDeletePostById";
 import {validator} from "../validators/validator";
 import {postsValidation} from "../validators/postsValidation";
 import {basicAuth} from "../middlewares/basicAuth";
+import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 
 export const postsRouter = Router()
 
-postsRouter.get('/', async (req: Request, res: Response) => {
-    const posts: PostOutput[] = await postsService.getAllPosts()
+postsRouter.get('/', async (req: RequestWithQuery<GetPostsWithQuery>, res: Response) => {
+    const posts: PostViewModel = await postsService.getAllPosts(req)
     res.status(HTTP_STATUSES.OK_200).send(posts)
 })
 postsRouter.post('/', basicAuth, validator(postsValidation), async (req: RequestWithBody<CreateUpdatePost>, res: Response) => {

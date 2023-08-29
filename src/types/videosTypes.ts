@@ -9,6 +9,14 @@ export type VideoOutput = {
     availableResolutions: AvailableResolutions[]
 }
 
+export type VideoViewModel = {
+    pagesCount: number,
+    page: number,
+    pageSize: number,
+    totalCount: number,
+    items: VideoOutput[]
+}
+
 export enum AvailableResolutions {
     P144 = "P144",
     P240 = "P240",

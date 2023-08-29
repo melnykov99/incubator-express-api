@@ -1,7 +1,12 @@
-import {PostOutput} from "../types/postsTypes";
+import {PostOutput, PostViewModel} from "../types/postsTypes";
 import {DB_RESULTS} from "../common/constants";
 import {db} from "./db";
 import {DeleteResult} from "mongodb";
+import {RequestWithParamsAndQuery, RequestWithQuery} from "../types/requestGenerics";
+import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
+import {PaginationValues} from "../types/commonTypes";
+import {pagination} from "../common/pagination";
+import {GetDeleteBlogById} from "../dto/blogs/GetDeleteBlogById";
 
 export const postsRepository = {
     /**
@@ -12,10 +17,21 @@ export const postsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Отдаем все посты из БД. Отдаем без монговского _id
+     * Обращаемся к функции пагинации, передавая query параметры из запроса и название коллекции
+     * Функция возвращает paginationValues к которым обращаемся для формирования объекта, который будем возвращать
+     * Возвращаем информацию о страницах и в объекте items возвращаем массив с постами
+     * Посты из БД отдаем без монговского _id
+     * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
      */
-    async getAllPosts(): Promise<PostOutput[]> {
-        return await db.postsCollection.find({}, {projection: {_id: 0}}).toArray()
+    async getAllPosts(req: RequestWithQuery<GetPostsWithQuery>): Promise<PostViewModel> {
+        const paginationValues: PaginationValues = await pagination(req.query.pageNumber, req.query.pageSize, 'postsCollection')
+        return {
+            pagesCount: paginationValues.pagesCount,
+            page: paginationValues.pageNumber,
+            pageSize: paginationValues.pageSize,
+            totalCount: paginationValues.totalCount,
+            items: await db.postsCollection.find({}, {projection: {_id: 0}}).skip(paginationValues.skip).limit(paginationValues.limit).toArray()
+        }
     },
     /**
      * Добавляем объект поста в БД
@@ -54,11 +70,22 @@ export const postsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Ищем посты которые привязаны к конкретному блогу
-     * Если такого блога нет или у блога нет постов, то отдадим пустой массив
-     * @param blogId id блога к которому привязаны посты
+     * Обращаемся к функции пагинации, передавая query параметры из запроса и название коллекции
+     * Функция возвращает paginationValues к которым обращаемся для формирования объекта, который будем возвращать
+     * Возвращаем информацию о страницах и в объекте items возвращаем массив с постами
+     * Посты из БД отдаем без монговского _id
+     * Ищем посты которые привязаны к конкретному блогу. Если такого блога нет или у блога нет постов, то в items будет пустой массив
+     * @param req запрос в котором id блога в params и параметры пагинации в query
      */
-    async getPostsByBlogId(blogId: string): Promise<PostOutput[]> {
-        return await db.postsCollection.find({blogId}).toArray()
+    async getPostsByBlogId(req: RequestWithParamsAndQuery<GetDeleteBlogById, GetPostsWithQuery>): Promise<PostViewModel> {
+        const blogId: string = req.params.id
+        const paginationValues: PaginationValues = await pagination(req.query.pageNumber, req.query.pageSize, 'postsCollection')
+        return {
+            pagesCount: paginationValues.pagesCount,
+            page: paginationValues.pageNumber,
+            pageSize: paginationValues.pageSize,
+            totalCount: paginationValues.totalCount,
+            items: await db.postsCollection.find({blogId}).skip(paginationValues.skip).limit(paginationValues.limit).toArray()
+        }
     }
 }

@@ -1,17 +1,18 @@
-import {Request, Response, Router} from "express";
+import {Response, Router} from "express";
 import {DB_RESULTS, HTTP_STATUSES} from "../common/constants";
 import {videosService} from "../services/videosService";
-import {VideoOutput} from "../types/videosTypes";
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody} from "../types/requestGenerics";
+import {VideoOutput, VideoViewModel} from "../types/videosTypes";
+import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody, RequestWithQuery} from "../types/requestGenerics";
 import {GetDeleteVideoById} from "../dto/videos/GetDeleteVideoById";
-import {CreateUpdateVideo} from "../dto/videos/CreateUodateVideo";
+import {CreateUpdateVideo} from "../dto/videos/CreateUpdateVideo";
 import {videosValidation} from "../validators/videosValidation";
 import {validator} from "../validators/validator";
+import {GetVideosWithQuery} from "../dto/videos/GetVideosWithQuery";
 
 export const videosRouter = Router()
 
-videosRouter.get('/', async (req: Request, res: Response) => {
-    const videos: VideoOutput[] = await videosService.getAllVideos()
+videosRouter.get('/', async (req: RequestWithQuery<GetVideosWithQuery>, res: Response) => {
+    const videos: VideoViewModel = await videosService.getAllVideos(req)
     res.status(HTTP_STATUSES.OK_200).send(videos)
 })
 

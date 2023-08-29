@@ -1,18 +1,20 @@
 import {postsRepository} from "../repositories/postsRepository";
-import {PostOutput} from "../types/postsTypes";
-import {RequestWithBody, RequestWithParamsAndBody} from "../types/requestGenerics";
+import {PostOutput, PostViewModel} from "../types/postsTypes";
+import {RequestWithBody, RequestWithParamsAndBody, RequestWithQuery} from "../types/requestGenerics";
 import {CreateUpdatePost} from "../dto/posts/CreateUpdatePost";
 import {BlogOutput} from "../types/blogsTypes";
 import {blogsRepository} from "../repositories/blogsRepository";
 import {DB_RESULTS} from "../common/constants";
 import {GetDeletePostById} from "../dto/posts/GetDeletePostById";
+import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 
 export const postsService = {
     /**
-     * Обращаемся к postsRepository, запрашивает все посты
+     * Обращаемся к postsRepository, запрашивая посты. Отдаем весь запрос.
+     * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
      */
-    async getAllPosts(): Promise<PostOutput[]> {
-        return await postsRepository.getAllPosts()
+    async getAllPosts(req: RequestWithQuery<GetPostsWithQuery>): Promise<PostViewModel> {
+        return await postsRepository.getAllPosts(req)
     },
     /**
      * Сначала находим blog по id. Он всегда здесь будет найден, поскольку на этапе валидации запроса мы это проверяем.

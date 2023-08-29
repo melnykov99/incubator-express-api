@@ -1,5 +1,5 @@
 import {Result, ValidationChain, ValidationError, validationResult} from "express-validator";
-import {CreateUpdateVideo} from "../dto/videos/CreateUodateVideo";
+import {CreateUpdateVideo} from "../dto/videos/CreateUpdateVideo";
 import {RequestWithBody} from "../types/requestGenerics";
 import {Response, NextFunction} from "express";
 import {ErrorsMessage} from "../types/errorsTypes";
