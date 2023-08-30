@@ -4,8 +4,8 @@ import {db} from "./db";
 import {DeleteResult} from "mongodb";
 import {RequestWithQuery} from "../types/requestGenerics";
 import {GetBlogsWithQuery} from "../dto/blogs/GetBlogsWithQuery";
-import {pagination} from "../common/pagination";
-import {PaginationValues} from "../types/commonTypes";
+import {paginationAndSorting} from "../common/paginationAndSorting";
+import {PagSortValues} from "../types/commonTypes";
 
 export const blogsRepository = {
     /**
@@ -16,20 +16,26 @@ export const blogsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Обращаемся к функции пагинации, передавая query параметры из запроса и название коллекции
-     * Функция возвращает paginationValues к которым обращаемся для формирования объекта, который будем возвращать
+     * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
+     * Функция возвращает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
      * Возвращаем информацию о страницах и в объекте items возвращаем массив с блогами
      * Блоги из БД отдаем без монговского _id
-     * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
+     * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
      */
     async getAllBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
-        const paginationValues: PaginationValues = await pagination(req.query.pageNumber, req.query.pageSize, 'blogsCollection')
+        const pagSortValues: PagSortValues = await paginationAndSorting(
+            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'blogsCollection')
         return {
-            pagesCount: paginationValues.pagesCount,
-            page: paginationValues.pageNumber,
-            pageSize: paginationValues.pageSize,
-            totalCount: paginationValues.totalCount,
-            items: await db.blogsCollection.find({}, {projection: {_id: 0}}).skip(paginationValues.skip).limit(paginationValues.limit).toArray()
+            pagesCount: pagSortValues.pagesCount,
+            page: pagSortValues.pageNumber,
+            pageSize: pagSortValues.pageSize,
+            totalCount: pagSortValues.totalCount,
+            items: await db.blogsCollection
+                .find({}, {projection: {_id: 0}})
+                .skip(pagSortValues.skip)
+                .limit(pagSortValues.limit)
+                .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})
+                .toArray()
         }
     },
     /**

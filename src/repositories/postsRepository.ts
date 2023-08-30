@@ -4,8 +4,8 @@ import {db} from "./db";
 import {DeleteResult} from "mongodb";
 import {RequestWithParamsAndQuery, RequestWithQuery} from "../types/requestGenerics";
 import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
-import {PaginationValues} from "../types/commonTypes";
-import {pagination} from "../common/pagination";
+import {PagSortValues} from "../types/commonTypes";
+import {paginationAndSorting} from "../common/paginationAndSorting";
 import {GetDeleteBlogById} from "../dto/blogs/GetDeleteBlogById";
 
 export const postsRepository = {
@@ -17,20 +17,27 @@ export const postsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Обращаемся к функции пагинации, передавая query параметры из запроса и название коллекции
-     * Функция возвращает paginationValues к которым обращаемся для формирования объекта, который будем возвращать
+     * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
+     * Функция возвращает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
      * Возвращаем информацию о страницах и в объекте items возвращаем массив с постами
      * Посты из БД отдаем без монговского _id
-     * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
+     * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
      */
     async getAllPosts(req: RequestWithQuery<GetPostsWithQuery>): Promise<PostViewModel> {
-        const paginationValues: PaginationValues = await pagination(req.query.pageNumber, req.query.pageSize, 'postsCollection')
+        const pagSortValues: PagSortValues = await paginationAndSorting(
+            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'postsCollection')
+        console.log(pagSortValues)
         return {
-            pagesCount: paginationValues.pagesCount,
-            page: paginationValues.pageNumber,
-            pageSize: paginationValues.pageSize,
-            totalCount: paginationValues.totalCount,
-            items: await db.postsCollection.find({}, {projection: {_id: 0}}).skip(paginationValues.skip).limit(paginationValues.limit).toArray()
+            pagesCount: pagSortValues.pagesCount,
+            page: pagSortValues.pageNumber,
+            pageSize: pagSortValues.pageSize,
+            totalCount: pagSortValues.totalCount,
+            items: await db.postsCollection
+                .find({}, {projection: {_id: 0}})
+                .skip(pagSortValues.skip)
+                .limit(pagSortValues.limit)
+                .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})
+                .toArray()
         }
     },
     /**
@@ -70,22 +77,28 @@ export const postsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Обращаемся к функции пагинации, передавая query параметры из запроса и название коллекции
-     * Функция возвращает paginationValues к которым обращаемся для формирования объекта, который будем возвращать
+     * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
+     * Функция возвращает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
      * Возвращаем информацию о страницах и в объекте items возвращаем массив с постами
      * Посты из БД отдаем без монговского _id
      * Ищем посты которые привязаны к конкретному блогу. Если такого блога нет или у блога нет постов, то в items будет пустой массив
-     * @param req запрос в котором id блога в params и параметры пагинации в query
+     * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
      */
     async getPostsByBlogId(req: RequestWithParamsAndQuery<GetDeleteBlogById, GetPostsWithQuery>): Promise<PostViewModel> {
         const blogId: string = req.params.id
-        const paginationValues: PaginationValues = await pagination(req.query.pageNumber, req.query.pageSize, 'postsCollection')
+        const pagSortValues: PagSortValues = await paginationAndSorting(
+            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'postsCollection')
         return {
-            pagesCount: paginationValues.pagesCount,
-            page: paginationValues.pageNumber,
-            pageSize: paginationValues.pageSize,
-            totalCount: paginationValues.totalCount,
-            items: await db.postsCollection.find({blogId}).skip(paginationValues.skip).limit(paginationValues.limit).toArray()
+            pagesCount: pagSortValues.pagesCount,
+            page: pagSortValues.pageNumber,
+            pageSize: pagSortValues.pageSize,
+            totalCount: pagSortValues.totalCount,
+            items: await db.postsCollection
+                .find({blogId})
+                .skip(pagSortValues.skip)
+                .limit(pagSortValues.limit)
+                .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})
+                .toArray()
         }
     }
 }
