@@ -57,15 +57,15 @@ function definitionSortBy(sortB: string | undefined, collection: 'videosCollecti
  * @param sortD Направление сортировки. sortDirection, передается в query параметрах запроса. asc или desc
  * @param pageN Номер страницы. pageNumber, передается в query параметрах запроса
  * @param pageS Размер страницы. pageSize, передается в query параметрах запроса
- * @param searchNameTerm Фильтр для .countDocuments
  * @param collection название коллекции из которой вызывается функция. Обращаемся к коллекции чтоб узнать количество элементов
+ * @param searchNameTerm Фильтр для .countDocuments. Необязательный параметр, передается только в blogsRepository
  */
 export async function paginationAndSorting(sortB: string | undefined,
                                            sortD: string | undefined,
                                            pageN: string | undefined,
                                            pageS: string | undefined,
-                                           searchNameTerm: {} | {name: string},
-                                           collection: 'videosCollection' | 'blogsCollection' | 'postsCollection'): Promise<PagSortValues> {
+                                           collection: 'videosCollection' | 'blogsCollection' | 'postsCollection',
+                                           searchNameTerm: {} | { name: string } = {}): Promise<PagSortValues> {
     const sortBy: string = definitionSortBy(sortB, collection)
     const sortDirection: -1 | 1 = (sortB === undefined) ? -1 : (sortD === 'asc') ? 1 : -1
     const totalCount: number = await db[collection].countDocuments(searchNameTerm)

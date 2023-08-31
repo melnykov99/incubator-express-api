@@ -28,7 +28,7 @@ export const blogsRepository = {
     async getAllBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
         const searchNameTerm: {} | {name: string} = searchNameTermDefinition(req.query.searchNameTerm)
         const pagSortValues: PagSortValues = await paginationAndSorting(
-            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, searchNameTerm,'blogsCollection')
+            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'blogsCollection',searchNameTerm)
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,
