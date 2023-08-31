@@ -11,7 +11,7 @@ export const usersService = {
         return await usersRepository.getUsers(req)
     },
     /**
-     * Достаем login, email и password из тела запроса
+     *  Достаем login, email и password из тела запроса
      * Передаем password в функцию generatePasswordHash и получаем passwordHash
      * Записываем эти данные в объект newUser, который передаем в репозиторий для добавления в БД
      * Возвращаем те данные, которые соответствуют UserOutput
