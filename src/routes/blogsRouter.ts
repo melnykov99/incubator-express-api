@@ -68,5 +68,5 @@ blogsRouter.post('/:id/posts', basicAuth, validator(createPostByBlogIdValidation
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
     }
-    res.status(HTTP_STATUSES.CREATED_201).send()
+    res.status(HTTP_STATUSES.CREATED_201).send(newPost)
 })

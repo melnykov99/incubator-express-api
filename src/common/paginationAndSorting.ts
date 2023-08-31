@@ -67,7 +67,7 @@ export async function paginationAndSorting(sortB: string | undefined,
                                            collection: 'videosCollection' | 'blogsCollection' | 'postsCollection',
                                            searchNameTerm: {} | { name: string } = {}): Promise<PagSortValues> {
     const sortBy: string = definitionSortBy(sortB, collection)
-    const sortDirection: -1 | 1 = (sortB === undefined) ? -1 : (sortD === 'asc') ? 1 : -1
+    const sortDirection: -1 | 1 = (sortD === undefined) ? -1 : (sortD === 'asc') ? 1 : -1
     const totalCount: number = await db[collection].countDocuments(searchNameTerm)
     const pageNumber: number = (pageN === undefined) ? 1 : Number(pageN)
     const pageSize: number = (pageS === undefined) ? 10 : Number(pageS)
