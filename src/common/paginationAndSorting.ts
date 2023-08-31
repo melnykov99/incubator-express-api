@@ -58,17 +58,19 @@ function definitionSortBy(sortB: string | undefined, collection: 'videosCollecti
  * @param pageN Номер страницы. pageNumber, передается в query параметрах запроса
  * @param pageS Размер страницы. pageSize, передается в query параметрах запроса
  * @param collection название коллекции из которой вызывается функция. Обращаемся к коллекции чтоб узнать количество элементов
- * @param searchNameTerm Фильтр для .countDocuments. Необязательный параметр, передается только в blogsRepository.
+ * @param searchNameTerm Фильтр для .countDocuments. Используется в blogsRepository при get запросе блогов. В остальных случаях если передаем, то передаем {}
+ * @param blogId id блога. Передается в postsRepository в функции getPostsByBlogId. Используем для подсчета постов у блога. По умолчанию будет undefined и не используется
  */
 export async function paginationAndSorting(sortB: string | undefined,
                                            sortD: string | undefined,
                                            pageN: string | undefined,
                                            pageS: string | undefined,
                                            collection: 'videosCollection' | 'blogsCollection' | 'postsCollection',
-                                           searchNameTerm: {} | { name: string } = {}): Promise<PagSortValues> {
+                                           searchNameTerm: {} | { name: string } = {},
+                                           blogId: string | undefined = undefined): Promise<PagSortValues> {
     const sortBy: string = definitionSortBy(sortB, collection)
     const sortDirection: -1 | 1 = (sortD === undefined) ? -1 : (sortD === 'asc') ? 1 : -1
-    const totalCount: number = await db[collection].countDocuments(searchNameTerm)
+    const totalCount: number = (blogId === undefined) ? await db[collection].countDocuments(searchNameTerm) : await db[collection].countDocuments({blogId})
     const pageNumber: number = (pageN === undefined) ? 1 : Number(pageN)
     const pageSize: number = (pageS === undefined) ? 10 : Number(pageS)
     const pagesCount: number = Math.ceil(totalCount / pageSize)

@@ -26,7 +26,6 @@ export const postsRepository = {
     async getAllPosts(req: RequestWithQuery<GetPostsWithQuery>): Promise<PostViewModel> {
         const pagSortValues: PagSortValues = await paginationAndSorting(
             req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'postsCollection')
-        console.log(pagSortValues)
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,
@@ -87,7 +86,7 @@ export const postsRepository = {
     async getPostsByBlogId(req: RequestWithParamsAndQuery<GetDeleteBlogById, GetPostsWithQuery>): Promise<PostViewModel> {
         const blogId: string = req.params.id
         const pagSortValues: PagSortValues = await paginationAndSorting(
-            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'postsCollection')
+            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'postsCollection', {}, blogId)
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,
