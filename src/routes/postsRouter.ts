@@ -13,7 +13,7 @@ import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 export const postsRouter = Router()
 
 postsRouter.get('/', async (req: RequestWithQuery<GetPostsWithQuery>, res: Response) => {
-    const posts: PostViewModel = await postsService.getAllPosts(req)
+    const posts: PostViewModel = await postsService.getPosts(req)
     res.status(HTTP_STATUSES.OK_200).send(posts)
 })
 postsRouter.post('/', basicAuth, validator(postsValidation), async (req: RequestWithBody<CreateUpdatePost>, res: Response) => {

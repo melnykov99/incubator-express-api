@@ -23,7 +23,7 @@ export const postsRepository = {
      * Посты из БД отдаем без монговского _id
      * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
      */
-    async getAllPosts(req: RequestWithQuery<GetPostsWithQuery>): Promise<PostViewModel> {
+    async getPosts(req: RequestWithQuery<GetPostsWithQuery>): Promise<PostViewModel> {
         const pagSortValues: PagSortValues = await paginationAndSorting(
             req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'postsCollection')
         return {

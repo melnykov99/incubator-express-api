@@ -11,8 +11,8 @@ export const videosService = {
      * Обращаемся к videosRepository, чтобы достать все видео из БД. Отдаем весь запрос
      * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
      */
-    async getAllVideos(req: RequestWithQuery<GetVideosWithQuery>): Promise<VideoViewModel> {
-        return await videosRepository.getAllVideos(req)
+    async getVideos(req: RequestWithQuery<GetVideosWithQuery>): Promise<VideoViewModel> {
+        return await videosRepository.getVideos(req)
     },
     /**
      * Преобразуем id из строки в число и обращаемся к videosRepository

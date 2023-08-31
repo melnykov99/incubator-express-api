@@ -23,7 +23,7 @@ import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 export const blogsRouter = Router()
 
 blogsRouter.get('/', async (req: RequestWithQuery<GetBlogsWithQuery>, res: Response) => {
-    const blogs: BlogViewModel = await blogsService.getAllBlogs(req)
+    const blogs: BlogViewModel = await blogsService.getBlogs(req)
     res.status(HTTP_STATUSES.OK_200).send(blogs)
 })
 blogsRouter.post('/', basicAuth, validator(blogsValidation), async (req: RequestWithBody<CreateUpdateBlog>, res: Response) => {

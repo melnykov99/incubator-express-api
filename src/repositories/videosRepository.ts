@@ -22,7 +22,7 @@ export const videosRepository = {
      * Видео из БД отдаем без монговского _id
      * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
      */
-    async getAllVideos(req: RequestWithQuery<GetVideosWithQuery>): Promise<VideoViewModel> {
+    async getVideos(req: RequestWithQuery<GetVideosWithQuery>): Promise<VideoViewModel> {
         const pagSortValues: PagSortValues = await paginationAndSorting(
             req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'videosCollection')
         return {

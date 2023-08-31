@@ -25,7 +25,7 @@ export const blogsRepository = {
      * Блоги из БД отдаем без монговского _id
      * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
      */
-    async getAllBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
+    async getBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
         const searchNameTerm: {} | {name: string} = searchNameTermDefinition(req.query.searchNameTerm)
         const pagSortValues: PagSortValues = await paginationAndSorting(
             req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'blogsCollection',searchNameTerm)

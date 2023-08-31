@@ -20,8 +20,8 @@ export const blogsService = {
      * обращаемся к blogsRepository, чтобы достать все блоги из БД. Передаем весь запрос
      * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
      */
-    async getAllBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
-        return await blogsRepository.getAllBlogs(req)
+    async getBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
+        return await blogsRepository.getBlogs(req)
     },
     /**
      * Принимаем весь запрос и из его body достаем инфу для нового объекта blog. Созданный объект передаем в blogsRepository для создания

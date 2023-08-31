@@ -13,8 +13,8 @@ export const postsService = {
      * Обращаемся к postsRepository, запрашивая посты. Отдаем весь запрос.
      * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
      */
-    async getAllPosts(req: RequestWithQuery<GetPostsWithQuery>): Promise<PostViewModel> {
-        return await postsRepository.getAllPosts(req)
+    async getPosts(req: RequestWithQuery<GetPostsWithQuery>): Promise<PostViewModel> {
+        return await postsRepository.getPosts(req)
     },
     /**
      * Сначала находим blog по id. Он всегда здесь будет найден, поскольку на этапе валидации запроса мы это проверяем.

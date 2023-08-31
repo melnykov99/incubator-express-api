@@ -14,7 +14,7 @@ import {PagSortValues} from "../types/commonTypes";
  * @param sortB sortBy переданный в query
  * @param collection коллекция из которой вызывается функция пагинации/сортировки
  */
-function definitionSortBy(sortB: string | undefined, collection: 'videosCollection' | 'blogsCollection' | 'postsCollection') {
+function sortByDefinition(sortB: string | undefined, collection: 'videosCollection' | 'blogsCollection' | 'postsCollection') {
     let sortBy: string = 'createdAt'
     if (sortB === undefined) {
         return sortBy
@@ -42,7 +42,7 @@ function definitionSortBy(sortB: string | undefined, collection: 'videosCollecti
 
 /**
  * Функция пагинации. Принимает запрос и название коллекции, формирует переменные, которые нужны в репозитории для пагинации
- * Объявляем переменную sortBy и с помощью функции definitionSortBy определяем поле для сортировки.
+ * Объявляем переменную sortBy и с помощью функции sortByDefinition определяем поле для сортировки.
  * В переменной sortDirection определяем направление сортировки. Из query приходит desc или asc.
  *  если ничего не придет, то по умолчанию ставим -1 (desc у монги). В ином случае проверяем, равняется ли sortB значению 'asc'
  *  если равняется, то ставим 1 (asc у монги). В ином случае значит нам прислали неправильные данные, ставим по умолчанию 1
@@ -68,7 +68,7 @@ export async function paginationAndSorting(sortB: string | undefined,
                                            collection: 'videosCollection' | 'blogsCollection' | 'postsCollection',
                                            searchNameTerm: {} | { name: string } = {},
                                            blogId: string | undefined = undefined): Promise<PagSortValues> {
-    const sortBy: string = definitionSortBy(sortB, collection)
+    const sortBy: string = sortByDefinition(sortB, collection)
     const sortDirection: -1 | 1 = (sortD === undefined) ? -1 : (sortD === 'asc') ? 1 : -1
     const totalCount: number = (blogId === undefined) ? await db[collection].countDocuments(searchNameTerm) : await db[collection].countDocuments({blogId})
     const pageNumber: number = (pageN === undefined) ? 1 : Number(pageN)

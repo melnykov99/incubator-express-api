@@ -12,7 +12,7 @@ import {GetVideosWithQuery} from "../dto/videos/GetVideosWithQuery";
 export const videosRouter = Router()
 
 videosRouter.get('/', async (req: RequestWithQuery<GetVideosWithQuery>, res: Response) => {
-    const videos: VideoViewModel = await videosService.getAllVideos(req)
+    const videos: VideoViewModel = await videosService.getVideos(req)
     res.status(HTTP_STATUSES.OK_200).send(videos)
 })
 
