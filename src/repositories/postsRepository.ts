@@ -94,7 +94,7 @@ export const postsRepository = {
             pageSize: pagSortValues.pageSize,
             totalCount: pagSortValues.totalCount,
             items: await db.postsCollection
-                .find({blogId})
+                .find({blogId}, {projection: {_id: 0}})
                 .skip(pagSortValues.skip)
                 .limit(pagSortValues.limit)
                 .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})
