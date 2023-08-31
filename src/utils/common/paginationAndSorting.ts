@@ -3,6 +3,7 @@ import {VideoOutput} from "../../types/videosTypes";
 import {BlogOutput} from "../../types/blogsTypes";
 import {PostOutput} from "../../types/postsTypes";
 import {PagSortValues} from "../../types/commonTypes";
+import {UserOutput} from "../../types/usersTypes";
 
 /**
  * Функция для определения sortBy. Объявляем переменную sortBy и записываем в нее значение по умолчанию createAt
@@ -14,7 +15,7 @@ import {PagSortValues} from "../../types/commonTypes";
  * @param sortB sortBy переданный в query
  * @param collection коллекция из которой вызывается функция пагинации/сортировки
  */
-function sortByDefinition(sortB: string | undefined, collection: 'videosCollection' | 'blogsCollection' | 'postsCollection') {
+function sortByDefinition(sortB: string | undefined, collection: 'videosCollection' | 'blogsCollection' | 'postsCollection' | 'usersCollection') {
     let sortBy: string = 'createdAt'
     if (sortB === undefined) {
         return sortBy
@@ -34,6 +35,12 @@ function sortByDefinition(sortB: string | undefined, collection: 'videosCollecti
     if (collection === 'postsCollection') {
         const validSortFields: (keyof PostOutput)[] = ['id', 'title', 'shortDescription', 'content', 'blogId', 'blogName', 'createdAt']
         if (validSortFields.includes(sortB as keyof PostOutput)) {
+            sortBy = sortB
+        }
+    }
+    if (collection === 'postsCollection') {
+        const validSortFields: (keyof UserOutput)[] = ['id', 'login', 'email', 'createdAt']
+        if (validSortFields.includes(sortB as keyof UserOutput)) {
             sortBy = sortB
         }
     }
@@ -65,7 +72,7 @@ export async function paginationAndSorting(sortB: string | undefined,
                                            sortD: string | undefined,
                                            pageN: string | undefined,
                                            pageS: string | undefined,
-                                           collection: 'videosCollection' | 'blogsCollection' | 'postsCollection',
+                                           collection: 'videosCollection' | 'blogsCollection' | 'postsCollection' | 'usersCollection',
                                            searchNameTerm: {} | { name: string } = {},
                                            blogId: string | undefined = undefined): Promise<PagSortValues> {
     const sortBy: string = sortByDefinition(sortB, collection)

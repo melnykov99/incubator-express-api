@@ -4,36 +4,35 @@ import {usersRepository} from "../repositories/usersRepository";
 import {UserInDB, UserOutput} from "../types/usersTypes";
 import {CreateUser} from "../dto/users/CreateUser";
 import {DB_RESULTS} from "../utils/common/constants";
-import bcrypt from 'bcrypt'
+import {generatePasswordHash} from "../utils/common/generatePasswordHash";
 
 export const usersService = {
     async getUsers(req: RequestWithQuery<GetUsersWithQuery>): Promise<UserOutput[]> {
         return await usersRepository.getUsers(req)
     },
+    /**
+     * Достаем login, email и password из тела запроса
+     * Передаем password в функцию generatePasswordHash и получаем passwordHash
+     * Записываем эти данные в объект newUser, который передаем в репозиторий для добавления в БД
+     * Возвращаем те данные, которые соответствуют UserOutput
+     * @param req принимаем весь запрос, из него достаем login, email и password
+     */
     async createUser(req: RequestWithBody<CreateUser>): Promise<UserOutput> {
         const {login, email, password} = req.body
-
-        //мб соль и хэш тоже куда-то переместить лучше
-        const passwordSalt: string = await bcrypt.genSalt(10)
-        const passwordHash: string = await this._generateHash(password, passwordSalt)
-
-        const newUserForDB: UserInDB = {
+        const passwordHash: string = await generatePasswordHash(password)
+        const newUser: UserInDB = {
             id: Date.now().toString(),
             login,
             email,
-            passwordHash: passwordHash,
+            passwordHash,
             createdAt: (new Date().toISOString()),
         }
-        await usersRepository.createUser(newUserForDB)
-        const {id, createdAt} = newUserForDB
+        await usersRepository.createUser(newUser)
+        const {id, createdAt} = newUser
         return {id, login, email, createdAt};
 
     },
     async deleteUser(id: string): Promise<DB_RESULTS> {
         return await usersRepository.deleteUser(id)
     },
-    // куда-то переместить эту функцию надо
-    async _generateHash(password: string, salt: string) {
-        return await bcrypt.hash(password, salt)
-    }
 }

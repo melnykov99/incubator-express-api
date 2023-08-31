@@ -4,21 +4,24 @@ import {GetUsersWithQuery} from "../dto/users/GetUsersWithQuery";
 import {UserInDB, UserOutput} from "../types/usersTypes";
 import {DeleteResult} from "mongodb";
 import {DB_RESULTS} from "../utils/common/constants";
+import {PagSortValues} from "../types/commonTypes";
+import {paginationAndSorting} from "../utils/common/paginationAndSorting";
 
 export const usersRepository = {
     async getUsers(req: RequestWithQuery<GetUsersWithQuery>): Promise<UserOutput[]> {
-        return db.usersCollection.find({}).toArray()
+        const pagSortValues: PagSortValues = await paginationAndSorting(
+            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'usersCollection')
+
+        return db.usersCollection
+            .find({}, {projection: {_id: 0, passwordHash: 0}})
+            .skip(pagSortValues.skip)
+            .limit(pagSortValues.limit)
+            .sort(pagSortValues.sortBy)
+            .toArray()
     },
     async createUser(newUser: UserInDB): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.usersCollection.insertOne(newUser)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
-    },
-    async getUserById(id: string): Promise<UserOutput | DB_RESULTS.NOT_FOUND> {
-      const foundUser: UserOutput | null = await db.usersCollection.findOne({id}, {projection: {_id: 0, passwordHash: 0}})
-        if (foundUser === null) {
-            return DB_RESULTS.NOT_FOUND
-        }
-        return foundUser
     },
     async deleteUser(id: string): Promise<DB_RESULTS> {
         const deleteResult: DeleteResult = await db.usersCollection.deleteOne({id})
