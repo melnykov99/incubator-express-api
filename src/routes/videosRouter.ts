@@ -1,5 +1,5 @@
 import {Response, Router} from "express";
-import {DB_RESULTS, HTTP_STATUSES} from "../common/constants";
+import {DB_RESULTS, HTTP_STATUSES} from "../utils/common/constants";
 import {videosService} from "../services/videosService";
 import {VideoOutput, VideoViewModel} from "../types/videosTypes";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody, RequestWithQuery} from "../types/requestGenerics";

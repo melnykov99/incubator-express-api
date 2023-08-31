@@ -1,11 +1,11 @@
 import {PostOutput, PostViewModel} from "../types/postsTypes";
-import {DB_RESULTS} from "../common/constants";
+import {DB_RESULTS} from "../utils/common/constants";
 import {db} from "./db";
 import {DeleteResult} from "mongodb";
 import {RequestWithParamsAndQuery, RequestWithQuery} from "../types/requestGenerics";
 import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 import {PagSortValues} from "../types/commonTypes";
-import {paginationAndSorting} from "../common/paginationAndSorting";
+import {paginationAndSorting} from "../utils/common/paginationAndSorting";
 import {GetDeleteBlogById} from "../dto/blogs/GetDeleteBlogById";
 
 export const postsRepository = {

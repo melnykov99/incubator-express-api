@@ -1,6 +1,6 @@
 import request from 'supertest'
 import {app} from "../../src/setting"
-import {HTTP_STATUSES} from "../../src/common/constants";
+import {HTTP_STATUSES} from "../../src/utils/common/constants";
 
 describe('OPEN MAIN PAGE', () => {
     it('should return status 200 and main page', async () => {

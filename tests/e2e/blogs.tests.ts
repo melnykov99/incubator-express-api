@@ -1,6 +1,6 @@
 import request from "supertest";
 import {app} from "../../src/setting";
-import {HTTP_STATUSES} from "../../src/common/constants";
+import {HTTP_STATUSES} from "../../src/utils/common/constants";
 import {BlogOutput} from "../../src/types/blogsTypes";
 
 //TODO: переписать тесты под монгу

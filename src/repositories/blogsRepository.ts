@@ -1,12 +1,12 @@
 import {BlogOutput, BlogViewModel} from "../types/blogsTypes";
-import {DB_RESULTS} from "../common/constants";
+import {DB_RESULTS} from "../utils/common/constants";
 import {db} from "./db";
 import {DeleteResult} from "mongodb";
 import {RequestWithQuery} from "../types/requestGenerics";
 import {GetBlogsWithQuery} from "../dto/blogs/GetBlogsWithQuery";
-import {paginationAndSorting} from "../common/paginationAndSorting";
+import {paginationAndSorting} from "../utils/common/paginationAndSorting";
 import {PagSortValues} from "../types/commonTypes";
-import {searchNameTermDefinition} from "../common/searchNameTermDefinition";
+import {searchNameTermDefinition} from "../utils/blogs/searchNameTermDefinition";
 
 export const blogsRepository = {
     /**

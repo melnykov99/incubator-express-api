@@ -4,7 +4,7 @@ import {RequestWithBody, RequestWithParamsAndBody, RequestWithQuery} from "../ty
 import {CreateUpdatePost} from "../dto/posts/CreateUpdatePost";
 import {BlogOutput} from "../types/blogsTypes";
 import {blogsRepository} from "../repositories/blogsRepository";
-import {DB_RESULTS} from "../common/constants";
+import {DB_RESULTS} from "../utils/common/constants";
 import {GetDeletePostById} from "../dto/posts/GetDeletePostById";
 import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 

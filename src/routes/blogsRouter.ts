@@ -1,7 +1,7 @@
 import {Response, Router} from "express";
 import {blogsService} from "../services/blogsService";
 import {BlogOutput, BlogViewModel} from "../types/blogsTypes";
-import {DB_RESULTS, HTTP_STATUSES} from "../common/constants";
+import {DB_RESULTS, HTTP_STATUSES} from "../utils/common/constants";
 import {
     RequestWithBody,
     RequestWithParams,

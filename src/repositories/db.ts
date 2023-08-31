@@ -3,6 +3,7 @@ import {VideoOutput} from "../types/videosTypes";
 import {BlogOutput} from "../types/blogsTypes";
 import {PostOutput} from "../types/postsTypes";
 import dotenv from "dotenv";
+import {UserOutput} from "../types/usersTypes";
 
 dotenv.config()
 
@@ -25,5 +26,6 @@ export async function runDb() {
 export const db = {
     videosCollection: client.db("IncubatorCluster").collection<VideoOutput>("videos"),
     blogsCollection: client.db("IncubatorCluster").collection<BlogOutput>("blogs"),
-    postsCollection: client.db("IncubatorCluster").collection<PostOutput>("posts")
+    postsCollection: client.db("IncubatorCluster").collection<PostOutput>("posts"),
+    usersCollection: client.db('IncubatorCluster').collection<UserOutput>("users")
 }

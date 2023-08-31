@@ -1,7 +1,7 @@
 import {Response, Router} from "express";
 import {postsService} from "../services/postsService";
 import {PostOutput, PostViewModel} from "../types/postsTypes";
-import {DB_RESULTS, HTTP_STATUSES} from "../common/constants";
+import {DB_RESULTS, HTTP_STATUSES} from "../utils/common/constants";
 import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody, RequestWithQuery} from "../types/requestGenerics";
 import {CreateUpdatePost} from "../dto/posts/CreateUpdatePost";
 import {GetDeletePostById} from "../dto/posts/GetDeletePostById";

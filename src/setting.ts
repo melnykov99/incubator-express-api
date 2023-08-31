@@ -1,9 +1,10 @@
 import express, {Request, Response} from 'express';
-import {HTTP_STATUSES} from "./common/constants";
+import {HTTP_STATUSES} from "./utils/common/constants";
 import {videosRouter} from "./routes/videosRouter";
 import {deleteDataRouter} from "./routes/deleteDataRouter";
 import {blogsRouter} from "./routes/blogsRouter";
 import {postsRouter} from "./routes/postsRouter";
+import {usersRouter} from "./routes/usersRouter";
 
 export const app = express()
 
@@ -15,3 +16,4 @@ app.use('/testing/all-data', deleteDataRouter)
 app.use('/videos', videosRouter)
 app.use('/blogs', blogsRouter)
 app.use('/posts', postsRouter)
+app.use('/users', usersRouter)

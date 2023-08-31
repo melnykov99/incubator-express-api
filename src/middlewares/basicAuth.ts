@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from "express";
-import {HTTP_STATUSES} from "../common/constants";
+import {HTTP_STATUSES} from "../utils/common/constants";
 
 /**
  * Проверка авторизации пользователя. В запросе должна быть basic авторизация с значением admin:qwerty

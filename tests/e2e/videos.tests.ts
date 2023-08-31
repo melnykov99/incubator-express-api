@@ -1,9 +1,9 @@
 import request from 'supertest'
 import {app} from "../../src/setting"
-import {HTTP_STATUSES} from "../../src/common/constants";
+import {HTTP_STATUSES} from "../../src/utils/common/constants";
 import {VideoOutput} from "../../src/types/videosTypes";
 import {videosErrors} from "../../src/validators/errors/videosErrors";
-import {regexDateCheckISO8601} from "../../src/common/regex";
+import {regexDateCheckISO8601} from "../../src/utils/common/regex";
 
 const videosDB: any[] = []
 

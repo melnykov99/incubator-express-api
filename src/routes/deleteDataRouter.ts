@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {HTTP_STATUSES} from "../common/constants";
+import {HTTP_STATUSES} from "../utils/common/constants";
 import {videosRepository} from "../repositories/videosRepository";
 import {blogsRepository} from "../repositories/blogsRepository";
 import {postsRepository} from "../repositories/postsRepository";

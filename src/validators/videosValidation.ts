@@ -1,7 +1,7 @@
 import {body, ValidationChain, CustomValidator} from 'express-validator';
 import {videosErrors} from "./errors/videosErrors";
 import {AvailableResolutions} from "../types/videosTypes";
-import {regexDateCheckISO8601} from "../common/regex";
+import {regexDateCheckISO8601} from "../utils/common/regex";
 
 /**
  *

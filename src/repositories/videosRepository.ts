@@ -1,10 +1,10 @@
 import {VideoOutput, VideoViewModel} from "../types/videosTypes";
-import {DB_RESULTS} from "../common/constants";
+import {DB_RESULTS} from "../utils/common/constants";
 import {db} from "./db";
 import {DeleteResult} from "mongodb";
 import {RequestWithQuery} from "../types/requestGenerics";
 import {GetVideosWithQuery} from "../dto/videos/GetVideosWithQuery";
-import {paginationAndSorting} from "../common/paginationAndSorting";
+import {paginationAndSorting} from "../utils/common/paginationAndSorting";
 import {PagSortValues} from "../types/commonTypes";
 
 export const videosRepository = {

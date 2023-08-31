@@ -1,8 +1,8 @@
-import {db} from "../repositories/db";
-import {VideoOutput} from "../types/videosTypes";
-import {BlogOutput} from "../types/blogsTypes";
-import {PostOutput} from "../types/postsTypes";
-import {PagSortValues} from "../types/commonTypes";
+import {db} from "../../repositories/db";
+import {VideoOutput} from "../../types/videosTypes";
+import {BlogOutput} from "../../types/blogsTypes";
+import {PostOutput} from "../../types/postsTypes";
+import {PagSortValues} from "../../types/commonTypes";
 
 /**
  * Функция для определения sortBy. Объявляем переменную sortBy и записываем в нее значение по умолчанию createAt

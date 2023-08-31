@@ -1,6 +1,6 @@
 import {videosRepository} from "../repositories/videosRepository";
 import {AvailableResolutions, VideoOutput, VideoViewModel} from "../types/videosTypes";
-import {DB_RESULTS} from "../common/constants";
+import {DB_RESULTS} from "../utils/common/constants";
 import {RequestWithBody, RequestWithParamsAndBody, RequestWithQuery} from "../types/requestGenerics";
 import {CreateUpdateVideo} from "../dto/videos/CreateUpdateVideo";
 import {GetDeleteVideoById} from "../dto/videos/GetDeleteVideoById";

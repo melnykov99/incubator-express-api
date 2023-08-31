@@ -1,6 +1,6 @@
 import {blogsRepository} from "../repositories/blogsRepository";
 import {BlogOutput, BlogViewModel} from "../types/blogsTypes";
-import {DB_RESULTS} from "../common/constants";
+import {DB_RESULTS} from "../utils/common/constants";
 import {
     RequestWithBody,
     RequestWithParamsAndBody,
