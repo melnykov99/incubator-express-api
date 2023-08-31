@@ -6,6 +6,7 @@ import {RequestWithQuery} from "../types/requestGenerics";
 import {GetBlogsWithQuery} from "../dto/blogs/GetBlogsWithQuery";
 import {paginationAndSorting} from "../common/paginationAndSorting";
 import {PagSortValues} from "../types/commonTypes";
+import {searchNameTermDefinition} from "../common/searchNameTermDefinition";
 
 export const blogsRepository = {
     /**
@@ -16,6 +17,8 @@ export const blogsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
+     * Обращаемся к функции определения searchNameTerm, передавая ей значение из query параметра.
+     * searchNameTerm затем используем как фильтр в выводе (.find) и в функции пагинации/сортировки (.countDocuments)
      * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
      * Функция возвращает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
      * Возвращаем информацию о страницах и в объекте items возвращаем массив с блогами
@@ -23,15 +26,16 @@ export const blogsRepository = {
      * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
      */
     async getAllBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
+        const searchNameTerm: {} | {name: string} = searchNameTermDefinition(req.query.searchNameTerm)
         const pagSortValues: PagSortValues = await paginationAndSorting(
-            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'blogsCollection')
+            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, searchNameTerm,'blogsCollection')
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,
             pageSize: pagSortValues.pageSize,
             totalCount: pagSortValues.totalCount,
             items: await db.blogsCollection
-                .find({}, {projection: {_id: 0}})
+                .find(searchNameTerm, {projection: {_id: 0}})
                 .skip(pagSortValues.skip)
                 .limit(pagSortValues.limit)
                 .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})

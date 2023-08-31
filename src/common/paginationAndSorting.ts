@@ -46,7 +46,7 @@ function definitionSortBy(sortB: string | undefined, collection: 'videosCollecti
  * В переменной sortDirection определяем направление сортировки. Из query приходит desc или asc.
  *  если ничего не придет, то по умолчанию ставим -1 (desc у монги). В ином случае проверяем, равняется ли sortB значению 'asc'
  *  если равняется, то ставим 1 (asc у монги). В ином случае значит нам прислали неправильные данные, ставим по умолчанию 1
- * Объвялем totalCount в которой определяем количество документов в коллекции
+ * Объвялем totalCount в которой определяем по фильтру количество документов в коллекции
  * pageNumber это текущая страница. pageNumber передается в query параметре. Если его нет, то выставляем по умолчанию pageNumber 1
  * pageSize это размер страницы. pageSize передается в query параметре. Если его нет, то выставляем по умолчанию 10
  * В pageCount определяем количество страниц. Общее число элементов делим на размер страницы и округляем в бОльшую стороную
@@ -57,16 +57,18 @@ function definitionSortBy(sortB: string | undefined, collection: 'videosCollecti
  * @param sortD Направление сортировки. sortDirection, передается в query параметрах запроса. asc или desc
  * @param pageN Номер страницы. pageNumber, передается в query параметрах запроса
  * @param pageS Размер страницы. pageSize, передается в query параметрах запроса
+ * @param searchNameTerm Фильтр для .countDocuments
  * @param collection название коллекции из которой вызывается функция. Обращаемся к коллекции чтоб узнать количество элементов
  */
 export async function paginationAndSorting(sortB: string | undefined,
                                            sortD: string | undefined,
                                            pageN: string | undefined,
                                            pageS: string | undefined,
+                                           searchNameTerm: {} | {name: string},
                                            collection: 'videosCollection' | 'blogsCollection' | 'postsCollection'): Promise<PagSortValues> {
     const sortBy: string = definitionSortBy(sortB, collection)
     const sortDirection: -1 | 1 = (sortB === undefined) ? -1 : (sortD === 'asc') ? 1 : -1
-    const totalCount: number = await db[collection].countDocuments({})
+    const totalCount: number = await db[collection].countDocuments(searchNameTerm)
     const pageNumber: number = (pageN === undefined) ? 1 : Number(pageN)
     const pageSize: number = (pageS === undefined) ? 10 : Number(pageS)
     const pagesCount: number = Math.ceil(totalCount / pageSize)
