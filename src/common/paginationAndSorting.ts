@@ -58,7 +58,7 @@ function definitionSortBy(sortB: string | undefined, collection: 'videosCollecti
  * @param pageN Номер страницы. pageNumber, передается в query параметрах запроса
  * @param pageS Размер страницы. pageSize, передается в query параметрах запроса
  * @param collection название коллекции из которой вызывается функция. Обращаемся к коллекции чтоб узнать количество элементов
- * @param searchNameTerm Фильтр для .countDocuments. Необязательный параметр, передается только в blogsRepository
+ * @param searchNameTerm Фильтр для .countDocuments. Необязательный параметр, передается только в blogsRepository.
  */
 export async function paginationAndSorting(sortB: string | undefined,
                                            sortD: string | undefined,
