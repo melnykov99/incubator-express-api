@@ -84,16 +84,16 @@ export const postsRepository = {
      * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
      */
     async getPostsByBlogId(req: RequestWithParamsAndQuery<GetDeleteBlogById, GetPostsWithQuery>): Promise<PostViewModel> {
-        const blogId: string = req.params.id
+        const filter: string = req.params.id
         const pagSortValues: PagSortValues = await paginationAndSorting(
-            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'postsCollection', {}, blogId)
+            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'postsCollection', filter)
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,
             pageSize: pagSortValues.pageSize,
             totalCount: pagSortValues.totalCount,
             items: await db.postsCollection
-                .find({blogId}, {projection: {_id: 0}})
+                .find({filter}, {projection: {_id: 0}})
                 .skip(pagSortValues.skip)
                 .limit(pagSortValues.limit)
                 .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})

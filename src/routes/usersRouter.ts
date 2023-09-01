@@ -4,7 +4,7 @@ import {RequestWithBody, RequestWithParams, RequestWithQuery} from "../types/req
 import {GetUsersWithQuery} from "../dto/users/GetUsersWithQuery";
 import {DB_RESULTS, HTTP_STATUSES} from "../utils/common/constants";
 import {usersService} from "../services/usersService";
-import {UserOutput} from "../types/usersTypes";
+import {UserOutput, UserViewModel} from "../types/usersTypes";
 import {CreateUser} from "../dto/users/CreateUser";
 import {DeleteUser} from "../dto/users/DeleteUser";
 import {validator} from "../validators/validator";
@@ -13,7 +13,7 @@ import {usersValidation} from "../validators/usersValidation";
 export const usersRouter = Router()
 
 usersRouter.get('/', basicAuth, async (req: RequestWithQuery<GetUsersWithQuery>, res: Response) => {
-    const users: UserOutput[] = await usersService.getUsers(req)
+    const users: UserViewModel = await usersService.getUsers(req)
     res.status(HTTP_STATUSES.OK_200).send(users)
 })
 usersRouter.post('/', basicAuth, validator(usersValidation), async (req: RequestWithBody<CreateUser>, res: Response) => {

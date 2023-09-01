@@ -18,7 +18,7 @@ export const blogsRepository = {
     },
     /**
      * Обращаемся к функции определения searchNameTerm, передавая ей значение из query параметра.
-     * searchNameTerm затем используем как фильтр в выводе (.find) и в функции пагинации/сортировки (.countDocuments)
+     * searchNameTerm затем используем как filter в выводе (.find) и в функции пагинации/сортировки (.countDocuments)
      * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
      * Функция возвращает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
      * Возвращаем информацию о страницах и в объекте items возвращаем массив с блогами
@@ -26,16 +26,16 @@ export const blogsRepository = {
      * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
      */
     async getBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
-        const searchNameTerm: {} | {name: string} = searchNameTermDefinition(req.query.searchNameTerm)
+        const filter: {} | { name: string } = searchNameTermDefinition(req.query.searchNameTerm)
         const pagSortValues: PagSortValues = await paginationAndSorting(
-            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'blogsCollection',searchNameTerm)
+            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'blogsCollection', filter)
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,
             pageSize: pagSortValues.pageSize,
             totalCount: pagSortValues.totalCount,
             items: await db.blogsCollection
-                .find(searchNameTerm, {projection: {_id: 0}})
+                .find(filter, {projection: {_id: 0}})
                 .skip(pagSortValues.skip)
                 .limit(pagSortValues.limit)
                 .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})

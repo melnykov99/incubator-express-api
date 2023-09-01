@@ -1,23 +1,35 @@
 import {db} from "./db";
 import {RequestWithQuery} from "../types/requestGenerics";
 import {GetUsersWithQuery} from "../dto/users/GetUsersWithQuery";
-import {UserInDB, UserOutput} from "../types/usersTypes";
+import {UserInDB, UserViewModel} from "../types/usersTypes";
 import {DeleteResult} from "mongodb";
 import {DB_RESULTS} from "../utils/common/constants";
 import {PagSortValues} from "../types/commonTypes";
 import {paginationAndSorting} from "../utils/common/paginationAndSorting";
+import {searchLoginEmailDefinition} from "../utils/users/searchLoginEmailDefinition";
 
 export const usersRepository = {
-    async getUsers(req: RequestWithQuery<GetUsersWithQuery>): Promise<UserOutput[]> {
+    async deleteAllUsers(): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        await db.usersCollection.deleteMany({})
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    async getUsers(req: RequestWithQuery<GetUsersWithQuery>): Promise<UserViewModel> {
+        const filter = searchLoginEmailDefinition(req.query.searchLoginTerm, req.query.searchEmailTerm)
         const pagSortValues: PagSortValues = await paginationAndSorting(
-            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'usersCollection')
+            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'usersCollection', filter)
 
-        return db.usersCollection
-            .find({}, {projection: {_id: 0, passwordHash: 0}})
-            .skip(pagSortValues.skip)
-            .limit(pagSortValues.limit)
-            .sort(pagSortValues.sortBy)
-            .toArray()
+        return {
+            pagesCount: pagSortValues.pagesCount,
+            page: pagSortValues.pageNumber,
+            pageSize: pagSortValues.pageSize,
+            totalCount: pagSortValues.totalCount,
+            items: await db.usersCollection
+                .find(filter, {projection: {_id: 0, passwordHash: 0}})
+                .skip(pagSortValues.skip)
+                .limit(pagSortValues.limit)
+                .sort(pagSortValues.sortBy)
+                .toArray()
+        }
     },
     async createUser(newUser: UserInDB): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.usersCollection.insertOne(newUser)
