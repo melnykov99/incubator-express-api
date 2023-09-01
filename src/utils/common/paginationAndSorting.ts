@@ -75,7 +75,7 @@ export async function paginationAndSorting(sortB: string | undefined,
                                            filter: any = {}): Promise<PagSortValues> {
     const sortBy: string = sortByDefinition(sortB, collection)
     const sortDirection: -1 | 1 = (sortD === undefined) ? -1 : (sortD === 'asc') ? 1 : -1
-    const totalCount: number = await db[collection].countDocuments({filter})
+    const totalCount: number = await db[collection].countDocuments(filter)
     const pageNumber: number = (pageN === undefined) ? 1 : Number(pageN)
     const pageSize: number = (pageS === undefined) ? 10 : Number(pageS)
     const pagesCount: number = Math.ceil(totalCount / pageSize)
