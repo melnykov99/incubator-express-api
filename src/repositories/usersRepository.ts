@@ -27,7 +27,7 @@ export const usersRepository = {
                 .find(filter, {projection: {_id: 0, passwordHash: 0}})
                 .skip(pagSortValues.skip)
                 .limit(pagSortValues.limit)
-                .sort(pagSortValues.sortBy)
+                .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})
                 .toArray()
         }
     },
