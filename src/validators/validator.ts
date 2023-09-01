@@ -8,6 +8,7 @@ import {CreateUpdateBlog} from "../dto/blogs/CreateUpdateBlog";
 import {CreateUpdatePost} from "../dto/posts/CreateUpdatePost";
 import {CreatePostByBlogId} from "../dto/posts/CreatePostByBlogId";
 import {CreateUser} from "../dto/users/CreateUser";
+import {Login} from "../dto/auth/Login";
 
 /**
  * Циклом проходится по ValidationChain и запускает каждую проверку. Если были ошибки при валидации, то запишет их в массив errors.
@@ -16,7 +17,7 @@ import {CreateUser} from "../dto/users/CreateUser";
  * @return если ошибок нет, то отдает запрос дальше. Если ошибки есть, то 400 статус и выводит msg этих ошибок
  */
 export const validator = (validations: ValidationChain[]) => {
-    return async (req: RequestWithBody<CreateUpdateVideo | CreateUpdateBlog | CreateUpdatePost | CreatePostByBlogId | CreateUser>, res: Response, next: NextFunction) => {
+    return async (req: RequestWithBody<CreateUpdateVideo | CreateUpdateBlog | CreateUpdatePost | CreatePostByBlogId | CreateUser | Login>, res: Response, next: NextFunction) => {
         for (let validation of validations) {
             await validation.run(req);
         }

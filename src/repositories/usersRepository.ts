@@ -41,5 +41,12 @@ export const usersRepository = {
             return DB_RESULTS.NOT_FOUND
         }
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    async authUser(loginOrEmail: string): Promise<UserInDB | DB_RESULTS.INVALID_DATA> {
+        const foundUser: UserInDB | null = await db.usersCollection.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
+        if (foundUser === null) {
+            return DB_RESULTS.INVALID_DATA
+        }
+        return foundUser
     }
 }

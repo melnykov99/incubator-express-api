@@ -19,4 +19,6 @@ export enum HTTP_STATUSES {
 export enum DB_RESULTS {
     "NOT_FOUND" = "element not found",
     "SUCCESSFULLY_COMPLETED" = "element action completed",
+    "DATA_CORRECT" = "The data sent is correct",
+    "INVALID_DATA" = "The data sent is wrong"
 }
