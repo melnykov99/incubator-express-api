@@ -85,6 +85,7 @@ export const postsRepository = {
      */
     async getPostsByBlogId(req: RequestWithParamsAndQuery<GetDeleteBlogById, GetPostsWithQuery>): Promise<PostViewModel> {
         const filter: string = req.params.id
+        console.log(filter)
         const pagSortValues: PagSortValues = await paginationAndSorting(
             req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'postsCollection', filter)
         return {
