@@ -1,6 +1,6 @@
 import {Result, ValidationChain, ValidationError, validationResult} from "express-validator";
 import {CreateUpdateVideo} from "../dto/videos/CreateUpdateVideo";
-import {RequestWithBody} from "../types/requestGenerics";
+import {RequestWithBody, RequestWithParamsAndBody} from "../types/requestGenerics";
 import {Response, NextFunction} from "express";
 import {ErrorsMessage} from "../types/errorsTypes";
 import {HTTP_STATUSES} from "../utils/common/constants";
@@ -9,6 +9,8 @@ import {CreateUpdatePost} from "../dto/posts/CreateUpdatePost";
 import {CreatePostByBlogId} from "../dto/posts/CreatePostByBlogId";
 import {CreateUser} from "../dto/users/CreateUser";
 import {LoginUser} from "../dto/auth/LoginUser";
+import {UpdateDeleteCommentById} from "../dto/comments/UpdateDeleteCommentById";
+import {UpdateComment} from "../dto/comments/UpdateComment";
 
 /**
  * Циклом проходится по ValidationChain и запускает каждую проверку. Если были ошибки при валидации, то запишет их в массив errors.
@@ -17,7 +19,9 @@ import {LoginUser} from "../dto/auth/LoginUser";
  * @return если ошибок нет, то отдает запрос дальше. Если ошибки есть, то 400 статус и выводит msg этих ошибок
  */
 export const validator = (validations: ValidationChain[]) => {
-    return async (req: RequestWithBody<CreateUpdateVideo | CreateUpdateBlog | CreateUpdatePost | CreatePostByBlogId | CreateUser | LoginUser>, res: Response, next: NextFunction) => {
+    return async (req:
+                      RequestWithBody<CreateUpdateVideo | CreateUpdateBlog | CreateUpdatePost | CreatePostByBlogId | CreateUser | LoginUser>
+                      | RequestWithParamsAndBody<UpdateDeleteCommentById, UpdateComment>, res: Response, next: NextFunction) => {
         for (let validation of validations) {
             await validation.run(req);
         }

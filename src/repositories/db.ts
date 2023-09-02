@@ -4,6 +4,7 @@ import {BlogOutput} from "../types/blogsTypes";
 import {PostOutput} from "../types/postsTypes";
 import {UserInDB} from "../types/usersTypes";
 import dotenv from "dotenv";
+import {CommentViewModel} from "../types/commentsTypes";
 
 
 dotenv.config()
@@ -28,5 +29,6 @@ export const db = {
     videosCollection: client.db("IncubatorCluster").collection<VideoOutput>("videos"),
     blogsCollection: client.db("IncubatorCluster").collection<BlogOutput>("blogs"),
     postsCollection: client.db("IncubatorCluster").collection<PostOutput>("posts"),
-    usersCollection: client.db('IncubatorCluster').collection<UserInDB>("users")
+    usersCollection: client.db("IncubatorCluster").collection<UserInDB>("users"),
+    commentsCollection: client.db("IncubatorCluster").collection<CommentViewModel>("comments")
 }
