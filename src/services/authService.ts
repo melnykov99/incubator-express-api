@@ -1,18 +1,27 @@
 import {RequestWithBody} from "../types/requestGenerics";
-import {Login} from "../dto/auth/Login";
+import {LoginUser} from "../dto/auth/LoginUser";
 import {DB_RESULTS} from "../utils/common/constants";
 import {usersRepository} from "../repositories/usersRepository";
 import {UserInDB} from "../types/usersTypes";
-import bcrypt from "bcrypt";
+import {comparePassword} from "../utils/common/passwordHash";
 
 export const authService = {
-    async authUser(req: RequestWithBody<Login>): Promise<DB_RESULTS.DATA_CORRECT | DB_RESULTS.INVALID_DATA> {
+    /**
+     * Метод для аутентификации юзера. Достаем loginOrEmail и password из тела запроса
+     * loginOrEmail передаем в usersRepository для поиска в БД
+     * Если по таким данным ничего не нашли, то сразу выходим из функции, возвращая DB_RESULTS.INVALID_DATA
+     * Если юзера нашли, то проверяем его пароль. В метод comparePassword передаем пароль из тела запроса и хэш найденного юзера
+     * Если пароль неверный, то метод compare вернет false. В таком случае выйдем из функции, возвращая DB_RESULTS.INVALID_DATA
+     * Если пароль подходит, значит все данные верны и возвращаем DB_RESULTS.DATA_CORRECT
+     * @param req запрос в теле которого содержится пароль и логин или email юзера
+     */
+    async loginUser(req: RequestWithBody<LoginUser>): Promise<DB_RESULTS.DATA_CORRECT | DB_RESULTS.INVALID_DATA> {
         const {loginOrEmail, password} = req.body
-        const authUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.authUser(loginOrEmail)
-        if (authUser === DB_RESULTS.INVALID_DATA) {
+        const loginUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.loginUser(loginOrEmail)
+        if (loginUser === DB_RESULTS.INVALID_DATA) {
             return DB_RESULTS.INVALID_DATA
         }
-        if (!await bcrypt.compare(password, authUser.passwordHash)) {
+        if (!await comparePassword(password, loginUser.passwordHash)) {
             return DB_RESULTS.INVALID_DATA
         }
         return DB_RESULTS.DATA_CORRECT

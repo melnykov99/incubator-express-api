@@ -18,7 +18,7 @@ export const postsRepository = {
     },
     /**
      * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
-     * Функция возвращает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
+     * Функция возвращает PagSortValues к которым обращаемся для формирования объекта
      * Возвращаем информацию о страницах и в объекте items возвращаем массив с постами
      * Посты из БД отдаем без монговского _id
      * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
@@ -65,7 +65,7 @@ export const postsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Удаляем пост по id. Если поста нет, то в deletedCount будте 0. В таком случае вернем NOT_FOUND
+     * Удаляем пост по id. Если поста нет, то в deletedCount будет 0. В таком случае вернем NOT_FOUND
      * @param id id поста
      */
     async deletePostById(id: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {

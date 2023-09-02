@@ -21,7 +21,7 @@ usersRouter.post('/', basicAuth, validator(usersValidation), async (req: Request
     res.status(HTTP_STATUSES.CREATED_201).send(newUser)
 })
 usersRouter.delete('/:id', basicAuth, async (req: RequestWithParams<DeleteUser>, res: Response) => {
-    const deleteResult: DB_RESULTS = await usersService.deleteUser(req.params.id)
+    const deleteResult: DB_RESULTS.SUCCESSFULLY_COMPLETED | DB_RESULTS.NOT_FOUND = await usersService.deleteUser(req.params.id)
     if (deleteResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return

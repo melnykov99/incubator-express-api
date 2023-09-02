@@ -11,7 +11,7 @@ import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 export const postsService = {
     /**
      * Обращаемся к postsRepository, запрашивая посты. Отдаем весь запрос.
-     * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
+     * @param req запрос в котором параметры для пагинации и сортировки
      */
     async getPosts(req: RequestWithQuery<GetPostsWithQuery>): Promise<PostViewModel> {
         return await postsRepository.getPosts(req)

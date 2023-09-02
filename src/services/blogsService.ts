@@ -18,7 +18,7 @@ import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 export const blogsService = {
     /**
      * обращаемся к blogsRepository, чтобы достать все блоги из БД. Передаем весь запрос
-     * @param req запрос в котором параметры для пагинации. pageNumber и pageSize
+     * @param req запрос в котором параметры для пагинации и сортировки
      */
     async getBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
         return await blogsRepository.getBlogs(req)
