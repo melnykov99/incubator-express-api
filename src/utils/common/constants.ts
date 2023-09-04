@@ -15,10 +15,10 @@ export enum HTTP_STATUSES {
  * В слое работы с данными в зависимости от БД и методов могут возвращаться разные результаты, если элемент не найден. null, undefined и т.д.
  * Мы же для удобства, если элемент не был найден, то с репозитория в сервис возвращаем константу NOT_FOUND
  * Если возвращать никаких данных не нужено из БД, то репозиторий вернет SUCCESSFULLY_COMPLETED
+ * INVALID DATA используется в auth при аутентификации
  */
 export enum DB_RESULTS {
     "NOT_FOUND" = "element not found",
     "SUCCESSFULLY_COMPLETED" = "element action completed",
-    "DATA_CORRECT" = "The data sent is correct",
     "INVALID_DATA" = "The data sent is wrong"
 }

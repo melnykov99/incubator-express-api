@@ -15,6 +15,13 @@ export const usersService = {
         return await usersRepository.getUsers(req)
     },
     /**
+     * Обращаемся к usersRepository чтобы найти юзера в БД по id
+     * @param id id юзера
+     */
+    async getUserById(id: string): Promise<UserInDB | DB_RESULTS.NOT_FOUND> {
+        return usersRepository.getUserById(id)
+    },
+    /**
      * Достаем login, email и password из тела запроса
      * Передаем password в функцию generatePasswordHash и получаем passwordHash
      * Записываем эти данные в объект newUser, который передаем в репозиторий для добавления в БД

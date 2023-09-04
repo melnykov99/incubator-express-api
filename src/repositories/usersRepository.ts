@@ -43,6 +43,17 @@ export const usersRepository = {
         }
     },
     /**
+     * находим юзера в БД по id. Если не находим, то возвращаем константу DB_RESULTS.NOT_FOUND
+     * @param id id юзера
+     */
+    async getUserById(id: string): Promise<UserInDB | DB_RESULTS.NOT_FOUND> {
+        const foundUser: UserInDB | null = await db.usersCollection.findOne({id})
+        if (!foundUser) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        return foundUser
+    },
+    /**
      * Добавляем объект юзера в БД
      * @param newUser объект юзера, который сформировали из присланных данных в запросе
      */
