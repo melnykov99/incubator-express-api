@@ -16,7 +16,7 @@ export const authService = {
      * Если пароль подходит, значит все данные верны. Обращаемся к методу createJWT, передавая объект юзера и формируем jwt token
      * @param req запрос в теле которого содержится пароль и логин или email юзера
      */
-    async loginUser(req: RequestWithBody<LoginUser>): Promise<string | DB_RESULTS.INVALID_DATA> {
+    async loginUser(req: RequestWithBody<LoginUser>): Promise<{ accessToken: string } | DB_RESULTS.INVALID_DATA> {
         const {loginOrEmail, password} = req.body
         const loginUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.loginUser(loginOrEmail)
         if (loginUser === DB_RESULTS.INVALID_DATA) {
@@ -25,6 +25,6 @@ export const authService = {
         if (!await comparePassword(password, loginUser.passwordHash)) {
             return DB_RESULTS.INVALID_DATA
         }
-        return await jwtService.createJWT(loginUser)
+        return {accessToken: await jwtService.createJWT(loginUser)}
     }
 }

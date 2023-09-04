@@ -5,13 +5,11 @@ import {validator} from "../validators/validator";
 import {loginValidation} from "../validators/authValidation";
 import {DB_RESULTS, HTTP_STATUSES} from "../utils/common/constants";
 import {authService} from "../services/authService";
-import {jwtService} from "../utils/common/jwtService";
 import {jwtAuth} from "../middlewares/jwtAuth";
 
 export const authRouter = Router()
 authRouter.post('/login', validator(loginValidation), async (req: RequestWithBody<LoginUser>, res: Response) => {
-    const loginResult: string | DB_RESULTS.INVALID_DATA = await authService.loginUser(req)
-    await jwtService.getUserIdByToken(loginResult)
+    const loginResult: { accessToken: string } | DB_RESULTS.INVALID_DATA = await authService.loginUser(req)
     if (loginResult === DB_RESULTS.INVALID_DATA) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return
