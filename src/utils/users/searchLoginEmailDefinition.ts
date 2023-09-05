@@ -1,23 +1,26 @@
 /**
  * Функция для определения фильтра в usersRepository.getUsers
  * Принимает searchLoginTerm и searchEmailTerm, переданные в query параметрах запроса
- * Объявляем объект filter.
- * Если searchLoginTerm не равен undefined, то добавляем в ключ filter.login регулярку с значением searchLoginTerm и флагом поиска без учета регистра
+ * Объявляем массив filter.
+ * Если searchLoginTerm не равен undefined, то добавляем login значение которого регулярка с значением searchLoginTerm и флагом поиска без учета регистра
+ * Пушим login в массив filter
  * Та же логика для searchEmailTerm
  * Если оба значения оказались undefined, то вернем {}. В ином случае возвращаем получившейся фильтр
  * @param searchLoginTerm логин юзера или его часть
  * @param searchEmailTerm email юзера или его часть
  */
 export function searchLoginEmailDefinition(searchLoginTerm: string | undefined, searchEmailTerm: string | undefined) {
-    const filter: Record<string, any> = {};
+    const filter = []
     if (searchLoginTerm) {
-        filter.login = new RegExp(searchLoginTerm, 'i');
+        const login: RegExp = new RegExp(searchLoginTerm, 'i')
+        filter.push({login})
     }
     if (searchEmailTerm) {
-        filter.email = new RegExp(searchEmailTerm, 'i');
+        const email: RegExp = new RegExp(searchEmailTerm, 'i')
+        filter.push({email})
     }
-    if (Object.keys(filter).length === 0) {
-        return {};
+    if (filter.length === 0) {
+        return {}
     }
-    return { $or: [filter] };
+    return { $or: filter };
 }
