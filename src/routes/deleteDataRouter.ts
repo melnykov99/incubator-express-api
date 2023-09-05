@@ -4,6 +4,7 @@ import {videosRepository} from "../repositories/videosRepository";
 import {blogsRepository} from "../repositories/blogsRepository";
 import {postsRepository} from "../repositories/postsRepository";
 import {usersRepository} from "../repositories/usersRepository";
+import {commentsRepository} from "../repositories/commentsRepository";
 
 export const deleteDataRouter = Router()
 
@@ -13,5 +14,6 @@ deleteDataRouter.delete('/', async (req: Request, res: Response) => {
     await blogsRepository.deleteAllBlogs()
     await postsRepository.deleteAllPosts()
     await usersRepository.deleteAllUsers()
+    await commentsRepository.deleteAllComments()
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
