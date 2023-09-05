@@ -1,12 +1,22 @@
 import {postsRepository} from "../repositories/postsRepository";
 import {PostOutput, PostViewModel} from "../types/postsTypes";
-import {RequestWithBody, RequestWithParamsAndBody, RequestWithQuery} from "../types/requestGenerics";
+import {
+    RequestWithBody,
+    RequestWithParamsAndBody,
+    RequestWithParamsAndQuery,
+    RequestWithQuery
+} from "../types/requestGenerics";
 import {CreateUpdatePost} from "../dto/posts/CreateUpdatePost";
 import {BlogOutput} from "../types/blogsTypes";
 import {blogsRepository} from "../repositories/blogsRepository";
 import {DB_RESULTS} from "../utils/common/constants";
 import {GetDeletePostById} from "../dto/posts/GetDeletePostById";
 import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
+import {GetCommentsByPostId} from "../dto/posts/GetCommentsByPostId";
+import {CreateCommentByPostId} from "../dto/posts/CreateCommentByPostId";
+import {CommentInDB, CommentViewModel} from "../types/commentsTypes";
+import {commentsRepository} from "../repositories/commentsRepository";
+import {GetCommentsByPostIdWithQuery} from "../dto/posts/GetCommentsByPostIdWithQuery";
 
 export const postsService = {
     /**
@@ -87,5 +97,44 @@ export const postsService = {
      */
     async deletePostById(id: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         return postsRepository.deletePostById(id)
+    },
+    /**
+     *
+     */
+    async getCommentsByPostId(req: RequestWithParamsAndQuery<GetCommentsByPostId, GetCommentsByPostIdWithQuery>) {
+        const postId: string = req.params.postId
+        const foundPost: PostOutput | null = await postsRepository.getPostById(postId)
+        if (foundPost === null) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        return await commentsRepository.getCommentsByPostId(req)
+    },
+    /**
+     *
+     * @param req
+     */
+    async createCommentByPostId(req: RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>) {
+        const foundPost: PostOutput | null = await postsRepository.getPostById(req.params.postId)
+        if (foundPost === null) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        const newComment: CommentInDB = {
+            id: Date.now().toString(),
+            content: req.body.content,
+            commentatorInfo: {
+                userId: req.user.id,
+                userLogin: req.user.login
+            },
+            createdAt: (new Date().toISOString()),
+            postId: req.params.postId
+        }
+        await commentsRepository.createCommentByPostId(newComment)
+        const newCommentOutput: CommentViewModel = {
+            id: newComment.id,
+            content: newComment.content,
+            commentatorInfo: newComment.commentatorInfo,
+            createdAt: newComment.createdAt
+        }
+        return newCommentOutput
     }
 }

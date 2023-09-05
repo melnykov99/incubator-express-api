@@ -2,13 +2,25 @@ import {Response, Router} from "express";
 import {postsService} from "../services/postsService";
 import {PostOutput, PostViewModel} from "../types/postsTypes";
 import {DB_RESULTS, HTTP_STATUSES} from "../utils/common/constants";
-import {RequestWithBody, RequestWithParams, RequestWithParamsAndBody, RequestWithQuery} from "../types/requestGenerics";
+import {
+    RequestWithBody,
+    RequestWithParams,
+    RequestWithParamsAndBody,
+    RequestWithParamsAndQuery,
+    RequestWithQuery
+} from "../types/requestGenerics";
 import {CreateUpdatePost} from "../dto/posts/CreateUpdatePost";
 import {GetDeletePostById} from "../dto/posts/GetDeletePostById";
 import {validator} from "../validators/validator";
 import {postsValidation} from "../validators/postsValidation";
 import {basicAuth} from "../middlewares/basicAuth";
 import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
+import {jwtAuth} from "../middlewares/jwtAuth";
+import {GetCommentsByPostId} from "../dto/posts/GetCommentsByPostId";
+import {CreateCommentByPostId} from "../dto/posts/CreateCommentByPostId";
+import {commentsValidation} from "../validators/commentsValidation";
+import {CommentsViewModel, CommentViewModel} from "../types/commentsTypes";
+import {GetCommentsByPostIdWithQuery} from "../dto/posts/GetCommentsByPostIdWithQuery";
 
 export const postsRouter = Router()
 
@@ -47,4 +59,21 @@ postsRouter.delete('/:id', basicAuth, async (req: RequestWithParams<GetDeletePos
         return
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+})
+postsRouter.get('/:postId/comments', async (req: RequestWithParamsAndQuery<GetCommentsByPostId, GetCommentsByPostIdWithQuery>, res: Response) => {
+    const foundComments: DB_RESULTS.NOT_FOUND | CommentsViewModel = await postsService.getCommentsByPostId(req)
+    if (foundComments === DB_RESULTS.NOT_FOUND) {
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        return
+    }
+    res.status(HTTP_STATUSES.OK_200).send(foundComments)
+})
+postsRouter.post('/:postId/comments', jwtAuth, validator(commentsValidation), async (req: RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>, res: Response) => {
+    const newComment: CommentViewModel | DB_RESULTS.NOT_FOUND = await postsService.createCommentByPostId(req)
+    if (newComment === DB_RESULTS.NOT_FOUND) {
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        return
+    }
+    res.status(HTTP_STATUSES.CREATED_201).send(newComment)
+
 })

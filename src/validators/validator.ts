@@ -11,6 +11,8 @@ import {CreateUser} from "../dto/users/CreateUser";
 import {LoginUser} from "../dto/auth/LoginUser";
 import {UpdateDeleteCommentById} from "../dto/comments/UpdateDeleteCommentById";
 import {UpdateComment} from "../dto/comments/UpdateComment";
+import {GetCommentsByPostId} from "../dto/posts/GetCommentsByPostId";
+import {CreateCommentByPostId} from "../dto/posts/CreateCommentByPostId";
 
 /**
  * Циклом проходится по ValidationChain и запускает каждую проверку. Если были ошибки при валидации, то запишет их в массив errors.
@@ -19,9 +21,9 @@ import {UpdateComment} from "../dto/comments/UpdateComment";
  * @return если ошибок нет, то отдает запрос дальше. Если ошибки есть, то 400 статус и выводит msg этих ошибок
  */
 export const validator = (validations: ValidationChain[]) => {
-    return async (req:
-                      RequestWithBody<CreateUpdateVideo | CreateUpdateBlog | CreateUpdatePost | CreatePostByBlogId | CreateUser | LoginUser>
-                      | RequestWithParamsAndBody<UpdateDeleteCommentById, UpdateComment>, res: Response, next: NextFunction) => {
+    return async (req: RequestWithBody<CreateUpdateVideo | CreateUpdateBlog | CreateUpdatePost | CreatePostByBlogId | CreateUser | LoginUser>
+                      | RequestWithParamsAndBody<UpdateDeleteCommentById, UpdateComment> | RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>,
+                  res: Response, next: NextFunction) => {
         for (let validation of validations) {
             await validation.run(req);
         }
