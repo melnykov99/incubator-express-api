@@ -25,9 +25,11 @@ commentsRouter.delete('/:commentId', jwtAuth, async (req: RequestWithParams<Upda
     const deleteResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED = await commentsService.deleteCommentById(req.params.commentId, req.user.id)
     if (deleteResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        return
     }
     if (deleteResult === DB_RESULTS.INVALID_DATA) {
         res.sendStatus(HTTP_STATUSES.FORBIDDEN_403)
+        return
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })

@@ -17,7 +17,6 @@ export const commentsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     async getCommentsByPostId(req: RequestWithParamsAndQuery<GetCommentsByPostId, GetCommentsByPostIdWithQuery>): Promise<DB_RESULTS.NOT_FOUND | CommentsViewModel> {
-        const filter: string = req.params.postId
         const pagSortValues: PagSortValues = await paginationAndSorting(req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'blogsCollection')
         return {
             pagesCount: pagSortValues.pagesCount,
@@ -25,7 +24,7 @@ export const commentsRepository = {
             pageSize: pagSortValues.pageSize,
             totalCount: pagSortValues.totalCount,
             items: await db.commentsCollection
-                .find({filter}, {projection: {_id: 0}})
+                .find({postId: req.params.postId}, {projection: {_id: 0}})
                 .skip(pagSortValues.skip)
                 .limit(pagSortValues.limit)
                 .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})
@@ -43,7 +42,7 @@ export const commentsRepository = {
      * @param id id комментария, по нему ищем
      */
     async getCommentById(id: string): Promise<DB_RESULTS.NOT_FOUND | CommentViewModel> {
-        const foundComment: CommentViewModel | null = await db.commentsCollection.findOne({id})
+        const foundComment: CommentViewModel | null = await db.commentsCollection.findOne({id}, {projection: {_id: 0}})
         if (!foundComment) {
             return DB_RESULTS.NOT_FOUND
         }
