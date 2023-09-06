@@ -39,6 +39,7 @@ commentsRouter.get('/:id', async (req: RequestWithParams<GetCommentById>, res: R
     const foundComment: DB_RESULTS.NOT_FOUND | CommentViewModel = await commentsService.getCommentById(req.params.id)
     if (foundComment === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        return
     }
     res.status(HTTP_STATUSES.OK_200).send(foundComment)
 })

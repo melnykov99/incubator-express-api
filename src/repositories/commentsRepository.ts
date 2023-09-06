@@ -24,7 +24,7 @@ export const commentsRepository = {
             pageSize: pagSortValues.pageSize,
             totalCount: pagSortValues.totalCount,
             items: await db.commentsCollection
-                .find({postId: req.params.postId}, {projection: {_id: 0}})
+                .find({postId: req.params.postId}, {projection: {_id: 0, postId: 0}})
                 .skip(pagSortValues.skip)
                 .limit(pagSortValues.limit)
                 .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})
@@ -38,11 +38,11 @@ export const commentsRepository = {
     /**
      * Поиск комментария по id
      * Если комментария нет, то вернем DB_RESULTS.NOT_FOUND
-     * В ином случае возвращаем объект комментария из БД
+     * В ином случае возвращаем объект комментария из БД. Возвращаем без postId
      * @param id id комментария, по нему ищем
      */
     async getCommentById(id: string): Promise<DB_RESULTS.NOT_FOUND | CommentViewModel> {
-        const foundComment: CommentViewModel | null = await db.commentsCollection.findOne({id}, {projection: {_id: 0}})
+        const foundComment: CommentViewModel | null = await db.commentsCollection.findOne({id}, {projection: {_id: 0, postId: 0}})
         if (!foundComment) {
             return DB_RESULTS.NOT_FOUND
         }
