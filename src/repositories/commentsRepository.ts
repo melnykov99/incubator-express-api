@@ -17,14 +17,15 @@ export const commentsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     async getCommentsByPostId(req: RequestWithParamsAndQuery<GetCommentsByPostId, GetCommentsByPostIdWithQuery>): Promise<DB_RESULTS.NOT_FOUND | CommentsViewModel> {
-        const pagSortValues: PagSortValues = await paginationAndSorting(req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'commentsCollection')
+        const filter = {postId: req.params.postId}
+        const pagSortValues: PagSortValues = await paginationAndSorting(req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'commentsCollection', filter)
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,
             pageSize: pagSortValues.pageSize,
             totalCount: pagSortValues.totalCount,
             items: await db.commentsCollection
-                .find({postId: req.params.postId}, {projection: {_id: 0, postId: 0}})
+                .find(filter, {projection: {_id: 0, postId: 0}})
                 .skip(pagSortValues.skip)
                 .limit(pagSortValues.limit)
                 .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})
