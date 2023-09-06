@@ -17,7 +17,7 @@ export const commentsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     async getCommentsByPostId(req: RequestWithParamsAndQuery<GetCommentsByPostId, GetCommentsByPostIdWithQuery>): Promise<DB_RESULTS.NOT_FOUND | CommentsViewModel> {
-        const pagSortValues: PagSortValues = await paginationAndSorting(req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'blogsCollection')
+        const pagSortValues: PagSortValues = await paginationAndSorting(req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'commentsCollection')
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,

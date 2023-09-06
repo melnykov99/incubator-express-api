@@ -15,9 +15,11 @@ commentsRouter.put('/:commentId', jwtAuth, validator(commentsValidation), async 
     const updateResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED = await commentsService.updateCommentById(req.params.commentId, req.user.id, req.body.content)
     if (updateResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
+        return
     }
     if (updateResult === DB_RESULTS.INVALID_DATA) {
         res.sendStatus(HTTP_STATUSES.FORBIDDEN_403)
+        return
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
