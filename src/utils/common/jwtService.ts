@@ -25,8 +25,6 @@ export const jwtService = {
      */
     async createJWT(user: UserInDB): Promise<JwtToken> {
         const token = jwt.sign({userId: user.id}, process.env.JWT_SECRET!, {expiresIn: '1h'})
-        const secret = process.env.JWT_SECRET!
-        console.log(secret)
         assertsJwtToken(token)
         return token
     },
