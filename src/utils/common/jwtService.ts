@@ -1,7 +1,17 @@
 import {UserInDB} from "../../types/usersTypes";
 import jwt from 'jsonwebtoken'
+import {JwtToken} from "../../types/commonTypes";
 
-
+/**
+ * Функция для проверки типа токена. Проверяем соответствует ли он типу JwtToken
+ * Указываем, что этот тип должен соответствовать строке, которая при сплите на 3 части с сепаратором '.' имеет длинну 3
+ * @param value токен, который проверяем
+ */
+function assertsJwtToken(value: string): asserts value is JwtToken {
+    if(value.split('.').length !== 3) {
+        throw new Error('wrong format of jwt token')
+    }
+}
 /**
  * сервис для работы с jwt токенами
  */
@@ -9,10 +19,13 @@ export const jwtService = {
     /**
      * В метод jwt.sign передаем userId, именно эта информация будет зашифрована в jwt token
      * Также передаем секрет для шифровки и время жизни токена
+     * Проверяем токен на нужный формат. jwt всегда разделен на 3 части точками. Если будет неверный формат, то появится ошибка.
      * @param user объект пользователя, который логинится
      */
-    async createJWT(user: UserInDB): Promise<string> {
-        return jwt.sign({userId: user.id}, process.env.JWT_SECRET || 'secret', {expiresIn: '1h'})
+    async createJWT(user: UserInDB): Promise<JwtToken> {
+        const token = jwt.sign({userId: user.id}, process.env.JWT_SECRET || 'secret', {expiresIn: '1h'})
+        assertsJwtToken(token)
+        return token
     },
     /**
      * Функция для поиска юзера по токену

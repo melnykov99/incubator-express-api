@@ -8,3 +8,5 @@ export type PagSortValues = {
     skip: number,
     limit: number,
 }
+
+export type JwtToken = string & {__jwtTokenBrand: 'JwtToken'}

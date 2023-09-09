@@ -5,6 +5,7 @@ import {usersRepository} from "../repositories/usersRepository";
 import {UserInDB} from "../types/usersTypes";
 import {comparePassword} from "../utils/common/passwordHash";
 import {jwtService} from "../utils/common/jwtService";
+import {JwtToken} from "../types/commonTypes";
 
 export const authService = {
     /**
@@ -16,7 +17,7 @@ export const authService = {
      * Если пароль подходит, значит все данные верны. Обращаемся к методу createJWT, передавая объект юзера и формируем jwt token
      * @param req запрос в теле которого содержится пароль и логин или email юзера
      */
-    async loginUser(req: RequestWithBody<LoginUser>): Promise<{ accessToken: string } | DB_RESULTS.INVALID_DATA> {
+    async loginUser(req: RequestWithBody<LoginUser>): Promise<{ accessToken: JwtToken } | DB_RESULTS.INVALID_DATA> {
         const {loginOrEmail, password} = req.body
         const loginUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.loginUser(loginOrEmail)
         if (loginUser === DB_RESULTS.INVALID_DATA) {
