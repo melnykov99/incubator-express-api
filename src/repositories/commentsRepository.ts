@@ -16,8 +16,18 @@ export const commentsRepository = {
         await db.commentsCollection.deleteMany({})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
+    /**
+     * Получение всех комментариев к определенному посту, по id этого поста
+     * Делаем filter, где ключ postId, а значение postId из params запроса
+     * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
+     * Функция возвращает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
+     * Возвращаем информацию о страницах и в объекте items возвращаем массив с комментариями
+     * Комментарии из БД отдаем без монговского _id
+     * Ищем комментарии которые привязаны к конкретному посту. Если комментариев у поста нет, то в items будет пустой массив
+     * @param req запрос, где в params лежит postId, а в query могут содержаться значения для пагинации и сортировки
+     */
     async getCommentsByPostId(req: RequestWithParamsAndQuery<GetCommentsByPostId, GetCommentsByPostIdWithQuery>): Promise<DB_RESULTS.NOT_FOUND | CommentsViewModel> {
-        const filter = {postId: req.params.postId}
+        const filter: { postId: string } = {postId: req.params.postId}
         const pagSortValues: PagSortValues = await paginationAndSorting(req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'commentsCollection', filter)
         return {
             pagesCount: pagSortValues.pagesCount,
@@ -32,6 +42,11 @@ export const commentsRepository = {
                 .toArray()
         }
     },
+    /**
+     * Добавление нового комментария в БД
+     * Возвращаем константу об успешном выполнении
+     * @param newComment объект нового комментария
+     */
     async createCommentByPostId(newComment: CommentInDB): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.commentsCollection.insertOne(newComment)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
@@ -43,7 +58,12 @@ export const commentsRepository = {
      * @param id id комментария, по нему ищем
      */
     async getCommentById(id: string): Promise<DB_RESULTS.NOT_FOUND | CommentOutput> {
-        const foundComment: CommentOutput | null = await db.commentsCollection.findOne({id}, {projection: {_id: 0, postId: 0}})
+        const foundComment: CommentOutput | null = await db.commentsCollection.findOne({id}, {
+            projection: {
+                _id: 0,
+                postId: 0
+            }
+        })
         if (!foundComment) {
             return DB_RESULTS.NOT_FOUND
         }

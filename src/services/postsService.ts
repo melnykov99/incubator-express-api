@@ -14,7 +14,7 @@ import {GetDeletePostById} from "../dto/posts/GetDeletePostById";
 import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 import {GetCommentsByPostId} from "../dto/posts/GetCommentsByPostId";
 import {CreateCommentByPostId} from "../dto/posts/CreateCommentByPostId";
-import {CommentInDB, CommentOutput} from "../types/commentsTypes";
+import {CommentInDB, CommentOutput, CommentsViewModel} from "../types/commentsTypes";
 import {commentsRepository} from "../repositories/commentsRepository";
 import {GetCommentsByPostIdWithQuery} from "../dto/posts/GetCommentsByPostIdWithQuery";
 
@@ -60,8 +60,8 @@ export const postsService = {
      * @param id id поста
      */
     async getPostById(id: string): Promise<DB_RESULTS.NOT_FOUND | PostOutput> {
-        const foundPost: PostOutput | null = await postsRepository.getPostById(id)
-        if (foundPost === null) {
+        const foundPost: PostOutput | DB_RESULTS.NOT_FOUND = await postsRepository.getPostById(id)
+        if (foundPost === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
         return foundPost
@@ -80,8 +80,8 @@ export const postsService = {
             return DB_RESULTS.NOT_FOUND
         }
         const postId: string = req.params.id
-        const foundPost: null | PostOutput = await postsRepository.getPostById(postId)
-        if (foundPost === null) {
+        const foundPost: PostOutput | DB_RESULTS.NOT_FOUND = await postsRepository.getPostById(postId)
+        if (foundPost === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
         const updatedPost: PostOutput = {
@@ -105,23 +105,31 @@ export const postsService = {
         return postsRepository.deletePostById(id)
     },
     /**
-     *
+     * Поиск комментариев, которые принадлежат конкретному посту
+     * Определяем константу postId и кладем в нее значение из params
+     * Ищем пост по id, если не находим, то прерываем функцию и возвращаем DB_RESULTS.NOT_FOUND
+     * Если пост есть, то идем за всеми комментариями к этому посту вызывая getCommentsByPostId и передавая весь запрос
+     * @param req запрос, где в params лежит postId, а в query могут содержаться значения для пагинации и сортировки
      */
-    async getCommentsByPostId(req: RequestWithParamsAndQuery<GetCommentsByPostId, GetCommentsByPostIdWithQuery>) {
+    async getCommentsByPostId(req: RequestWithParamsAndQuery<GetCommentsByPostId, GetCommentsByPostIdWithQuery>): Promise<DB_RESULTS.NOT_FOUND | CommentsViewModel> {
         const postId: string = req.params.postId
-        const foundPost: PostOutput | null = await postsRepository.getPostById(postId)
-        if (foundPost === null) {
+        const foundPost: PostOutput | DB_RESULTS.NOT_FOUND = await postsRepository.getPostById(postId)
+        if (foundPost === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
         return await commentsRepository.getCommentsByPostId(req)
     },
     /**
-     *
-     * @param req
+     * Создание комментарией к определенному посту
+     * Ищем пост по postId из params. Если не находим, то прерываем функцию и возвращаем DB_RESULTS.NOT_FOUND
+     * Если пост есть, то создаем объект с новым комментарием
+     * Новый комментарий передаем в repository для добавления в БД
+     * В return собираем те данные, которые нужно вернуть клиенту
+     * @param req запрос в котором лежит postId в params, информация о комментарии в теле и информация о юзере в req.user
      */
-    async createCommentByPostId(req: RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>) {
-        const foundPost: PostOutput | null = await postsRepository.getPostById(req.params.postId)
-        if (foundPost === null) {
+    async createCommentByPostId(req: RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>): Promise<DB_RESULTS.NOT_FOUND | CommentOutput> {
+        const foundPost: PostOutput | DB_RESULTS.NOT_FOUND = await postsRepository.getPostById(req.params.postId)
+        if (foundPost === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
         const newComment: CommentInDB = {
@@ -135,12 +143,11 @@ export const postsService = {
             postId: req.params.postId
         }
         await commentsRepository.createCommentByPostId(newComment)
-        const newCommentOutput: CommentOutput = {
+        return {
             id: newComment.id,
             content: newComment.content,
             commentatorInfo: newComment.commentatorInfo,
             createdAt: newComment.createdAt
         }
-        return newCommentOutput
     }
 }

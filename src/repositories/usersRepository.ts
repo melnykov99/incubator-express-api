@@ -80,7 +80,7 @@ export const usersRepository = {
      */
     async loginUser(loginOrEmail: string): Promise<UserInDB | DB_RESULTS.INVALID_DATA> {
         const foundUser: UserInDB | null = await db.usersCollection.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
-        if (foundUser === null) {
+        if (!foundUser) {
             return DB_RESULTS.INVALID_DATA
         }
         return foundUser

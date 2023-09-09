@@ -48,11 +48,16 @@ export const postsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Находим пост по id и возвращаем его или null
+     * Находим пост по id, если его нет, то придет null. В этом случае возвращаем константу DB_RESULTS.NOT_FOUND
+     * Если пост есть, то вернем его
      * @param id id поста
      */
-    async getPostById(id: string): Promise<PostOutput | null> {
-        return await db.postsCollection.findOne({id}, {projection: {_id: 0}})
+    async getPostById(id: string): Promise<PostOutput | DB_RESULTS.NOT_FOUND> {
+        const foundPost: PostOutput | null = await db.postsCollection.findOne({id}, {projection: {_id: 0}})
+        if (!foundPost) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        return foundPost
     },
     /**
      * Обновляем пост по id. Пост точно будет найден потому что до этого в service искали его. Сюда не дошли, если бы не было
@@ -84,7 +89,7 @@ export const postsRepository = {
      * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
      */
     async getPostsByBlogId(req: RequestWithParamsAndQuery<GetDeleteBlogById, GetPostsWithQuery>): Promise<PostViewModel> {
-        const filter: {blogId: string} = {blogId: req.params.id}
+        const filter: { blogId: string } = {blogId: req.params.id}
         const pagSortValues: PagSortValues = await paginationAndSorting(
             req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'postsCollection', filter)
         return {

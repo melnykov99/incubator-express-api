@@ -8,7 +8,7 @@ import {commentsRepository} from "../repositories/commentsRepository";
 
 export const deleteDataRouter = Router()
 
-// Удаляем все данные. Обращаемся напрямую к репозиториям и делаем массивы пустыми
+// Удаляем все данные из БД.
 deleteDataRouter.delete('/', async (req: Request, res: Response) => {
     await videosRepository.deleteAllVideos()
     await blogsRepository.deleteAllBlogs()

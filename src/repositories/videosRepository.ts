@@ -45,7 +45,7 @@ export const videosRepository = {
      */
     async getVideoById(id: number): Promise<DB_RESULTS.NOT_FOUND | VideoOutput> {
         const foundVideo: VideoOutput | null = await db.videosCollection.findOne({id}, {projection: {_id: 0}})
-        if (foundVideo === null) {
+        if (!foundVideo) {
             return DB_RESULTS.NOT_FOUND
         }
         return foundVideo

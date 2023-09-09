@@ -9,4 +9,5 @@ export type PagSortValues = {
     limit: number,
 }
 
+// этот тип проверяется в функции assertsJwtToken в jwtService
 export type JwtToken = string & {__jwtTokenBrand: 'JwtToken'}
