@@ -50,11 +50,7 @@ export const blogsService = {
      * @param id id блога
      */
     async getBlogById(id: string): Promise<BlogOutput | DB_RESULTS.NOT_FOUND> {
-        const foundBlog: BlogOutput | null = await blogsRepository.getBlogById(id)
-        if (foundBlog === null) {
-            return DB_RESULTS.NOT_FOUND
-        }
-        return foundBlog
+        return await blogsRepository.getBlogById(id)
     },
     /**
      * Принимаем запрос с значениями для обновления блога и id блога
@@ -64,8 +60,8 @@ export const blogsService = {
      */
     async updateBlogById(req: RequestWithParamsAndBody<GetDeleteBlogById, CreateUpdateBlog>): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         const blogId: string = req.params.id
-        const foundBlog: BlogOutput | null = await blogsRepository.getBlogById(blogId)
-        if (foundBlog === null) {
+        const foundBlog: BlogOutput | DB_RESULTS.NOT_FOUND = await blogsRepository.getBlogById(blogId)
+        if (foundBlog === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
         const updatedBlog: BlogOutput = {
@@ -89,7 +85,8 @@ export const blogsService = {
     },
     /**
      * Ищем посты которые привязаны к конкретному блогу.
-     * Обращаемся к postsRepository для этого. Если блога нет или постов у этого блога нет, то придет пустой массив
+     * Обращаемся к postsRepository для этого. Если блога нет или постов у этого блога нет
+     * То в items будет пустой массив
      * @param req запрос в котором id блога в params и параметры пагинации в query
      */
     async getPostsByBlogId(req: RequestWithParamsAndQuery<GetDeleteBlogById, GetPostsWithQuery>): Promise<DB_RESULTS.NOT_FOUND | PostViewModel> {
@@ -107,8 +104,8 @@ export const blogsService = {
      * В теле запроса title, shortDescription и content
      */
     async createPostByBlogId(req: RequestWithParamsAndBody<GetDeleteBlogById, CreatePostByBlogId>) {
-        const foundBlog: BlogOutput | null = await blogsRepository.getBlogById(req.params.id)
-        if (foundBlog === null) {
+        const foundBlog: BlogOutput | DB_RESULTS.NOT_FOUND = await blogsRepository.getBlogById(req.params.id)
+        if (foundBlog === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
         const newPost: PostOutput = {

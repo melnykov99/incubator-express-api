@@ -34,14 +34,17 @@ export const postsService = {
      * @param req запрос в теле которого значения для создания поста
      */
     async createPost(req: RequestWithBody<CreateUpdatePost>): Promise<PostOutput | DB_RESULTS.NOT_FOUND> {
-        const foundBlog: BlogOutput | null = await blogsRepository.getBlogById(req.body.blogId)
+        const foundBlog: BlogOutput | DB_RESULTS.NOT_FOUND = await blogsRepository.getBlogById(req.body.blogId)
+        if (foundBlog === DB_RESULTS.NOT_FOUND) {
+            return DB_RESULTS.NOT_FOUND
+        }
         const newPost: PostOutput = {
             id: Date.now().toString(),
             title: req.body.title,
             shortDescription: req.body.shortDescription,
             content: req.body.content,
             blogId: req.body.blogId,
-            blogName: foundBlog!.name,
+            blogName: foundBlog.name,
             createdAt: (new Date().toISOString()),
         }
         //здесь создаем новую константу newPostForDB и прокидываем в нее значения из newPost.
@@ -72,7 +75,10 @@ export const postsService = {
      * @param req
      */
     async updatePostById(req: RequestWithParamsAndBody<GetDeletePostById, CreateUpdatePost>): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
-        const foundBlog: null | BlogOutput = await blogsRepository.getBlogById(req.body.blogId)
+        const foundBlog: DB_RESULTS.NOT_FOUND | BlogOutput = await blogsRepository.getBlogById(req.body.blogId)
+        if (foundBlog === DB_RESULTS.NOT_FOUND) {
+            return DB_RESULTS.NOT_FOUND
+        }
         const postId: string = req.params.id
         const foundPost: null | PostOutput = await postsRepository.getPostById(postId)
         if (foundPost === null) {
@@ -84,7 +90,7 @@ export const postsService = {
             shortDescription: req.body.shortDescription,
             content: req.body.content,
             blogId: req.body.blogId,
-            blogName: foundBlog!.name,
+            blogName: foundBlog.name,
             createdAt: foundPost.createdAt
         }
         return await postsRepository.updatePostById(postId, updatedPost)

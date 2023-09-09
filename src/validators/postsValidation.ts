@@ -2,14 +2,15 @@ import {body, ValidationChain} from "express-validator";
 import {postsErrors} from "./errors/postsErrors";
 import {blogsRepository} from "../repositories/blogsRepository";
 import {BlogOutput} from "../types/blogsTypes";
+import {DB_RESULTS} from "../utils/common/constants";
 
 /**
  * Проверяем существует ли блог в БД с переданным id. Если не существует, то blogsRepository вернет null
  * @param value blogId
  */
 const checkAvailableBlog = async (value: string): Promise<boolean> => {
-    const foundBLog: null | BlogOutput = await blogsRepository.getBlogById(value)
-    return (foundBLog !== null)
+    const foundBLog: DB_RESULTS.NOT_FOUND | BlogOutput = await blogsRepository.getBlogById(value)
+    return (foundBLog !== DB_RESULTS.NOT_FOUND)
 }
 
 /**

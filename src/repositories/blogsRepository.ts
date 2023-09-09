@@ -51,11 +51,17 @@ export const blogsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Находим блог по id и возвращаем его или null
+     * Находим блог по id, если блога с таким id нет, то БД вернет null
+     * Если пришло значение null, то возвращаем константу DB_RESULTS.NOT_FOUND
+     * Иначе возвращаем найденный блог
      * @param id id блога
      */
-    async getBlogById(id: string): Promise<BlogOutput | null> {
-        return await db.blogsCollection.findOne({id}, {projection: {_id: 0}})
+    async getBlogById(id: string): Promise<BlogOutput | DB_RESULTS.NOT_FOUND> {
+        const foundBLog: BlogOutput | null = await db.blogsCollection.findOne({id}, {projection: {_id: 0}})
+        if (!foundBLog) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        return foundBLog
     },
     /**
      * Обновляем блог по id. Блон точно будет найден потому что до этого в service искали блог. Сюда не дошли, если бы не было
