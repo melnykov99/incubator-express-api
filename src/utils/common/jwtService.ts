@@ -24,7 +24,9 @@ export const jwtService = {
      * @param user объект пользователя, который логинится
      */
     async createJWT(user: UserInDB): Promise<JwtToken> {
-        const token = jwt.sign({userId: user.id}, process.env.JWT_SECRET || 'secret', {expiresIn: '1h'})
+        const token = jwt.sign({userId: user.id}, process.env.JWT_SECRET!, {expiresIn: '1h'})
+        const secret = process.env.JWT_SECRET!
+        console.log(secret)
         assertsJwtToken(token)
         return token
     },
@@ -37,7 +39,7 @@ export const jwtService = {
      */
     async getUserIdByToken(token: string): Promise<string | null> {
         try {
-            const result: jwt.JwtPayload = jwt.verify(token, process.env.JWT_SECRET || 'secret') as JwtPayload
+            const result: jwt.JwtPayload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload
             return result.userId
         } catch (error) {
             return null
