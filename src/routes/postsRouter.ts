@@ -19,7 +19,7 @@ import {jwtAuth} from "../middlewares/jwtAuth";
 import {GetCommentsByPostId} from "../dto/posts/GetCommentsByPostId";
 import {CreateCommentByPostId} from "../dto/posts/CreateCommentByPostId";
 import {commentsValidation} from "../validators/commentsValidation";
-import {CommentsViewModel, CommentViewModel} from "../types/commentsTypes";
+import {CommentsViewModel, CommentOutput} from "../types/commentsTypes";
 import {GetCommentsByPostIdWithQuery} from "../dto/posts/GetCommentsByPostIdWithQuery";
 
 export const postsRouter = Router()
@@ -69,7 +69,7 @@ postsRouter.get('/:postId/comments', async (req: RequestWithParamsAndQuery<GetCo
     res.status(HTTP_STATUSES.OK_200).send(foundComments)
 })
 postsRouter.post('/:postId/comments', jwtAuth, validator(commentsValidation), async (req: RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>, res: Response) => {
-    const newComment: CommentViewModel | DB_RESULTS.NOT_FOUND = await postsService.createCommentByPostId(req)
+    const newComment: CommentOutput | DB_RESULTS.NOT_FOUND = await postsService.createCommentByPostId(req)
     if (newComment === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return

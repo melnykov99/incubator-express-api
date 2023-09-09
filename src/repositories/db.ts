@@ -4,7 +4,7 @@ import {BlogOutput} from "../types/blogsTypes";
 import {PostOutput} from "../types/postsTypes";
 import {UserInDB} from "../types/usersTypes";
 import dotenv from "dotenv";
-import {CommentViewModel} from "../types/commentsTypes";
+import {CommentInDB} from "../types/commentsTypes";
 
 
 dotenv.config()
@@ -25,10 +25,12 @@ export async function runDb() {
 }
 
 //Объявляем объект db внутри которого обращаемся к нужным нам коллекциям
+//В коллекциях videos, blogs, posts данные в БД совпадают с теми, что мы выводим, поэтому тип output
+//В коллекциях users и comments есть недоступные для пользователя данные, поэтому тип InDB
 export const db = {
     videosCollection: client.db("IncubatorCluster").collection<VideoOutput>("videos"),
     blogsCollection: client.db("IncubatorCluster").collection<BlogOutput>("blogs"),
     postsCollection: client.db("IncubatorCluster").collection<PostOutput>("posts"),
     usersCollection: client.db("IncubatorCluster").collection<UserInDB>("users"),
-    commentsCollection: client.db("IncubatorCluster").collection<CommentViewModel>("comments")
+    commentsCollection: client.db("IncubatorCluster").collection<CommentInDB>("comments")
 }

@@ -8,7 +8,7 @@ import {validator} from "../validators/validator";
 import {commentsValidation} from "../validators/commentsValidation";
 import {jwtAuth} from "../middlewares/jwtAuth";
 import {commentsService} from "../services/commentsService";
-import {CommentViewModel} from "../types/commentsTypes";
+import {CommentOutput} from "../types/commentsTypes";
 
 export const commentsRouter = Router()
 commentsRouter.put('/:commentId', jwtAuth, validator(commentsValidation), async (req: RequestWithParamsAndBody<UpdateDeleteCommentById, UpdateComment>, res: Response) => {
@@ -36,7 +36,7 @@ commentsRouter.delete('/:commentId', jwtAuth, async (req: RequestWithParams<Upda
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 commentsRouter.get('/:id', async (req: RequestWithParams<GetCommentById>, res: Response) => {
-    const foundComment: DB_RESULTS.NOT_FOUND | CommentViewModel = await commentsService.getCommentById(req.params.id)
+    const foundComment: DB_RESULTS.NOT_FOUND | CommentOutput = await commentsService.getCommentById(req.params.id)
     if (foundComment === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return

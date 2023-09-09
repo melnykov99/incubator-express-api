@@ -3,7 +3,7 @@ export type CommentatorInfo = {
     userLogin: string
 }
 
-export type CommentViewModel = {
+export type CommentOutput = {
     id: string,
     content: string,
     commentatorInfo: CommentatorInfo,
@@ -14,7 +14,7 @@ export type CommentsViewModel = {
     page: number,
     pageSize: number,
     totalCount: number,
-    items: CommentViewModel[]
+    items: CommentOutput[]
 }
 export type CommentInDB = {
     id: string,

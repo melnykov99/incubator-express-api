@@ -4,7 +4,7 @@ import {BlogOutput} from "../../types/blogsTypes";
 import {PostOutput} from "../../types/postsTypes";
 import {PagSortValues} from "../../types/commonTypes";
 import {UserOutput} from "../../types/usersTypes";
-import {CommentViewModel} from "../../types/commentsTypes";
+import {CommentOutput} from "../../types/commentsTypes";
 
 /**
  * Функция для определения sortBy. Объявляем переменную sortBy и записываем в нее значение по умолчанию createAt
@@ -46,8 +46,8 @@ function sortByDefinition(sortB: string | undefined, collection: 'videosCollecti
         }
     }
     if (collection === 'commentsCollection') {
-        const validSortFields: (keyof CommentViewModel)[] = ['id', 'content', 'commentatorInfo', 'createdAt']
-        if (validSortFields.includes(sortB as keyof CommentViewModel)) {
+        const validSortFields: (keyof CommentOutput)[] = ['id', 'content', 'commentatorInfo', 'createdAt']
+        if (validSortFields.includes(sortB as keyof CommentOutput)) {
             sortBy = sortB
         }
     }

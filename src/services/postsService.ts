@@ -14,7 +14,7 @@ import {GetDeletePostById} from "../dto/posts/GetDeletePostById";
 import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 import {GetCommentsByPostId} from "../dto/posts/GetCommentsByPostId";
 import {CreateCommentByPostId} from "../dto/posts/CreateCommentByPostId";
-import {CommentInDB, CommentViewModel} from "../types/commentsTypes";
+import {CommentInDB, CommentOutput} from "../types/commentsTypes";
 import {commentsRepository} from "../repositories/commentsRepository";
 import {GetCommentsByPostIdWithQuery} from "../dto/posts/GetCommentsByPostIdWithQuery";
 
@@ -135,7 +135,7 @@ export const postsService = {
             postId: req.params.postId
         }
         await commentsRepository.createCommentByPostId(newComment)
-        const newCommentOutput: CommentViewModel = {
+        const newCommentOutput: CommentOutput = {
             id: newComment.id,
             content: newComment.content,
             commentatorInfo: newComment.commentatorInfo,

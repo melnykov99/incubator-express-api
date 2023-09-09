@@ -1,6 +1,6 @@
 import {commentsRepository} from "../repositories/commentsRepository";
 import {DB_RESULTS} from "../utils/common/constants";
-import {CommentViewModel} from "../types/commentsTypes";
+import {CommentOutput} from "../types/commentsTypes";
 
 export const commentsService = {
     /**
@@ -13,7 +13,7 @@ export const commentsService = {
      * @param content новый текст комментария
      */
     async updateCommentById(commentId: string, userId: string, content: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
-        const foundComment: DB_RESULTS.NOT_FOUND | CommentViewModel = await commentsRepository.getCommentById(commentId)
+        const foundComment: DB_RESULTS.NOT_FOUND | CommentOutput = await commentsRepository.getCommentById(commentId)
         if (foundComment === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
@@ -31,7 +31,7 @@ export const commentsService = {
      * @param userId id юзера, который хочет удалить комментарий
      */
     async deleteCommentById(commentId: string, userId: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
-        const foundComment: DB_RESULTS.NOT_FOUND | CommentViewModel = await commentsRepository.getCommentById(commentId)
+        const foundComment: DB_RESULTS.NOT_FOUND | CommentOutput = await commentsRepository.getCommentById(commentId)
         if (foundComment === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
@@ -44,7 +44,7 @@ export const commentsService = {
      * Поиск комментария по id
      * @param id id комментария по которому делаем поиск
      */
-    async getCommentById(id: string): Promise<DB_RESULTS.NOT_FOUND | CommentViewModel> {
+    async getCommentById(id: string): Promise<DB_RESULTS.NOT_FOUND | CommentOutput> {
         return commentsRepository.getCommentById(id)
     }
 }

@@ -1,5 +1,5 @@
 import {db} from "./db";
-import {CommentInDB, CommentsViewModel, CommentViewModel} from "../types/commentsTypes";
+import {CommentInDB, CommentsViewModel, CommentOutput} from "../types/commentsTypes";
 import {DB_RESULTS} from "../utils/common/constants";
 import {DeleteResult, UpdateResult} from "mongodb";
 import {RequestWithParamsAndQuery} from "../types/requestGenerics";
@@ -42,8 +42,8 @@ export const commentsRepository = {
      * В ином случае возвращаем объект комментария из БД. Возвращаем без postId
      * @param id id комментария, по нему ищем
      */
-    async getCommentById(id: string): Promise<DB_RESULTS.NOT_FOUND | CommentViewModel> {
-        const foundComment: CommentViewModel | null = await db.commentsCollection.findOne({id}, {projection: {_id: 0, postId: 0}})
+    async getCommentById(id: string): Promise<DB_RESULTS.NOT_FOUND | CommentOutput> {
+        const foundComment: CommentOutput | null = await db.commentsCollection.findOne({id}, {projection: {_id: 0, postId: 0}})
         if (!foundComment) {
             return DB_RESULTS.NOT_FOUND
         }
