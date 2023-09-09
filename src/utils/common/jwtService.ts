@@ -1,5 +1,5 @@
 import {UserInDB} from "../../types/usersTypes";
-import jwt from 'jsonwebtoken'
+import jwt, {JwtPayload} from 'jsonwebtoken'
 import {JwtToken} from "../../types/commonTypes";
 
 /**
@@ -8,10 +8,11 @@ import {JwtToken} from "../../types/commonTypes";
  * @param value токен, который проверяем
  */
 function assertsJwtToken(value: string): asserts value is JwtToken {
-    if(value.split('.').length !== 3) {
+    if (value.split('.').length !== 3) {
         throw new Error('wrong format of jwt token')
     }
 }
+
 /**
  * сервис для работы с jwt токенами
  */
@@ -36,7 +37,7 @@ export const jwtService = {
      */
     async getUserIdByToken(token: string): Promise<string | null> {
         try {
-            const result: any = jwt.verify(token, process.env.JWT_SECRET || 'secret')
+            const result: jwt.JwtPayload = jwt.verify(token, process.env.JWT_SECRET || 'secret') as JwtPayload
             return result.userId
         } catch (error) {
             return null
