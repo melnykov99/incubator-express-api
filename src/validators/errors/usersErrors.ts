@@ -2,7 +2,7 @@ import {ErrorsObject} from "../../types/errorsTypes";
 
 export const usersErrors: ErrorsObject = {
     login: {
-        message: 'login must be string with a minimum length 3 characters and maximum length of 10 characters. Must contain Latin letters and a number',
+        message: 'This login has already been registered or it does not match the format. Login must be string with a minimum length 3 characters and maximum length of 10 characters. May contain Latin letters, numbers, hyphen and underscore',
         field: 'login'
     },
     password: {
@@ -10,7 +10,7 @@ export const usersErrors: ErrorsObject = {
         field: 'password'
     },
     email: {
-        message: 'email must be string and be in email format',
+        message: 'This email has already been registered or it does not match the format. Email must be string and be in email format',
         field: 'email'
     }
 }
