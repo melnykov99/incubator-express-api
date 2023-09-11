@@ -1,6 +1,4 @@
 import {db} from "./db";
-import {RequestWithQuery} from "../types/requestGenerics";
-import {GetUsersWithQuery} from "../dto/users/GetUsersWithQuery";
 import {UserInDB, UserViewModel} from "../types/usersTypes";
 import {DeleteResult} from "mongodb";
 import {DB_RESULTS} from "../utils/common/constants";
@@ -18,16 +16,27 @@ export const usersRepository = {
     },
     /**
      * Определяем фильтр с помощью функции searchLoginEmailDefinition, передавая ей значения из query параметров
-     * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
+     * Обращаемся к функции пагинации и сортировки, передавая query параметры пагниации/сортировки и название коллекции
      * Функция возвращает PagSortValues к которым обращаемся для формирования объекта
      * Возвращаем информацию о страницах и в объекте items возвращаем массив с юзерами
      * Юзеров из БД отдаем без монговского _id и без passwordHash, чтобы соответстовали типу UserOutput
-     * @param req запрос в котором параметры для пагинации и сортировки.
+     * @param sortBy по какому полю выполнить сортировку и вернуть результат
+     * @param sortDirection с каким направлением сделать сортировку asc или desc
+     * @param pageNumber номер страницы для вывода
+     * @param pageSize размер выводимой страницы
+     * @param searchLoginTerm логин или часть логина юзера для поиска в БД
+     * @param searchEmailTerm email юзера или его часть для поиска в БД
      */
-    async getUsers(req: RequestWithQuery<GetUsersWithQuery>): Promise<UserViewModel> {
-        const filter = searchLoginEmailDefinition(req.query.searchLoginTerm, req.query.searchEmailTerm)
-        const pagSortValues: PagSortValues = await paginationAndSorting(
-            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'usersCollection', filter)
+    async getUsers(
+        sortBy: string | undefined,
+        sortDirection: string | undefined,
+        pageNumber: string | undefined,
+        pageSize: string | undefined,
+        searchLoginTerm: string | undefined,
+        searchEmailTerm: string | undefined
+    ): Promise<UserViewModel> {
+        const filter = searchLoginEmailDefinition(searchLoginTerm, searchEmailTerm)
+        const pagSortValues: PagSortValues = await paginationAndSorting(sortBy, sortDirection, pageNumber, pageSize, 'usersCollection', filter)
 
         return {
             pagesCount: pagSortValues.pagesCount,

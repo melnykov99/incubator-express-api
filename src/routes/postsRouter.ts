@@ -25,11 +25,13 @@ import {GetCommentsByPostIdWithQuery} from "../dto/posts/GetCommentsByPostIdWith
 export const postsRouter = Router()
 
 postsRouter.get('/', async (req: RequestWithQuery<GetPostsWithQuery>, res: Response) => {
-    const posts: PostViewModel = await postsService.getPosts(req)
+    const {sortBy, sortDirection, pageNumber, pageSize} = req.query
+    const posts: PostViewModel = await postsService.getPosts(sortBy, sortDirection, pageNumber, pageSize)
     res.status(HTTP_STATUSES.OK_200).send(posts)
 })
 postsRouter.post('/', basicAuth, validator(postsValidation), async (req: RequestWithBody<CreateUpdatePost>, res: Response) => {
-    const newPost: PostOutput | DB_RESULTS.NOT_FOUND = await postsService.createPost(req)
+    const {title, shortDescription, content, blogId} = req.body
+    const newPost: PostOutput | DB_RESULTS.NOT_FOUND = await postsService.createPost(title, shortDescription, content, blogId)
     if (newPost === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
@@ -45,7 +47,9 @@ postsRouter.get('/:id', async (req: RequestWithParams<GetDeletePostById>, res: R
     res.status(HTTP_STATUSES.OK_200).send(foundPost)
 })
 postsRouter.put('/:id', basicAuth, validator(postsValidation), async (req: RequestWithParamsAndBody<GetDeletePostById, CreateUpdatePost>, res: Response) => {
-    const updateResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = await postsService.updatePostById(req)
+    const postId: string = req.params.id
+    const {title, shortDescription, content, blogId} = req.body
+    const updateResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = await postsService.updatePostById(postId, title, shortDescription, content, blogId)
     if (updateResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
@@ -61,7 +65,9 @@ postsRouter.delete('/:id', basicAuth, async (req: RequestWithParams<GetDeletePos
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 postsRouter.get('/:postId/comments', async (req: RequestWithParamsAndQuery<GetCommentsByPostId, GetCommentsByPostIdWithQuery>, res: Response) => {
-    const foundComments: DB_RESULTS.NOT_FOUND | CommentsViewModel = await postsService.getCommentsByPostId(req)
+    const postId: string = req.params.postId
+    const {sortBy, sortDirection, pageNumber, pageSize} = req.query
+    const foundComments: DB_RESULTS.NOT_FOUND | CommentsViewModel = await postsService.getCommentsByPostId(postId, sortBy, sortDirection, pageNumber, pageSize)
     if (foundComments === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
@@ -69,7 +75,10 @@ postsRouter.get('/:postId/comments', async (req: RequestWithParamsAndQuery<GetCo
     res.status(HTTP_STATUSES.OK_200).send(foundComments)
 })
 postsRouter.post('/:postId/comments', jwtAuth, validator(commentsValidation), async (req: RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>, res: Response) => {
-    const newComment: CommentOutput | DB_RESULTS.NOT_FOUND = await postsService.createCommentByPostId(req)
+    const postId: string = req.params.postId
+    const {content} = req.body
+    const {id, login} = req.user
+    const newComment: CommentOutput | DB_RESULTS.NOT_FOUND = await postsService.createCommentByPostId(postId, content, id, login)
     if (newComment === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return

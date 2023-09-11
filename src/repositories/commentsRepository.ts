@@ -2,11 +2,8 @@ import {db} from "./db";
 import {CommentInDB, CommentsViewModel, CommentOutput} from "../types/commentsTypes";
 import {DB_RESULTS} from "../utils/common/constants";
 import {DeleteResult, UpdateResult} from "mongodb";
-import {RequestWithParamsAndQuery} from "../types/requestGenerics";
-import {GetCommentsByPostId} from "../dto/posts/GetCommentsByPostId";
 import {PagSortValues} from "../types/commonTypes";
 import {paginationAndSorting} from "../utils/common/paginationAndSorting";
-import {GetCommentsByPostIdWithQuery} from "../dto/posts/GetCommentsByPostIdWithQuery";
 
 export const commentsRepository = {
     /**
@@ -18,17 +15,25 @@ export const commentsRepository = {
     },
     /**
      * Получение всех комментариев к определенному посту, по id этого поста
-     * Делаем filter, где ключ postId, а значение postId из params запроса
-     * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
+     * Делаем filter по postId
+     * Обращаемся к функции пагинации и сортировки, передавая query параметры пагинации/сортировки и название коллекции
      * Функция возвращает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
      * Возвращаем информацию о страницах и в объекте items возвращаем массив с комментариями
      * Комментарии из БД отдаем без монговского _id
      * Ищем комментарии которые привязаны к конкретному посту. Если комментариев у поста нет, то в items будет пустой массив
-     * @param req запрос, где в params лежит postId, а в query могут содержаться значения для пагинации и сортировки
+     * @param postId id поста по которому запрашиваем комментарии
+     * @param sortBy по какому полю выполнить сортировку и вернуть результат
+     * @param sortDirection с каким направлением сделать сортировку asc или desc
+     * @param pageNumber номер страницы для вывода
+     * @param pageSize размер выводимой страницы
      */
-    async getCommentsByPostId(req: RequestWithParamsAndQuery<GetCommentsByPostId, GetCommentsByPostIdWithQuery>): Promise<DB_RESULTS.NOT_FOUND | CommentsViewModel> {
-        const filter: { postId: string } = {postId: req.params.postId}
-        const pagSortValues: PagSortValues = await paginationAndSorting(req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'commentsCollection', filter)
+    async getCommentsByPostId(postId: string,
+                              sortBy: string | undefined,
+                              sortDirection: string | undefined,
+                              pageNumber: string | undefined,
+                              pageSize: string | undefined): Promise<DB_RESULTS.NOT_FOUND | CommentsViewModel> {
+        const filter: { postId: string } = {postId}
+        const pagSortValues: PagSortValues = await paginationAndSorting(sortBy, sortDirection, pageNumber, pageSize, 'commentsCollection', filter)
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,

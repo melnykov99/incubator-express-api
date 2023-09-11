@@ -6,7 +6,6 @@ import {
     RequestWithBody,
     RequestWithParams,
     RequestWithParamsAndBody,
-    RequestWithParamsAndQuery,
     RequestWithQuery
 } from "../types/requestGenerics";
 import {CreateUpdateBlog} from "../dto/blogs/CreateUpdateBlog";
@@ -23,15 +22,18 @@ import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 export const blogsRouter = Router()
 
 blogsRouter.get('/', async (req: RequestWithQuery<GetBlogsWithQuery>, res: Response) => {
-    const blogs: BlogViewModel = await blogsService.getBlogs(req)
+    const {searchNameTerm, sortBy, sortDirection, pageNumber, pageSize} = req.query
+    const blogs: BlogViewModel = await blogsService.getBlogs(searchNameTerm, sortBy, sortDirection, pageNumber, pageSize)
     res.status(HTTP_STATUSES.OK_200).send(blogs)
 })
 blogsRouter.post('/', basicAuth, validator(blogsValidation), async (req: RequestWithBody<CreateUpdateBlog>, res: Response) => {
-    const newBlog: BlogOutput = await blogsService.createBlog(req)
+    const {name, description, websiteUrl} = req.body
+    const newBlog: BlogOutput = await blogsService.createBlog(name, description, websiteUrl)
     res.status(HTTP_STATUSES.CREATED_201).send(newBlog)
 })
 blogsRouter.get('/:id', async (req: RequestWithParams<GetDeleteBlogById>, res: Response) => {
-    const foundBlog: BlogOutput | DB_RESULTS.NOT_FOUND = await blogsService.getBlogById(req.params.id)
+    const blogId: string = req.params.id
+    const foundBlog: BlogOutput | DB_RESULTS.NOT_FOUND = await blogsService.getBlogById(blogId)
     if (foundBlog === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
@@ -39,7 +41,9 @@ blogsRouter.get('/:id', async (req: RequestWithParams<GetDeleteBlogById>, res: R
     res.status(HTTP_STATUSES.OK_200).send(foundBlog)
 })
 blogsRouter.put('/:id', basicAuth, validator(blogsValidation), async (req: RequestWithParamsAndBody<GetDeleteBlogById, CreateUpdateBlog>, res: Response) => {
-    const updateResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = await blogsService.updateBlogById(req)
+    const blogId: string = req.params.id
+    const {name, description, websiteUrl} = req.body
+    const updateResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = await blogsService.updateBlogById(blogId, name, description, websiteUrl)
     if (updateResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
@@ -47,15 +51,18 @@ blogsRouter.put('/:id', basicAuth, validator(blogsValidation), async (req: Reque
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 blogsRouter.delete('/:id', basicAuth, async (req: RequestWithParams<GetDeleteBlogById>, res: Response) => {
-    const deleteResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = await blogsService.deleteBlogById(req.params.id)
+    const blogId: string = req.params.id
+    const deleteResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = await blogsService.deleteBlogById(blogId)
     if (deleteResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
-blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<GetDeleteBlogById, GetPostsWithQuery>, res: Response) => {
-    const foundPosts: DB_RESULTS.NOT_FOUND | PostViewModel = await blogsService.getPostsByBlogId(req)
+blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndBody<GetDeleteBlogById, GetPostsWithQuery>, res: Response) => {
+    const blogId: string = req.params.id
+    const {sortBy, sortDirection, pageNumber, pageSize} = req.body
+    const foundPosts: DB_RESULTS.NOT_FOUND | PostViewModel = await blogsService.getPostsByBlogId(blogId, sortBy, sortDirection, pageNumber, pageSize)
     if (foundPosts === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
@@ -63,7 +70,9 @@ blogsRouter.get('/:id/posts', async (req: RequestWithParamsAndQuery<GetDeleteBlo
     res.status(HTTP_STATUSES.OK_200).send(foundPosts)
 })
 blogsRouter.post('/:id/posts', basicAuth, validator(createPostByBlogIdValidation), async (req: RequestWithParamsAndBody<GetDeleteBlogById, CreatePostByBlogId>, res: Response) => {
-    const newPost: DB_RESULTS.NOT_FOUND | PostOutput = await blogsService.createPostByBlogId(req)
+    const blogId: string = req.params.id
+    const {title, shortDescription, content} = req.body
+    const newPost: DB_RESULTS.NOT_FOUND | PostOutput = await blogsService.createPostByBlogId(blogId, title, shortDescription, content)
     if (newPost === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return

@@ -12,7 +12,8 @@ import {GetVideosWithQuery} from "../dto/videos/GetVideosWithQuery";
 export const videosRouter = Router()
 
 videosRouter.get('/', async (req: RequestWithQuery<GetVideosWithQuery>, res: Response) => {
-    const videos: VideoViewModel = await videosService.getVideos(req)
+    const {sortBy, sortDirection, pageNumber, pageSize} = req.query
+    const videos: VideoViewModel = await videosService.getVideos(sortBy, sortDirection, pageNumber, pageSize)
     res.status(HTTP_STATUSES.OK_200).send(videos)
 })
 
@@ -26,12 +27,29 @@ videosRouter.get('/:id', async (req: RequestWithParams<GetDeleteVideoById>, res:
 })
 
 videosRouter.post('/', validator(videosValidation), async (req: RequestWithBody<CreateUpdateVideo>, res: Response) => {
-    const createdVideo: VideoOutput = await videosService.createVideo(req)
+    const {
+        title,
+        author,
+        canBeDownloaded,
+        minAgeRestriction,
+        publicationDate,
+        availableResolutions
+    } = req.body
+    const createdVideo: VideoOutput = await videosService.createVideo(title, author, canBeDownloaded, minAgeRestriction, publicationDate, availableResolutions)
     res.status(HTTP_STATUSES.CREATED_201).send(createdVideo)
 })
 
 videosRouter.put('/:id', validator(videosValidation), async (req: RequestWithParamsAndBody<GetDeleteVideoById, CreateUpdateVideo>, res: Response) => {
-    const updateResult: DB_RESULTS = await videosService.updateVideo(req)
+    const videoId: string = req.params.id
+    const {
+        title,
+        author,
+        canBeDownloaded,
+        minAgeRestriction,
+        publicationDate,
+        availableResolutions
+    } = req.body
+    const updateResult: DB_RESULTS = await videosService.updateVideo(videoId, title, author, canBeDownloaded, minAgeRestriction, publicationDate, availableResolutions)
     if (updateResult === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return

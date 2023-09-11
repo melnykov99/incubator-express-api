@@ -9,7 +9,8 @@ import {jwtAuth} from "../middlewares/jwtAuth";
 
 export const authRouter = Router()
 authRouter.post('/login', validator(loginValidation), async (req: RequestWithBody<LoginUser>, res: Response) => {
-    const loginResult: { accessToken: string } | DB_RESULTS.INVALID_DATA = await authService.loginUser(req)
+    const {loginOrEmail, password} = req.body
+    const loginResult: { accessToken: string } | DB_RESULTS.INVALID_DATA = await authService.loginUser(loginOrEmail, password)
     if (loginResult === DB_RESULTS.INVALID_DATA) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return

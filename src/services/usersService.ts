@@ -1,18 +1,26 @@
-import {RequestWithBody, RequestWithQuery} from "../types/requestGenerics";
-import {GetUsersWithQuery} from "../dto/users/GetUsersWithQuery";
 import {usersRepository} from "../repositories/usersRepository";
 import {UserInDB, UserOutput, UserViewModel} from "../types/usersTypes";
-import {CreateUser} from "../dto/users/CreateUser";
 import {DB_RESULTS} from "../utils/common/constants";
 import {generatePasswordHash} from "../utils/common/passwordHash";
 
-/**
- * обращаемся к usersRepository, чтобы достать юзеров из БД. Передаем весь запрос
- * @param req запрос в котором параметры для пагинации и сортировки
- */
+
 export const usersService = {
-    async getUsers(req: RequestWithQuery<GetUsersWithQuery>): Promise<UserViewModel> {
-        return await usersRepository.getUsers(req)
+    /**
+     * обращаемся к usersRepository, чтобы достать юзеров из БД. Передаем значения для пагинации, сортировки и фильтра
+     * @param sortBy по какому полю выполнить сортировку и вернуть результат
+     * @param sortDirection с каким направлением сделать сортировку asc или desc
+     * @param pageNumber номер страницы для вывода
+     * @param pageSize размер выводимой страницы
+     * @param searchLoginTerm логин или часть логина юзера для поиска в БД
+     * @param searchEmailTerm email юзера или его часть для поиска в БД
+     */
+    async getUsers(sortBy: string | undefined,
+                   sortDirection: string | undefined,
+                   pageNumber: string | undefined,
+                   pageSize: string | undefined,
+                   searchLoginTerm: string | undefined,
+                   searchEmailTerm: string | undefined): Promise<UserViewModel> {
+        return await usersRepository.getUsers(sortBy, sortDirection, pageNumber, pageSize, searchLoginTerm, searchEmailTerm)
     },
     /**
      * Обращаемся к usersRepository чтобы найти юзера в БД по id
@@ -22,14 +30,14 @@ export const usersService = {
         return usersRepository.getUserById(id)
     },
     /**
-     * Достаем login, email и password из тела запроса
      * Передаем password в функцию generatePasswordHash и получаем passwordHash
      * Записываем эти данные в объект newUser, который передаем в репозиторий для добавления в БД
      * Возвращаем те данные, которые соответствуют UserOutput
-     * @param req принимаем весь запрос, из него достаем login, email и password
+     * @param login логин пользователя, которые юзер передал в теле запроса
+     * @param password пароль пользователя, который юзер передал в теле запроса
+     * @param email email пользователя, который юзер передал в теле запроса
      */
-    async createUser(req: RequestWithBody<CreateUser>): Promise<UserOutput> {
-        const {login, email, password} = req.body
+    async createUser(login: string, password: string, email: string): Promise<UserOutput> {
         const passwordHash: string = await generatePasswordHash(password)
         const newUser: UserInDB = {
             id: Date.now().toString(),

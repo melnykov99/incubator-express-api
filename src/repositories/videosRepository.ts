@@ -2,8 +2,6 @@ import {VideoOutput, VideoViewModel} from "../types/videosTypes";
 import {DB_RESULTS} from "../utils/common/constants";
 import {db} from "./db";
 import {DeleteResult} from "mongodb";
-import {RequestWithQuery} from "../types/requestGenerics";
-import {GetVideosWithQuery} from "../dto/videos/GetVideosWithQuery";
 import {paginationAndSorting} from "../utils/common/paginationAndSorting";
 import {PagSortValues} from "../types/commonTypes";
 
@@ -16,15 +14,17 @@ export const videosRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
+     * Обращаемся к функции пагинации и сортировки, передавая query параметры пагинации/сортировки и название коллекции
      * Функция возвращает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
      * Возвращаем информацию о страницах и в объекте items возвращаем массив с видео
      * Видео из БД отдаем без монговского _id
-     * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
+     * @param sortBy по какому полю выполнить сортировку и вернуть результат
+     * @param sortDirection с каким направлением сделать сортировку asc или desc
+     * @param pageNumber номер страницы для вывода
+     * @param pageSize размер выводимой страницы
      */
-    async getVideos(req: RequestWithQuery<GetVideosWithQuery>): Promise<VideoViewModel> {
-        const pagSortValues: PagSortValues = await paginationAndSorting(
-            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'videosCollection')
+    async getVideos(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: string | undefined, pageSize: string | undefined): Promise<VideoViewModel> {
+        const pagSortValues: PagSortValues = await paginationAndSorting(sortBy, sortDirection, pageNumber, pageSize, 'videosCollection')
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,
@@ -63,11 +63,11 @@ export const videosRepository = {
     /**
      * Принимаем новый объект и id. По id находим видео и заменяем его на присланный объект. Видео всегда найдем потому что искали ранее в сервисе по id.
      * Не дошли бы сюда, если бы видео не было
-     * @param updatedVideo обновленный объект видео
      * @param id числовой id видео, который нужно обновить
+     * @param updatedVideo обновленный объект видео
      * @return возвращаем константу об успешном выполнении
      */
-    async updateVideo(updatedVideo: VideoOutput, id: number): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+    async updateVideo(id: number, updatedVideo: VideoOutput): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.videosCollection.updateOne({id}, {$set: updatedVideo})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },

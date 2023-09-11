@@ -13,11 +13,20 @@ import {usersValidation} from "../validators/usersValidation";
 export const usersRouter = Router()
 
 usersRouter.get('/', basicAuth, async (req: RequestWithQuery<GetUsersWithQuery>, res: Response) => {
-    const users: UserViewModel = await usersService.getUsers(req)
+    const {
+        sortBy,
+        sortDirection,
+        pageNumber,
+        pageSize,
+        searchLoginTerm,
+        searchEmailTerm
+    } = req.query
+    const users: UserViewModel = await usersService.getUsers(sortBy, sortDirection, pageNumber, pageSize, searchLoginTerm, searchEmailTerm)
     res.status(HTTP_STATUSES.OK_200).send(users)
 })
 usersRouter.post('/', basicAuth, validator(usersValidation), async (req: RequestWithBody<CreateUser>, res: Response) => {
-    const newUser: UserOutput = await usersService.createUser(req)
+    const {login, password, email} = req.body
+    const newUser: UserOutput = await usersService.createUser(login, password, email)
     res.status(HTTP_STATUSES.CREATED_201).send(newUser)
 })
 usersRouter.delete('/:id', basicAuth, async (req: RequestWithParams<DeleteUser>, res: Response) => {

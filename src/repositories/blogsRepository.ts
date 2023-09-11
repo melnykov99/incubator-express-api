@@ -2,8 +2,6 @@ import {BlogOutput, BlogViewModel} from "../types/blogsTypes";
 import {DB_RESULTS} from "../utils/common/constants";
 import {db} from "./db";
 import {DeleteResult} from "mongodb";
-import {RequestWithQuery} from "../types/requestGenerics";
-import {GetBlogsWithQuery} from "../dto/blogs/GetBlogsWithQuery";
 import {paginationAndSorting} from "../utils/common/paginationAndSorting";
 import {PagSortValues} from "../types/commonTypes";
 import {searchNameTermDefinition} from "../utils/blogs/searchNameTermDefinition";
@@ -17,18 +15,24 @@ export const blogsRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Обращаемся к функции определения searchNameTerm, передавая ей значение из query параметра.
      * searchNameTerm затем используем как filter в выводе (.find) и в функции пагинации/сортировки (.countDocuments)
-     * Обращаемся к функции пагинации и сортировки, передавая query параметры из запроса и название коллекции
-     * Функция возвращает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
-     * Возвращаем информацию о страницах и в объекте items возвращаем массив с блогами
+     * Обращаемся к функции пагинации и сортировки, передавая query параметры пагинации и сортировки, а также название коллекции
+     * Функция отдает PagSortValues к которым обращаемся для формирования объекта, который будем возвращать
+     * Возвращаем информацию о страницах и в объекте items возвращаем массив с блогами. Если блогов по указанному фильтру нет, то будет пустой массив
      * Блоги из БД отдаем без монговского _id
-     * @param req запрос в котором параметры для пагинации и сортировки. sortBy, sortDirection, pageNumber, pageSize
+     * @param searchNameTerm name блога по которому будет осуществляться поиск
+     * @param sortBy по какому полю выполнить сортировку и вернуть результат
+     * @param sortDirection с каким направлением сделать сортировку asc или desc
+     * @param pageNumber номер страницы для вывода
+     * @param pageSize размер выводимой страницы
      */
-    async getBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
-        const filter: {} | { name: string } = searchNameTermDefinition(req.query.searchNameTerm)
-        const pagSortValues: PagSortValues = await paginationAndSorting(
-            req.query.sortBy, req.query.sortDirection, req.query.pageNumber, req.query.pageSize, 'blogsCollection', filter)
+    async getBlogs(searchNameTerm: string | undefined,
+                   sortBy: string | undefined,
+                   sortDirection: string | undefined,
+                   pageNumber: string | undefined,
+                   pageSize: string | undefined): Promise<BlogViewModel> {
+        const filter: {} | { name: string } = searchNameTermDefinition(searchNameTerm)
+        const pagSortValues: PagSortValues = await paginationAndSorting(sortBy, sortDirection, pageNumber, pageSize, 'blogsCollection', filter)
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,

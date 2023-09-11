@@ -1,39 +1,38 @@
 import {blogsRepository} from "../repositories/blogsRepository";
 import {BlogOutput, BlogViewModel} from "../types/blogsTypes";
 import {DB_RESULTS} from "../utils/common/constants";
-import {
-    RequestWithBody,
-    RequestWithParamsAndBody,
-    RequestWithParamsAndQuery,
-    RequestWithQuery
-} from "../types/requestGenerics";
-import {CreateUpdateBlog} from "../dto/blogs/CreateUpdateBlog";
-import {GetDeleteBlogById} from "../dto/blogs/GetDeleteBlogById";
 import {PostOutput, PostViewModel} from "../types/postsTypes";
 import {postsRepository} from "../repositories/postsRepository";
-import {CreatePostByBlogId} from "../dto/posts/CreatePostByBlogId";
-import {GetBlogsWithQuery} from "../dto/blogs/GetBlogsWithQuery";
-import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
 
 export const blogsService = {
     /**
-     * обращаемся к blogsRepository, чтобы достать все блоги из БД. Передаем весь запрос
-     * @param req запрос в котором параметры для пагинации и сортировки
+     * обращаемся к blogsRepository, чтобы достать блоги из БД
+     * @param searchNameTerm name блога по которому будет осуществляться поиск
+     * @param sortBy по какому полю выполнить сортировку и вернуть результат
+     * @param sortDirection с каким направлением сделать сортировку asc или desc
+     * @param pageNumber номер страницы для вывода
+     * @param pageSize размер выводимой страницы
      */
-    async getBlogs(req: RequestWithQuery<GetBlogsWithQuery>): Promise<BlogViewModel> {
-        return await blogsRepository.getBlogs(req)
+    async getBlogs(searchNameTerm: string | undefined,
+                   sortBy: string | undefined,
+                   sortDirection: string | undefined,
+                   pageNumber: string | undefined,
+                   pageSize: string | undefined): Promise<BlogViewModel> {
+        return await blogsRepository.getBlogs(searchNameTerm, sortBy, sortDirection, pageNumber, pageSize)
     },
     /**
-     * Принимаем весь запрос и из его body достаем инфу для нового объекта blog. Созданный объект передаем в blogsRepository для создания
+     * Принимаем данные из body запроса для нового объекта blog. Созданный объект передаем в blogsRepository для создания
      * Возвращаем созданный блог
-     * @param req запрос в теле которого значения для создания блога
+     * @param name название блога
+     * @param description описание блога
+     * @param websiteUrl адрес блога
      */
-    async createBlog(req: RequestWithBody<CreateUpdateBlog>): Promise<BlogOutput> {
+    async createBlog(name: string, description: string, websiteUrl: string): Promise<BlogOutput> {
         const newBlog: BlogOutput = {
             id: Date.now().toString(),
-            name: req.body.name,
-            description: req.body.description,
-            websiteUrl: req.body.websiteUrl,
+            name: name,
+            description: description,
+            websiteUrl: websiteUrl,
             createdAt: (new Date().toISOString()),
             isMembership: false
         }
@@ -53,26 +52,28 @@ export const blogsService = {
         return await blogsRepository.getBlogById(id)
     },
     /**
-     * Принимаем запрос с значениями для обновления блога и id блога
+     * Принимаем id блога и значения для обновления этого блога из body запроса
      * Ищем блог по id, если его нет, то выходим из функции
      * Если блог есть, то создаем новый объект с его id + значениями из запроса и передаем это в blogsRepository для обновления
-     * @param req запрос в теле которого значения для обновления блога
+     * @param id id блога, который нужно изменить
+     * @param name новое имя блога
+     * @param description новое описание блога
+     * @param websiteUrl новый адрес блога
      */
-    async updateBlogById(req: RequestWithParamsAndBody<GetDeleteBlogById, CreateUpdateBlog>): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
-        const blogId: string = req.params.id
-        const foundBlog: BlogOutput | DB_RESULTS.NOT_FOUND = await blogsRepository.getBlogById(blogId)
+    async updateBlogById(id: string, name: string, description: string, websiteUrl: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        const foundBlog: BlogOutput | DB_RESULTS.NOT_FOUND = await blogsRepository.getBlogById(id)
         if (foundBlog === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
         const updatedBlog: BlogOutput = {
             id: foundBlog.id,
-            name: req.body.name,
-            description: req.body.description,
-            websiteUrl: req.body.websiteUrl,
+            name: name,
+            description: description,
+            websiteUrl: websiteUrl,
             createdAt: foundBlog.createdAt,
             isMembership: foundBlog.isMembership
         }
-        return await blogsRepository.updateBlogById(blogId, updatedBlog)
+        return await blogsRepository.updateBlogById(id, updatedBlog)
     },
     /**
      * Передаем id блога в blogsRepository для поиска и удаления, если есть.
@@ -85,35 +86,44 @@ export const blogsService = {
     },
     /**
      * Ищем посты которые привязаны к конкретному блогу.
-     * Обращаемся к postsRepository для этого. Если блога нет или постов у этого блога нет
-     * То в items будет пустой массив
-     * @param req запрос в котором id блога в params и параметры пагинации в query
+     * Обращаемся к postsRepository для этого. Если блога нет или постов у этого блога нет, то в items будет пустой массив
+     * @param blogId id блога по которому нужно достать почты
+     * @param sortBy по какому полю выполнить сортировку и вернуть результат
+     * @param sortDirection с каким направлением сделать сортировку asc или desc
+     * @param pageNumber номер страницы для вывода
+     * @param pageSize размер выводимой страницы
      */
-    async getPostsByBlogId(req: RequestWithParamsAndQuery<GetDeleteBlogById, GetPostsWithQuery>): Promise<DB_RESULTS.NOT_FOUND | PostViewModel> {
-        const foundPosts: PostViewModel = await postsRepository.getPostsByBlogId(req)
+    async getPostsByBlogId(blogId: string,
+                           sortBy: string | undefined,
+                           sortDirection: string | undefined,
+                           pageNumber: string | undefined,
+                           pageSize: string | undefined): Promise<DB_RESULTS.NOT_FOUND | PostViewModel> {
+        const foundPosts: PostViewModel = await postsRepository.getPostsByBlogId(blogId, sortBy, sortDirection, pageNumber, pageSize)
         if (!foundPosts.items.length) {
             return DB_RESULTS.NOT_FOUND
         }
         return foundPosts
     },
     /** Создаем пост для конкретного блога.
-     * Находим blog по id, который есть в параметре запроса. Если блоаг нет, то выходим из функции сразу.
-     * Если блог есть, то создаем объект поста, передаем ему значения из запроса, blogName из найденного блога.
+     * Находим blog по id. Если блога нет, то выходим из функции сразу.
+     * Если блог есть, то создаем объект поста, передаем ему значения из тела запроса и blogName из найденного блога.
      * Созданный объект передаем в postsRepository для создания поста. Возвращаемый созданный пост
-     * @param req передаем сюда запрос целиком. В req.params лежит blogId
-     * В теле запроса title, shortDescription и content
+     * @param blogId id блога к которому создаем пост
+     * @param title название поста
+     * @param shortDescription описание поста
+     * @param content контент поста
      */
-    async createPostByBlogId(req: RequestWithParamsAndBody<GetDeleteBlogById, CreatePostByBlogId>) {
-        const foundBlog: BlogOutput | DB_RESULTS.NOT_FOUND = await blogsRepository.getBlogById(req.params.id)
+    async createPostByBlogId(blogId: string, title: string, shortDescription: string, content: string): Promise<DB_RESULTS.NOT_FOUND | PostOutput> {
+        const foundBlog: BlogOutput | DB_RESULTS.NOT_FOUND = await blogsRepository.getBlogById(blogId)
         if (foundBlog === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
         const newPost: PostOutput = {
             id: Date.now().toString(),
-            title: req.body.title,
-            shortDescription: req.body.shortDescription,
-            content: req.body.content,
-            blogId: req.params.id,
+            title: title,
+            shortDescription: shortDescription,
+            content: content,
+            blogId: blogId,
             blogName: foundBlog.name,
             createdAt: (new Date().toISOString()),
         }
