@@ -2,19 +2,24 @@ import {body, CustomValidator, ValidationChain} from "express-validator";
 import {usersErrors} from "./errors/usersErrors";
 import {regexEmailCheck, regexLoginCheck} from "../utils/common/regex";
 import {UserInDB} from "../types/usersTypes";
-import {db} from "../repositories/db";
+import {usersRepository} from "../repositories/usersRepository";
+import {DB_RESULTS} from "../utils/common/constants";
 
 /**
  * Валидация логина. Логин должен соответствовать регулярке /^[a-zA-Z0-9_-]*$/ и пользователя с таким логином не должно быть в БД
  * Результат проверки значения на регулярное выражение кладем в checkLoginByRegex. Если значение не соответствует, то будет null
- * В searchUserByLogin кладем результат поиска в БД по логину. Если юзера с таким логином нет, то вернется null.
- * Если в checkLoginByRegex null, а в searchUserByLogin НЕ null (юзера нашли), то валидацию такое значение не проходит, возвращаем ошибку. Текст ошибки дальше в цепочки валидации.
+ * В случае с null валидацию не проходит, возвращаем ошибку. Текст ошибки дальше в цепочке валидации.
+ * В foundUser кладем результат поиска в БД по логину. Если юзера с таким логином не найдем то вернем DB_RESULTS.INVALID_DATA
+ * Если юзера нашли и значение foundUser НЕ DB_RESULTS.INVALID_DATA, то валидация не пройдена, возвращаем ошибку.
  * @param value login из body запроса
  */
 const checkLogin: CustomValidator = async (value: string) => {
     const checkLoginByRegex: RegExpMatchArray | null = value.match(regexLoginCheck)
-    const searchUserByLogin: UserInDB | null = await db.usersCollection.findOne({login: value})
-    if (checkLoginByRegex === null || searchUserByLogin !== null) {
+    if (checkLoginByRegex === null) {
+        throw new Error()
+    }
+    const foundUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.foundUserByLoginOrEmail(value)
+    if (foundUser !== DB_RESULTS.INVALID_DATA) {
         throw new Error()
     }
     return true
@@ -22,14 +27,18 @@ const checkLogin: CustomValidator = async (value: string) => {
 /**
  * Валидация email. Email должен соответствовать регулярке /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ и пользователя с таким email не должно быть в БД
  * Результат проверки значения на регулярное выражение кладем в checkEmailByRegex. Если значение не соответствует, то будет null
- * В searchUserByEmail кладем результат поиска в БД по email Если юзера с таким email-ом нет, то вернется null.
- * Если в checkEmailByRegex null, а в searchUserByEmail НЕ null (юзера нашли), то валидацию такое значение не проходит, возвращаем ошибку. Текст ошибки дальше в цепочки валидации.
+ * В случае с null валидацию не проходит, возвращаем ошибку. Текст ошибки дальше в цепочке валидации.
+ * В foundUser кладем результат поиска в БД по email. Если юзера с таким email не найдем, то вернем DB_RESULTS.INVALID_DATA
+ * Если юзера нашли и значение foundUser НЕ DB_RESULTS.INVALID_DATA, то валидация не пройдена, возвращаем ошибку.
  * @param value email из body запрос
  */
 const checkEmail: CustomValidator = async (value: string) => {
     const checkEmailByRegex: RegExpMatchArray | null = value.match(regexEmailCheck)
-    const searchUserByEmail: UserInDB | null = await db.usersCollection.findOne({email: value})
-    if (checkEmailByRegex === null || searchUserByEmail !== null) {
+    if (checkEmailByRegex === null) {
+        throw new Error()
+    }
+    const foundUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.foundUserByLoginOrEmail(value)
+    if (foundUser !== DB_RESULTS.INVALID_DATA) {
         throw new Error()
     }
     return true

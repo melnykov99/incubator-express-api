@@ -82,12 +82,13 @@ export const usersRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Метод для аутентификации юзера. Принимаем значение, которое содержит логин или email юзера.
+     * Метод поиска юзера по логину или email. Используется для аутентификации и для валидации при регистрации.
+     * Принимаем значение, которое содержит логин или email юзера.
      * Ищем юзера по полю login и email. Если ничего не находим, возвращаем DB_RESULTS.INVALID_DATA
      * Если нашли юзера, то весь объект с ним и возвращаем.
      * @param loginOrEmail строка с логином или емаилом юзера
      */
-    async loginUser(loginOrEmail: string): Promise<UserInDB | DB_RESULTS.INVALID_DATA> {
+    async foundUserByLoginOrEmail(loginOrEmail: string): Promise<UserInDB | DB_RESULTS.INVALID_DATA> {
         const foundUser: UserInDB | null = await db.usersCollection.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
         if (!foundUser) {
             return DB_RESULTS.INVALID_DATA

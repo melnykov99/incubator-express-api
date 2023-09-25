@@ -17,7 +17,7 @@ export const authService = {
      * @param password пароль юзера, который прислали в теле запроса
      */
     async loginUser(loginOrEmail: string, password: string): Promise<{ accessToken: JwtToken } | DB_RESULTS.INVALID_DATA> {
-        const loginUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.loginUser(loginOrEmail)
+        const loginUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.foundUserByLoginOrEmail(loginOrEmail)
         if (loginUser === DB_RESULTS.INVALID_DATA) {
             return DB_RESULTS.INVALID_DATA
         }
