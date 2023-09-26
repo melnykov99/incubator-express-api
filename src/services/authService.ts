@@ -4,6 +4,7 @@ import {UserInDB} from "../types/usersTypes";
 import {comparePassword} from "../utils/common/passwordHash";
 import {jwtService} from "../utils/common/jwtService";
 import {JwtToken} from "../types/commonTypes";
+import {emailAdapter} from "../adapters/email-adapter";
 
 export const authService = {
     /**
@@ -25,5 +26,8 @@ export const authService = {
             return DB_RESULTS.INVALID_DATA
         }
         return {accessToken: await jwtService.createJWT(loginUser)}
+    },
+    async sendRegistrationMail(email: string) {
+        await emailAdapter.sendRegistrationMail(email)
     }
 }

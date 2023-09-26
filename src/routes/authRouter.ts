@@ -14,14 +14,19 @@ import {RegistrationEmailResending} from "../dto/auth/RegistrationEmailResending
 export const authRouter = Router()
 authRouter.post('/login', validator(loginValidation), async (req: RequestWithBody<LoginUser>, res: Response) => {
     const {loginOrEmail, password} = req.body
-    const loginResult: { accessToken: string } | DB_RESULTS.INVALID_DATA = await authService.loginUser(loginOrEmail, password)
+    const loginResult: {
+        accessToken: string
+    } | DB_RESULTS.INVALID_DATA = await authService.loginUser(loginOrEmail, password)
     if (loginResult === DB_RESULTS.INVALID_DATA) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return
     }
     res.status(HTTP_STATUSES.OK_200).send(loginResult)
 })
-authRouter.post('/registration', validator(usersValidation), async(req: RequestWithBody<CreateUser>, res: Response) => {
+authRouter.post('/registration', validator(usersValidation), async (req: RequestWithBody<CreateUser>, res: Response) => {
+    await authService.sendRegistrationMail(req.body.email)
+    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+
 
 })
 authRouter.post('/registration-confirmation', async (req: RequestWithBody<RegistrationConfirmation>, res: Response) => {
