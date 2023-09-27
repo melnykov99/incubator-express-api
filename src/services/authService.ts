@@ -18,8 +18,8 @@ export const authService = {
      * @param password пароль юзера, который прислали в теле запроса
      */
     async loginUser(loginOrEmail: string, password: string): Promise<{ accessToken: JwtToken } | DB_RESULTS.INVALID_DATA> {
-        const loginUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.foundUserByLoginOrEmail(loginOrEmail)
-        if (loginUser === DB_RESULTS.INVALID_DATA) {
+        const loginUser: UserInDB | DB_RESULTS.NOT_FOUND = await usersRepository.foundUserByLoginOrEmail(loginOrEmail)
+        if (loginUser === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.INVALID_DATA
         }
         if (!await comparePassword(password, loginUser.passwordHash)) {

@@ -9,8 +9,8 @@ import {DB_RESULTS} from "../utils/common/constants";
  * Валидация логина. Логин должен соответствовать регулярке /^[a-zA-Z0-9_-]*$/ и пользователя с таким логином не должно быть в БД
  * Результат проверки значения на регулярное выражение кладем в checkLoginByRegex. Если значение не соответствует, то будет null
  * В случае с null валидацию не проходит, возвращаем ошибку. Текст ошибки дальше в цепочке валидации.
- * В foundUser кладем результат поиска в БД по логину. Если юзера с таким логином не найдем то вернем DB_RESULTS.INVALID_DATA
- * Если юзера нашли и значение foundUser НЕ DB_RESULTS.INVALID_DATA, то валидация не пройдена, возвращаем ошибку.
+ * В foundUser кладем результат поиска в БД по логину. Если юзера с таким логином не найдем то вернем DB_RESULTS.NOT_FOUND
+ * Если юзера нашли и значение foundUser НЕ DB_RESULTS.NOT_FOUND, то валидация не пройдена, возвращаем ошибку.
  * @param value login из body запроса
  */
 const checkLogin: CustomValidator = async (value: string) => {
@@ -18,8 +18,8 @@ const checkLogin: CustomValidator = async (value: string) => {
     if (checkLoginByRegex === null) {
         throw new Error()
     }
-    const foundUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.foundUserByLoginOrEmail(value)
-    if (foundUser !== DB_RESULTS.INVALID_DATA) {
+    const foundUser: UserInDB | DB_RESULTS.NOT_FOUND = await usersRepository.foundUserByLoginOrEmail(value)
+    if (foundUser !== DB_RESULTS.NOT_FOUND) {
         throw new Error()
     }
     return true
@@ -28,8 +28,8 @@ const checkLogin: CustomValidator = async (value: string) => {
  * Валидация email. Email должен соответствовать регулярке /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/ и пользователя с таким email не должно быть в БД
  * Результат проверки значения на регулярное выражение кладем в checkEmailByRegex. Если значение не соответствует, то будет null
  * В случае с null валидацию не проходит, возвращаем ошибку. Текст ошибки дальше в цепочке валидации.
- * В foundUser кладем результат поиска в БД по email. Если юзера с таким email не найдем, то вернем DB_RESULTS.INVALID_DATA
- * Если юзера нашли и значение foundUser НЕ DB_RESULTS.INVALID_DATA, то валидация не пройдена, возвращаем ошибку.
+ * В foundUser кладем результат поиска в БД по email. Если юзера с таким email не найдем, то вернем DB_RESULTS.NOT_FOUND
+ * Если юзера нашли и значение foundUser НЕ DB_RESULTS.NOT_FOUND, то валидация не пройдена, возвращаем ошибку.
  * @param value email из body запрос
  */
 const checkEmail: CustomValidator = async (value: string) => {
@@ -37,8 +37,8 @@ const checkEmail: CustomValidator = async (value: string) => {
     if (checkEmailByRegex === null) {
         throw new Error()
     }
-    const foundUser: UserInDB | DB_RESULTS.INVALID_DATA = await usersRepository.foundUserByLoginOrEmail(value)
-    if (foundUser !== DB_RESULTS.INVALID_DATA) {
+    const foundUser: UserInDB | DB_RESULTS.NOT_FOUND = await usersRepository.foundUserByLoginOrEmail(value)
+    if (foundUser !== DB_RESULTS.NOT_FOUND) {
         throw new Error()
     }
     return true

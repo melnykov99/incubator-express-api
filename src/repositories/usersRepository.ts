@@ -88,10 +88,10 @@ export const usersRepository = {
      * Если нашли юзера, то весь объект с ним и возвращаем.
      * @param loginOrEmail строка с логином или емаилом юзера
      */
-    async foundUserByLoginOrEmail(loginOrEmail: string): Promise<UserInDB | DB_RESULTS.INVALID_DATA> {
+    async foundUserByLoginOrEmail(loginOrEmail: string): Promise<UserInDB | DB_RESULTS.NOT_FOUND> {
         const foundUser: UserInDB | null = await db.usersCollection.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
         if (!foundUser) {
-            return DB_RESULTS.INVALID_DATA
+            return DB_RESULTS.NOT_FOUND
         }
         return foundUser
     }
