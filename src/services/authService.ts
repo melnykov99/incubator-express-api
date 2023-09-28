@@ -13,6 +13,7 @@ export const authService = {
      * Метод для аутентификации юзера
      * loginOrEmail передаем в usersRepository для поиска в БД
      * Если по таким данным ничего не нашли, то сразу выходим из функции, возвращая DB_RESULTS.INVALID_DATA
+     * Если юзера нашли, но у него isConfirmed === false (не подтвержден), то выходимиз функции, возвращая DB_RESULTS.INVALID_DATA. Неподтвержденный юзер не может логиниться
      * Если юзера нашли, то проверяем его пароль. В метод comparePassword передаем пароль из тела запроса и хэш найденного юзера
      * Если пароль неверный, то метод compare вернет false. В таком случае выйдем из функции, возвращая DB_RESULTS.INVALID_DATA
      * Если пароль подходит, значит все данные верны. Обращаемся к методу createJWT, передавая объект юзера и формируем jwt token
@@ -24,6 +25,9 @@ export const authService = {
     } | DB_RESULTS.INVALID_DATA> {
         const loginUser: UserInDB | DB_RESULTS.NOT_FOUND = await usersRepository.foundUserByLoginOrEmail(loginOrEmail)
         if (loginUser === DB_RESULTS.NOT_FOUND) {
+            return DB_RESULTS.INVALID_DATA
+        }
+        if (!loginUser.isConfirmed) {
             return DB_RESULTS.INVALID_DATA
         }
         if (!await comparePassword(password, loginUser.passwordHash)) {
@@ -51,7 +55,7 @@ export const authService = {
             passwordHash,
             createdAt: (new Date().toISOString()),
             confirmationCode: uuidv4(),
-            expirationDate: add(new Date(), {hours: 1}),
+            expirationDate: add(new Date(), {hours: 24}),
             isConfirmed: false
         }
         await usersRepository.createUser(newUser)
@@ -83,6 +87,19 @@ export const authService = {
             return DB_RESULTS.UNSUCCESSFULL
         }
         await usersRepository.confirmationUser(foundUser.id)
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    /**
+     * Ищем юзера по email. Он всегда будет, поскольку на этапе валидации проверяли наличие. Не дошли бы сюда, если бы юзера с таким email не было
+     * Отправляем письмо на указанный email, из foundUser достаем confirmationCode
+     * @param email адрес на который нужно отправить повторное сообщение
+     */
+    async registrationEmailResending(email: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        const foundUser: DB_RESULTS.NOT_FOUND | UserInDB = await usersRepository.foundUserByLoginOrEmail(email)
+        if (foundUser === DB_RESULTS.NOT_FOUND) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        await emailAdapter.sendRegistrationMail(email, foundUser.confirmationCode)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }

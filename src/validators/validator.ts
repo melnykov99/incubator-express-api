@@ -13,6 +13,7 @@ import {UpdateDeleteCommentById} from "../dto/comments/UpdateDeleteCommentById";
 import {UpdateComment} from "../dto/comments/UpdateComment";
 import {GetCommentsByPostId} from "../dto/posts/GetCommentsByPostId";
 import {CreateCommentByPostId} from "../dto/posts/CreateCommentByPostId";
+import {RegistrationEmailResending} from "../dto/auth/RegistrationEmailResending";
 
 /**
  * Циклом проходится по ValidationChain и запускает каждую проверку. Если были ошибки при валидации, то запишет их в массив errors.
@@ -22,7 +23,8 @@ import {CreateCommentByPostId} from "../dto/posts/CreateCommentByPostId";
  */
 export const validator = (validations: ValidationChain[]) => {
     return async (req: RequestWithBody<CreateUpdateVideo | CreateUpdateBlog | CreateUpdatePost | CreatePostByBlogId | CreateUser | LoginUser>
-                      | RequestWithParamsAndBody<UpdateDeleteCommentById, UpdateComment> | RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>,
+                      | RequestWithParamsAndBody<UpdateDeleteCommentById, UpdateComment> | RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>
+                      | RequestWithBody<RegistrationEmailResending>,
                   res: Response, next: NextFunction) => {
         for (let validation of validations) {
             await validation.run(req);

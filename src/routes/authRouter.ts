@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {RequestWithBody} from "../types/requestGenerics";
 import {LoginUser} from "../dto/auth/LoginUser";
 import {validator} from "../validators/validator";
-import {loginValidation} from "../validators/authValidation";
+import {emailResendingValidation, loginValidation} from "../validators/authValidation";
 import {DB_RESULTS, HTTP_STATUSES} from "../utils/common/constants";
 import {authService} from "../services/authService";
 import {jwtAuth} from "../middlewares/jwtAuth";
@@ -32,8 +32,6 @@ authRouter.post('/registration', validator(usersValidation), async (req: Request
         return
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
-
-
 })
 authRouter.post('/registration-confirmation', async (req: RequestWithBody<RegistrationConfirmation>, res: Response) => {
     const confirmationResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.UNSUCCESSFULL | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.confirmationUser(req.body.code)
@@ -42,11 +40,11 @@ authRouter.post('/registration-confirmation', async (req: RequestWithBody<Regist
         return
     }
     res.status(HTTP_STATUSES.BAD_REQUEST_400).send({"errorsMessages": [authErrors.confirmationCode]})
-
-
 })
-authRouter.post('/registration-email-resending', async (req: RequestWithBody<RegistrationEmailResending>, res: Response) => {
-
+authRouter.post('/registration-email-resending', validator(emailResendingValidation), async (req: RequestWithBody<RegistrationEmailResending>, res: Response) => {
+    // здесь не будет NOT_FOUND потому что на этапе валидации проверяли наличие юзера
+    const resendingResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.registrationEmailResending(req.body.email)
+    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 /**
  * Роут для проверки токена. Проверяем токен в мидлваре jwtAuth. Если токен валидный, то в req.user будет вся информация из БД о юзере
