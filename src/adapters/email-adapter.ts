@@ -1,5 +1,12 @@
 import nodemailer from "nodemailer";
 
+/**
+ * Метод для отправки сообщения при регистрации. Вызывается в authService
+ * В transport задаем настройки почтового сервиса для отправки
+ * В mailOptions задаем параметры письма. Отправляем на email из параметра. В ссылку вшиваем код подтверждения.
+ * Сейчас сайт для подтверждения обычная заглушка
+ * Далее отправляем email и выходим из функцкии
+ */
 export const emailAdapter = {
     async sendRegistrationMail(email: string, confirmationCode: string) {
         let transport = nodemailer.createTransport({
@@ -23,7 +30,7 @@ export const emailAdapter = {
                  </p>`
         }
 
-        transport.sendMail(mailOptions, function (error, info) {
+        await transport.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
             }

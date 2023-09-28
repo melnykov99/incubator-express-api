@@ -32,10 +32,15 @@ export const authService = {
         return {accessToken: await jwtService.createJWT(loginUser)}
     },
     /**
-     *
-     * @param login
-     * @param password
-     * @param email
+     * Метод регистрации пользователя
+     * Передаем password в функцию generatePasswordHash и получаем passwordHash
+     * Создаем объект нового юзера в который прокидываем login, email, passwordHash, createdAt, confirmationCode (для подтверждения email),
+     * expirationDate (срок действия кода для подтверждения) и isConfirmed - статус подтверждения пользователя.
+     * Добавляем объект в БД и отправляем письмо с кодом подтверждения на указанный email
+     * Если по какой-то причине при отправке письма ошибка, то пользователя удаляем из БД и возвращаем константу о неуспешном выполнении
+     * @param login логин пользователя из тела запроса
+     * @param password пароль пользователя из тела запроса
+     * @param email email пользователя из тела запроса
      */
     async registrationUser(login: string, password: string, email: string): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED | DB_RESULTS.UNSUCCESSFULL> {
         const passwordHash: string = await generatePasswordHash(password)
