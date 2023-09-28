@@ -19,7 +19,7 @@ export const usersRepository = {
      * Обращаемся к функции пагинации и сортировки, передавая query параметры пагниации/сортировки и название коллекции
      * Функция возвращает PagSortValues к которым обращаемся для формирования объекта
      * Возвращаем информацию о страницах и в объекте items возвращаем массив с юзерами
-     * Юзеров из БД отдаем без монговского _id и без passwordHash, чтобы соответстовали типу UserOutput
+     * Юзеров из БД отдаем только с нужными данными, чтобы соответствовали userOutput
      * @param sortBy по какому полю выполнить сортировку и вернуть результат
      * @param sortDirection с каким направлением сделать сортировку asc или desc
      * @param pageNumber номер страницы для вывода
@@ -44,7 +44,7 @@ export const usersRepository = {
             pageSize: pagSortValues.pageSize,
             totalCount: pagSortValues.totalCount,
             items: await db.usersCollection
-                .find(filter, {projection: {_id: 0, passwordHash: 0}})
+                .find(filter, {projection: {id: 1, login: 1, email: 1, createdAt: 1}})
                 .skip(pagSortValues.skip)
                 .limit(pagSortValues.limit)
                 .sort({[pagSortValues.sortBy]: pagSortValues.sortDirection})
