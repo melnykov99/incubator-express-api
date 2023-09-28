@@ -102,8 +102,8 @@ export const usersRepository = {
         return foundUser
     },
     /**
-     *
-     * @param code
+     * Ищем пользователя по confirmationCode. Если не находим, то возвращаем DB_RESULTS.NOT_FOUND, если нашли, то возвращаем пользователя
+     * @param code код для подтверждения пользователя. Приходит в теле запроса.
      */
     async foundUserByConfirmationCode(code: string): Promise<DB_RESULTS.NOT_FOUND | UserInDB> {
         const foundUser: UserInDB | null = await db.usersCollection.findOne({confirmationCode: code})
@@ -112,6 +112,10 @@ export const usersRepository = {
         }
         return foundUser
     },
+    /**
+     * Метод подтверждения юзера. Находим юзера по id и меняем у него isConfirmed на true
+     * @param id id юзера, которого нужно подтвердить
+     */
     async confirmationUser(id: string): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.usersCollection.updateOne({id: id}, {$set: {isConfirmed: true}})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED

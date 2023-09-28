@@ -65,8 +65,11 @@ export const authService = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     *
-     * @param code
+     * Функция подтверждения пользователя. Сначала ищем юзера по коду, если не находим, то выходим из функции
+     * Если пользователя нашли, но в isConfirmed у него уже значение true, то выходим из функции
+     * Если у пользователя expirationDate просрочился (меньше текущей даты), то выходим из функции
+     * В ином случае подтверждаем пользователя и завершаем функцию передавая DB_RESULTS.SUCCESSFULLY_COMPLETED
+     * @param code код для подтверждения пользователя. Приходит в теле запроса.
      */
     async confirmationUser(code: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.UNSUCCESSFULL | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         const foundUser: DB_RESULTS.NOT_FOUND | UserInDB = await usersRepository.foundUserByConfirmationCode(code)
