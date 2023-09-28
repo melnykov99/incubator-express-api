@@ -10,6 +10,7 @@ import {usersValidation} from "../validators/usersValidation";
 import {CreateUser} from "../dto/users/CreateUser";
 import {RegistrationConfirmation} from "../dto/auth/RegistrationConfirmation";
 import {RegistrationEmailResending} from "../dto/auth/RegistrationEmailResending";
+import {authErrors} from "../validators/errors/authErrors";
 
 export const authRouter = Router()
 authRouter.post('/login', validator(loginValidation), async (req: RequestWithBody<LoginUser>, res: Response) => {
@@ -35,6 +36,13 @@ authRouter.post('/registration', validator(usersValidation), async (req: Request
 
 })
 authRouter.post('/registration-confirmation', async (req: RequestWithBody<RegistrationConfirmation>, res: Response) => {
+    const confirmationResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.UNSUCCESSFULL | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.confirmationUser(req.body.code)
+    if (confirmationResult === DB_RESULTS.SUCCESSFULLY_COMPLETED) {
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+        return
+    }
+    res.status(HTTP_STATUSES.BAD_REQUEST_400).send({"errorsMessages": [authErrors.confirmationCode]})
+
 
 })
 authRouter.post('/registration-email-resending', async (req: RequestWithBody<RegistrationEmailResending>, res: Response) => {

@@ -8,5 +8,9 @@ export const authErrors: ErrorsObject = {
     password: {
         message: 'password must be string',
         field: 'password'
+    },
+    confirmationCode: {
+        message: 'confirmationCode expired, invalid or this email has already been confirmed',
+        field: 'confirmationCode'
     }
 }

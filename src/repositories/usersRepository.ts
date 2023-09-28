@@ -37,7 +37,6 @@ export const usersRepository = {
     ): Promise<UserViewModel> {
         const filter = searchLoginEmailDefinition(searchLoginTerm, searchEmailTerm)
         const pagSortValues: PagSortValues = await paginationAndSorting(sortBy, sortDirection, pageNumber, pageSize, 'usersCollection', filter)
-
         return {
             pagesCount: pagSortValues.pagesCount,
             page: pagSortValues.pageNumber,
@@ -56,7 +55,14 @@ export const usersRepository = {
      * @param id id юзера
      */
     async getUserById(id: string): Promise<UserOutput | DB_RESULTS.NOT_FOUND> {
-        const foundUser: UserOutput | null = await db.usersCollection.findOne({id}, {projection: {id: 1, login: 1, email: 1, createdAt: 1}})
+        const foundUser: UserOutput | null = await db.usersCollection.findOne({id}, {
+            projection: {
+                id: 1,
+                login: 1,
+                email: 1,
+                createdAt: 1
+            }
+        })
         if (!foundUser) {
             return DB_RESULTS.NOT_FOUND
         }
@@ -94,5 +100,20 @@ export const usersRepository = {
             return DB_RESULTS.NOT_FOUND
         }
         return foundUser
+    },
+    /**
+     *
+     * @param code
+     */
+    async foundUserByConfirmationCode(code: string): Promise<DB_RESULTS.NOT_FOUND | UserInDB> {
+        const foundUser: UserInDB | null = await db.usersCollection.findOne({confirmationCode: code})
+        if (foundUser === null) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        return foundUser
+    },
+    async confirmationUser(id: string): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        await db.usersCollection.updateOne({id: id}, {$set: {isConfirmed: true}})
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }

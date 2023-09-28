@@ -63,5 +63,23 @@ export const authService = {
             return DB_RESULTS.UNSUCCESSFULL
         }
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    /**
+     *
+     * @param code
+     */
+    async confirmationUser(code: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.UNSUCCESSFULL | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        const foundUser: DB_RESULTS.NOT_FOUND | UserInDB = await usersRepository.foundUserByConfirmationCode(code)
+        if (foundUser === DB_RESULTS.NOT_FOUND) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        if (foundUser.isConfirmed) {
+            return DB_RESULTS.UNSUCCESSFULL
+        }
+        if (foundUser.expirationDate < new Date()) {
+            return DB_RESULTS.UNSUCCESSFULL
+        }
+        await usersRepository.confirmationUser(foundUser.id)
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }
