@@ -1,5 +1,5 @@
 import {db} from "./db";
-import {UserInDB, UserViewModel} from "../types/usersTypes";
+import {UserInDB, UserOutput, UserViewModel} from "../types/usersTypes";
 import {DeleteResult} from "mongodb";
 import {DB_RESULTS} from "../utils/common/constants";
 import {PagSortValues} from "../types/commonTypes";
@@ -55,8 +55,8 @@ export const usersRepository = {
      * находим юзера в БД по id. Если не находим, то возвращаем константу DB_RESULTS.NOT_FOUND
      * @param id id юзера
      */
-    async getUserById(id: string): Promise<UserInDB | DB_RESULTS.NOT_FOUND> {
-        const foundUser: UserInDB | null = await db.usersCollection.findOne({id})
+    async getUserById(id: string): Promise<UserOutput | DB_RESULTS.NOT_FOUND> {
+        const foundUser: UserOutput | null = await db.usersCollection.findOne({id}, {projection: {id: 1, login: 1, email: 1, createdAt: 1}})
         if (!foundUser) {
             return DB_RESULTS.NOT_FOUND
         }

@@ -2,7 +2,7 @@ import {DB_RESULTS, HTTP_STATUSES} from "../utils/common/constants";
 import {NextFunction, Request, Response} from "express";
 import {jwtService} from "../utils/common/jwtService";
 import {usersService} from "../services/usersService";
-import {UserInDB} from "../types/usersTypes";
+import {UserOutput} from "../types/usersTypes";
 
 /**
  * мидлавара jwt авторизации
@@ -12,7 +12,7 @@ import {UserInDB} from "../types/usersTypes";
  * Обращаемся к функции getUserIdByToken и ищем юзера по этому токену. Если юзера нет или токен невалидный, то прерываем запрос, возвращая 401
  * Если id юзера получили, то обращаемся к БД и достаем этого юзера по id
  * Если юзера не нашли, то прерываем запрос и возвращаем 401
- * Если юзер найден, то кладем его в req.user и передаем выполнение запроса дальше
+ * Если юзер найден, то кладем данные о нем в req.user. Данные соответтсвенно UserOutput. И передаем выполнение запроса дальше
  * @param req
  * @param res
  * @param next
@@ -28,7 +28,7 @@ export const jwtAuth = async (req: Request, res: Response, next: NextFunction) =
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return
     }
-    const foundUser: UserInDB | DB_RESULTS.NOT_FOUND = await usersService.getUserById(userId)
+    const foundUser: UserOutput | DB_RESULTS.NOT_FOUND = await usersService.getUserById(userId)
     if (foundUser === DB_RESULTS.NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return

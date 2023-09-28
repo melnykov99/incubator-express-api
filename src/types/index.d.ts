@@ -1,4 +1,4 @@
-import {UserInDB} from "./usersTypes";
+import {UserOutput} from "./usersTypes";
 
 /**
  * создаем глобальную область видимости, которая охватывает все файлы в проекте
@@ -8,7 +8,7 @@ import {UserInDB} from "./usersTypes";
 declare global {
     namespace Express {
         export interface Request {
-            user: UserInDB
+            user: UserOutput
         }
     }
 }

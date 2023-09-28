@@ -28,7 +28,7 @@ export const usersService = {
      * Обращаемся к usersRepository чтобы найти юзера в БД по id
      * @param id id юзера
      */
-    async getUserById(id: string): Promise<UserInDB | DB_RESULTS.NOT_FOUND> {
+    async getUserById(id: string): Promise<UserOutput | DB_RESULTS.NOT_FOUND> {
         return usersRepository.getUserById(id)
     },
     /**
