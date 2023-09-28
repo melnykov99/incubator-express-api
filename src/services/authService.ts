@@ -1,10 +1,12 @@
 import {DB_RESULTS} from "../utils/common/constants";
 import {usersRepository} from "../repositories/usersRepository";
 import {UserInDB} from "../types/usersTypes";
-import {comparePassword} from "../utils/common/passwordHash";
+import {comparePassword, generatePasswordHash} from "../utils/common/passwordHash";
 import {jwtService} from "../utils/common/jwtService";
 import {JwtToken} from "../types/commonTypes";
 import {emailAdapter} from "../adapters/email-adapter";
+import {v4 as uuidv4} from "uuid";
+import add from "date-fns/add";
 
 export const authService = {
     /**
@@ -17,7 +19,9 @@ export const authService = {
      * @param loginOrEmail логин или email, который прислали в теле запроса
      * @param password пароль юзера, который прислали в теле запроса
      */
-    async loginUser(loginOrEmail: string, password: string): Promise<{ accessToken: JwtToken } | DB_RESULTS.INVALID_DATA> {
+    async loginUser(loginOrEmail: string, password: string): Promise<{
+        accessToken: JwtToken
+    } | DB_RESULTS.INVALID_DATA> {
         const loginUser: UserInDB | DB_RESULTS.NOT_FOUND = await usersRepository.foundUserByLoginOrEmail(loginOrEmail)
         if (loginUser === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.INVALID_DATA
@@ -27,7 +31,32 @@ export const authService = {
         }
         return {accessToken: await jwtService.createJWT(loginUser)}
     },
-    async sendRegistrationMail(email: string) {
-        await emailAdapter.sendRegistrationMail(email)
+    /**
+     *
+     * @param login
+     * @param password
+     * @param email
+     */
+    async registrationUser(login: string, password: string, email: string): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED | DB_RESULTS.UNSUCCESSFULL> {
+        const passwordHash: string = await generatePasswordHash(password)
+        const newUser: UserInDB = {
+            id: Date.now().toString(),
+            login,
+            email,
+            passwordHash,
+            createdAt: (new Date().toISOString()),
+            confirmationCode: uuidv4(),
+            expirationDate: add(new Date(), {hours: 1}),
+            isConfirmed: false
+        }
+        await usersRepository.createUser(newUser)
+        try {
+            await emailAdapter.sendRegistrationMail(email, newUser.confirmationCode)
+        } catch (error) {
+            console.log(error)
+            await usersRepository.deleteUser(newUser.id)
+            return DB_RESULTS.UNSUCCESSFULL
+        }
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }

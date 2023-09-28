@@ -24,7 +24,12 @@ authRouter.post('/login', validator(loginValidation), async (req: RequestWithBod
     res.status(HTTP_STATUSES.OK_200).send(loginResult)
 })
 authRouter.post('/registration', validator(usersValidation), async (req: RequestWithBody<CreateUser>, res: Response) => {
-    await authService.sendRegistrationMail(req.body.email)
+    const {login, password, email} = req.body
+    const registrationResult: DB_RESULTS.SUCCESSFULLY_COMPLETED | DB_RESULTS.UNSUCCESSFULL = await authService.registrationUser(login, password, email)
+    if (registrationResult === DB_RESULTS.UNSUCCESSFULL) {
+        res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
+        return
+    }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 
 

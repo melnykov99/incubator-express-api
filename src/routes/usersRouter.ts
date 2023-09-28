@@ -24,6 +24,10 @@ usersRouter.get('/', basicAuth, async (req: RequestWithQuery<GetUsersWithQuery>,
     const users: UserViewModel = await usersService.getUsers(sortBy, sortDirection, pageNumber, pageSize, searchLoginTerm, searchEmailTerm)
     res.status(HTTP_STATUSES.OK_200).send(users)
 })
+/**
+ * Запрос для создания пользователя вручную "суперадмином".
+ * По умолчанию пользователь добавляется/создается при регистрации запросом auth/registration и требует подтверждения email
+ */
 usersRouter.post('/', basicAuth, validator(usersValidation), async (req: RequestWithBody<CreateUser>, res: Response) => {
     const {login, password, email} = req.body
     const newUser: UserOutput = await usersService.createUser(login, password, email)

@@ -4,6 +4,9 @@ export type UserInDB = {
     email: string,
     passwordHash: string,
     createdAt: string
+    confirmationCode: string,
+    expirationDate: Date,
+    isConfirmed: boolean
 }
 export type UserOutput = {
     id: string,

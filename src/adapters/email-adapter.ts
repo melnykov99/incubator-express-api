@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 
 export const emailAdapter = {
-    async sendRegistrationMail(email: string) {
+    async sendRegistrationMail(email: string, confirmationCode: string) {
         let transport = nodemailer.createTransport({
             service: 'gmail',
             host: 'smtp.gmail.com',
@@ -14,9 +14,13 @@ export const emailAdapter = {
         let mailOptions = {
             from: 'Dmitry Melnikov <melnykovtestdev@gmail.com>',
             to: email,
-            subject: 'Hello world',
+            subject: 'Registration',
             text: 'Hello world text',
-            html: "<b>Hello world text</b>"
+            html: String.raw`
+                <h1>Thank for your registration</h1>
+                 <p>To finish registration please follow the link below:
+                     <a href='https://somesite.com/confirm-email?code=${confirmationCode}'>complete registration</a>
+                 </p>`
         }
 
         transport.sendMail(mailOptions, function (error, info) {

@@ -2,6 +2,8 @@ import {usersRepository} from "../repositories/usersRepository";
 import {UserInDB, UserOutput, UserViewModel} from "../types/usersTypes";
 import {DB_RESULTS} from "../utils/common/constants";
 import {generatePasswordHash} from "../utils/common/passwordHash";
+import {v4 as uuidv4} from 'uuid';
+import add from 'date-fns/add'
 
 
 export const usersService = {
@@ -30,9 +32,12 @@ export const usersService = {
         return usersRepository.getUserById(id)
     },
     /**
+     * Метод createUser для создания юзера вручную "суперадмином" через адрес post /users. По умолчанию юзеры создаются через auth/registration
      * Передаем password в функцию generatePasswordHash и получаем passwordHash
-     * Записываем эти данные в объект newUser, который передаем в репозиторий для добавления в БД
-     * Возвращаем те данные, которые соответствуют UserOutput
+     * Создаем объект нового юзера в который прокидываем login, email, passwordHash, createdAt, confirmationCode (для подтверждения email),
+     * expirationDate (срок действия кода для подтверждения) и isConfirmed - статус подтверждения пользователя.
+     * isConfirmed сразу true, при создании пользователя "суперадмином" подтверждение не нужно.
+     * Добавляем объект в БД и возвращаем те данные, которые соответствуют UserOutput
      * @param login логин пользователя, которые юзер передал в теле запроса
      * @param password пароль пользователя, который юзер передал в теле запроса
      * @param email email пользователя, который юзер передал в теле запроса
@@ -45,11 +50,13 @@ export const usersService = {
             email,
             passwordHash,
             createdAt: (new Date().toISOString()),
+            confirmationCode: uuidv4(),
+            expirationDate: add(new Date(), {hours: 1}),
+            isConfirmed: true
         }
         await usersRepository.createUser(newUser)
         const {id, createdAt} = newUser
         return {id, login, email, createdAt};
-
     },
     /**
      * обращаемся к usersRepository передавая id юзера, которого нужно удалить
