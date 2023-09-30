@@ -119,5 +119,14 @@ export const usersRepository = {
     async confirmationUser(id: string): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.usersCollection.updateOne({id: id}, {$set: {isConfirmed: true}})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    /**
+     * Обновление confirmation code у юзера по id
+     * @param id id юзера
+     * @param code новый код подтверждения, который нужно записать
+     */
+    async updateConfirmationCode(id: string, code: string): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        await db.usersCollection.updateOne({id: id}, {$set: {confirmationCode: code}})
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }

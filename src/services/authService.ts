@@ -91,7 +91,8 @@ export const authService = {
     },
     /**
      * Ищем юзера по email. Он всегда будет, поскольку на этапе валидации проверяли наличие. Не дошли бы сюда, если бы юзера с таким email не было
-     * Отправляем письмо на указанный email, из foundUser достаем confirmationCode
+     * Создаем новый код подтверждения. Новый код перезаписываем в БД у юзера
+     * Отправляем письмо с новым кодом на указанный email
      * @param email адрес на который нужно отправить повторное сообщение
      */
     async registrationEmailResending(email: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
@@ -99,7 +100,9 @@ export const authService = {
         if (foundUser === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
         }
-        await emailAdapter.sendRegistrationMail(email, foundUser.confirmationCode)
+        const newConfirmationCode: string = uuidv4()
+        await usersRepository.updateConfirmationCode(foundUser.id, newConfirmationCode)
+        await emailAdapter.sendRegistrationMail(email, newConfirmationCode)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }
