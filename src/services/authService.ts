@@ -90,15 +90,19 @@ export const authService = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Ищем юзера по email. Он всегда будет, поскольку на этапе валидации проверяли наличие. Не дошли бы сюда, если бы юзера с таким email не было
+     * Ищем юзера по email. Если не находим, то выходим из функции и возвращем DB_RESULTS.NOT_FOUND
+     * Если юзера нашли, но он уже подтвержден, то выходим из функции и возвращаем DB_RESULTS.INVALID_DATA. Подтвержденному юзеру не нужно повторно отправлять письмо подтверждения.
      * Создаем новый код подтверждения. Новый код перезаписываем в БД у юзера
      * Отправляем письмо с новым кодом на указанный email
      * @param email адрес на который нужно отправить повторное сообщение
      */
-    async registrationEmailResending(email: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+    async registrationEmailResending(email: string): Promise<DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED | DB_RESULTS.INVALID_DATA> {
         const foundUser: DB_RESULTS.NOT_FOUND | UserInDB = await usersRepository.foundUserByLoginOrEmail(email)
         if (foundUser === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.NOT_FOUND
+        }
+        if (foundUser.isConfirmed) {
+            return DB_RESULTS.INVALID_DATA
         }
         const newConfirmationCode: string = uuidv4()
         await usersRepository.updateConfirmationCode(foundUser.id, newConfirmationCode)

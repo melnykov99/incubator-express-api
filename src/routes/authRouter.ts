@@ -42,9 +42,13 @@ authRouter.post('/registration-confirmation', async (req: RequestWithBody<Regist
     res.status(HTTP_STATUSES.BAD_REQUEST_400).send({"errorsMessages": [authErrors.confirmationCode]})
 })
 authRouter.post('/registration-email-resending', validator(emailResendingValidation), async (req: RequestWithBody<RegistrationEmailResending>, res: Response) => {
-    // здесь не будет NOT_FOUND потому что на этапе валидации проверяли наличие юзера
-    const resendingResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.registrationEmailResending(req.body.email)
-    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    const resendingResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.registrationEmailResending(req.body.email)
+    if (resendingResult === DB_RESULTS.SUCCESSFULLY_COMPLETED) {
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+        return
+    }
+    res.status(HTTP_STATUSES.BAD_REQUEST_400).send({"errorsMessages": [authErrors.email]})
+
 })
 /**
  * Роут для проверки токена. Проверяем токен в мидлваре jwtAuth. Если токен валидный, то в req.user будет вся информация из БД о юзере
