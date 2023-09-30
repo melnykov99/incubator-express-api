@@ -13,6 +13,8 @@ import {RegistrationEmailResending} from "../dto/auth/RegistrationEmailResending
 import {authErrors} from "../validators/errors/authErrors";
 
 export const authRouter = Router()
+
+//авторизация созданного и подтвержденного пользователя
 authRouter.post('/login', validator(loginValidation), async (req: RequestWithBody<LoginUser>, res: Response) => {
     const {loginOrEmail, password} = req.body
     const loginResult: {
@@ -24,6 +26,8 @@ authRouter.post('/login', validator(loginValidation), async (req: RequestWithBod
     }
     res.status(HTTP_STATUSES.OK_200).send(loginResult)
 })
+
+// регистрация пользователя. Создание записи в БД и отправка письма с кодом на почту для подтверждения
 authRouter.post('/registration', validator(usersValidation), async (req: RequestWithBody<CreateUser>, res: Response) => {
     const {login, password, email} = req.body
     const registrationResult: DB_RESULTS.SUCCESSFULLY_COMPLETED | DB_RESULTS.UNSUCCESSFULL = await authService.registrationUser(login, password, email)
@@ -33,6 +37,8 @@ authRouter.post('/registration', validator(usersValidation), async (req: Request
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
+
+// подтверждение пользователя. Проверяем код из тела запроса
 authRouter.post('/registration-confirmation', async (req: RequestWithBody<RegistrationConfirmation>, res: Response) => {
     const confirmationResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.UNSUCCESSFULL | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.confirmationUser(req.body.code)
     if (confirmationResult === DB_RESULTS.SUCCESSFULLY_COMPLETED) {
@@ -41,6 +47,8 @@ authRouter.post('/registration-confirmation', async (req: RequestWithBody<Regist
     }
     res.status(HTTP_STATUSES.BAD_REQUEST_400).send({"errorsMessages": [authErrors.confirmationCode]})
 })
+
+// повторная отправка письма с кодом подтверждения на email пользователя.
 authRouter.post('/registration-email-resending', validator(emailResendingValidation), async (req: RequestWithBody<RegistrationEmailResending>, res: Response) => {
     const resendingResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.registrationEmailResending(req.body.email)
     if (resendingResult === DB_RESULTS.SUCCESSFULLY_COMPLETED) {
@@ -48,8 +56,16 @@ authRouter.post('/registration-email-resending', validator(emailResendingValidat
         return
     }
     res.status(HTTP_STATUSES.BAD_REQUEST_400).send({"errorsMessages": [authErrors.email]})
+})
+// роут для выдачи новой пары токенов
+authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 
 })
+
+authRouter.post('/logout', async (req: Request, res: Response) => {
+
+})
+
 /**
  * Роут для проверки токена. Проверяем токен в мидлваре jwtAuth. Если токен валидный, то в req.user будет вся информация из БД о юзере
  * Никуда не обращаемся, просто выводим нужные данные из req в ответе
