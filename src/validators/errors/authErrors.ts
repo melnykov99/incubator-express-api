@@ -10,8 +10,8 @@ export const authErrors: ErrorsObject = {
         field: 'password'
     },
     confirmationCode: {
-        message: 'confirmationCode expired, invalid or this email has already been confirmed',
-        field: 'confirmationCode'
+        message: 'confirmation code expired, invalid or this email has already been confirmed',
+        field: 'code'
     },
     emailResending: {
         message: 'incorrect email or user with such email has already been confirmed',
