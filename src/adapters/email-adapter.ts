@@ -18,6 +18,17 @@ export const emailAdapter = {
             }
         })
 
+        //проверка коннекта конфигурации трансопрта.
+        await new Promise((resolve, reject) => {
+            transport.verify(function (error, success) {
+                if (error) {
+                    reject(error)
+                } else {
+                    resolve(success)
+                }
+            })
+        })
+
         let mailOptions = {
             from: 'Dmitry Melnikov <melnykovtestdev@gmail.com>',
             to: email,
@@ -30,10 +41,15 @@ export const emailAdapter = {
                  </p>`
         }
 
-        await transport.sendMail(mailOptions, function (error, info) {
-            if (error) {
-                console.log(error);
-            }
+        //Оборачиваем в промис, поскольку при деплое на верселе окружение не дожидается отправку сообщения.
+        await new Promise((resolve, reject) => {
+            transport.sendMail(mailOptions, (err, info) => {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(info)
+                }
+            })
         })
         return
     }
