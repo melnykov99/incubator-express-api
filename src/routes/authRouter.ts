@@ -11,20 +11,23 @@ import {CreateUser} from "../dto/users/CreateUser";
 import {RegistrationConfirmation} from "../dto/auth/RegistrationConfirmation";
 import {RegistrationEmailResending} from "../dto/auth/RegistrationEmailResending";
 import {authErrors} from "../validators/errors/authErrors";
+import {JwtToken} from "../types/commonTypes";
 
 export const authRouter = Router()
 
-//авторизация созданного и подтвержденного пользователя
+//авторизация созданного и подтвержденного пользователя. Возвращаем refreshToken в куках и accessToken в теле ответа.
 authRouter.post('/login', validator(loginValidation), async (req: RequestWithBody<LoginUser>, res: Response) => {
     const {loginOrEmail, password} = req.body
     const loginResult: {
-        accessToken: string
+        accessToken: JwtToken,
+        refreshToken: JwtToken
     } | DB_RESULTS.INVALID_DATA = await authService.loginUser(loginOrEmail, password)
     if (loginResult === DB_RESULTS.INVALID_DATA) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return
     }
-    res.status(HTTP_STATUSES.OK_200).send(loginResult)
+    res.cookie('refreshToken', loginResult.refreshToken, {httpOnly: true, secure: true})
+    res.status(HTTP_STATUSES.OK_200).send({accessToken: loginResult.accessToken})
 })
 
 // регистрация пользователя. Создание записи в БД и отправка письма с кодом на почту для подтверждения

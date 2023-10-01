@@ -20,13 +20,16 @@ export const jwtService = {
     /**
      * В метод jwt.sign передаем userId, именно эта информация будет зашифрована в jwt token
      * Также передаем секрет для шифровки и время жизни токена
+     * Формируем accessToken и refreshToken
      * Проверяем токен на нужный формат. jwt всегда разделен на 3 части точками. Если будет неверный формат, то появится ошибка.
      * @param user объект пользователя, который логинится
      */
-    async createJWT(user: UserInDB): Promise<JwtToken> {
-        const token = jwt.sign({userId: user.id}, process.env.JWT_SECRET!, {expiresIn: '1h'})
-        assertsJwtToken(token)
-        return token
+    async createAuthTokens(user: UserInDB): Promise<{ accessToken: JwtToken, refreshToken: JwtToken }> {
+        const accessToken = jwt.sign({userId: user.id}, process.env.JWT_ACCESS_SECRET!, {expiresIn: '10s'})
+        const refreshToken = jwt.sign({userId: user.id}, process.env.JWT_REFRESH_SECRET!, {expiresIn: '20s'})
+        assertsJwtToken(accessToken)
+        assertsJwtToken(refreshToken)
+        return {accessToken, refreshToken}
     },
     /**
      * Функция для поиска юзера по токену

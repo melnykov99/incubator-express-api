@@ -16,12 +16,13 @@ export const authService = {
      * Если юзера нашли, но у него isConfirmed === false (не подтвержден), то выходимиз функции, возвращая DB_RESULTS.INVALID_DATA. Неподтвержденный юзер не может логиниться
      * Если юзера нашли, то проверяем его пароль. В метод comparePassword передаем пароль из тела запроса и хэш найденного юзера
      * Если пароль неверный, то метод compare вернет false. В таком случае выйдем из функции, возвращая DB_RESULTS.INVALID_DATA
-     * Если пароль подходит, значит все данные верны. Обращаемся к методу createJWT, передавая объект юзера и формируем jwt token
+     * Если пароль подходит, значит все данные верны. Передаем данные о юзере в метод для создания access и refresh токенов
      * @param loginOrEmail логин или email, который прислали в теле запроса
      * @param password пароль юзера, который прислали в теле запроса
      */
     async loginUser(loginOrEmail: string, password: string): Promise<{
-        accessToken: JwtToken
+        accessToken: JwtToken,
+        refreshToken: JwtToken
     } | DB_RESULTS.INVALID_DATA> {
         const loginUser: UserInDB | DB_RESULTS.NOT_FOUND = await usersRepository.foundUserByLoginOrEmail(loginOrEmail)
         if (loginUser === DB_RESULTS.NOT_FOUND) {
@@ -33,7 +34,7 @@ export const authService = {
         if (!await comparePassword(password, loginUser.passwordHash)) {
             return DB_RESULTS.INVALID_DATA
         }
-        return {accessToken: await jwtService.createJWT(loginUser)}
+        return await jwtService.createAuthTokens(loginUser)
     },
     /**
      * Метод регистрации пользователя
