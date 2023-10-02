@@ -17,6 +17,7 @@ export const authService = {
      * Если юзера нашли, то проверяем его пароль. В метод comparePassword передаем пароль из тела запроса и хэш найденного юзера
      * Если пароль неверный, то метод compare вернет false. В таком случае выйдем из функции, возвращая DB_RESULTS.INVALID_DATA
      * Если пароль подходит, значит все данные верны. Передаем данные о юзере в метод для создания access и refresh токенов
+     * созданный refreshToken сохраняем в БД для этого юзера
      * @param loginOrEmail логин или email, который прислали в теле запроса
      * @param password пароль юзера, который прислали в теле запроса
      */
@@ -34,7 +35,9 @@ export const authService = {
         if (!await comparePassword(password, loginUser.passwordHash)) {
             return DB_RESULTS.INVALID_DATA
         }
-        return await jwtService.createAuthTokens(loginUser)
+        const tokens: { accessToken: JwtToken, refreshToken: JwtToken } = await jwtService.createAuthTokens(loginUser)
+        await usersRepository.updateRefreshToken(loginUser.id, tokens.refreshToken)
+        return tokens
     },
     /**
      * Метод регистрации пользователя
@@ -109,5 +112,12 @@ export const authService = {
         await usersRepository.updateConfirmationCode(foundUser.id, newConfirmationCode)
         await emailAdapter.sendRegistrationMail(email, newConfirmationCode)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    async refreshTokens(refreshToken: string) {
+        if (refreshToken === undefined) {
+            return DB_RESULTS.INVALID_DATA
+        }
+
+        return
     }
 }

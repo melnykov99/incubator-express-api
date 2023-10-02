@@ -40,10 +40,13 @@ export const jwtService = {
      */
     async getUserIdByToken(token: string): Promise<string | null> {
         try {
-            const result: jwt.JwtPayload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload
+            const result: jwt.JwtPayload = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as JwtPayload
             return result.userId
         } catch (error) {
             return null
         }
+    },
+    async verifyRefreshToken(refreshToken: string) {
+        // провека не закончился ли токен
     }
 }

@@ -128,5 +128,21 @@ export const usersRepository = {
     async updateConfirmationCode(id: string, code: string): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.usersCollection.updateOne({id: id}, {$set: {confirmationCode: code}})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    /**
+     * Метод для добавляения/обновления refreshToken у юзера
+     * @param id id юзера которому нужно добавить refreshToken
+     * @param refreshToken refreshToken, котоорый нужно добавить/обновить
+     */
+    async updateRefreshToken(id: string, refreshToken: string): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        await db.usersCollection.updateOne({id: id}, {$set: {refreshToken}})
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    async findUserByRefreshToken(refreshToken: string): Promise<DB_RESULTS.NOT_FOUND | UserInDB> {
+        const foundUser: UserInDB | null = await db.usersCollection.findOne({refreshToken: refreshToken})
+        if (foundUser === null) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        return foundUser
     }
 }

@@ -6,7 +6,8 @@ export type UserInDB = {
     createdAt: string
     confirmationCode: string,
     expirationDate: Date,
-    isConfirmed: boolean
+    isConfirmed: boolean,
+    refreshToken?: string
 }
 export type UserOutput = {
     id: string,
