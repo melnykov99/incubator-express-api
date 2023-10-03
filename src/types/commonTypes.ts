@@ -11,3 +11,4 @@ export type PagSortValues = {
 
 // этот тип проверяется в функции assertsJwtToken в jwtService
 export type JwtToken = string & {__jwtTokenBrand: 'JwtToken'}
+export type AccessRefreshToken = {accessToken: JwtToken, refreshToken: JwtToken}

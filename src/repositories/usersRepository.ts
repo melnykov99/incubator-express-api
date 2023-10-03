@@ -131,14 +131,18 @@ export const usersRepository = {
     },
     /**
      * Метод для добавляения/обновления refreshToken у юзера
-     * @param id id юзера которому нужно добавить refreshToken
+     * @param id id юзера которому нужно добавить/обновить refreshToken
      * @param refreshToken refreshToken, котоорый нужно добавить/обновить
      */
     async updateRefreshToken(id: string, refreshToken: string): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.usersCollection.updateOne({id: id}, {$set: {refreshToken}})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
-    async findUserByRefreshToken(refreshToken: string): Promise<DB_RESULTS.NOT_FOUND | UserInDB> {
+    /**
+     * Метод для поиска юзера по refreshToken. Используется для того, чтобы определить валидный ли токен, принадлежит ли он какому-то юзеру
+     * @param refreshToken присланный refreshToken
+     */
+    async foundUserByRefreshToken(refreshToken: string): Promise<DB_RESULTS.NOT_FOUND | UserInDB> {
         const foundUser: UserInDB | null = await db.usersCollection.findOne({refreshToken: refreshToken})
         if (foundUser === null) {
             return DB_RESULTS.NOT_FOUND

@@ -11,17 +11,14 @@ import {CreateUser} from "../dto/users/CreateUser";
 import {RegistrationConfirmation} from "../dto/auth/RegistrationConfirmation";
 import {RegistrationEmailResending} from "../dto/auth/RegistrationEmailResending";
 import {authErrors} from "../validators/errors/authErrors";
-import {JwtToken} from "../types/commonTypes";
+import {AccessRefreshToken} from "../types/commonTypes";
 
 export const authRouter = Router()
 
 //авторизация созданного и подтвержденного пользователя. Возвращаем refreshToken в куках и accessToken в теле ответа.
 authRouter.post('/login', validator(loginValidation), async (req: RequestWithBody<LoginUser>, res: Response) => {
     const {loginOrEmail, password} = req.body
-    const tokens: {
-        accessToken: JwtToken,
-        refreshToken: JwtToken
-    } | DB_RESULTS.INVALID_DATA = await authService.loginUser(loginOrEmail, password)
+    const tokens: AccessRefreshToken | DB_RESULTS.INVALID_DATA = await authService.loginUser(loginOrEmail, password)
     if (tokens === DB_RESULTS.INVALID_DATA) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return
@@ -62,12 +59,13 @@ authRouter.post('/registration-email-resending', validator(emailResendingValidat
 })
 // роут для выдачи новой пары токенов
 authRouter.post('/refresh-token', async (req: Request, res: Response) => {
-    const tokens = await authService.refreshTokens(req.cookies.refreshToken)
+    const tokens: DB_RESULTS.INVALID_DATA | AccessRefreshToken = await authService.refreshTokens(req.cookies.refreshToken)
     if (tokens === DB_RESULTS.INVALID_DATA) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return
     }
-    res.sendStatus(HTTP_STATUSES.OK_200)
+    res.cookie('refreshToken', tokens.refreshToken, {httpOnly: true, secure: true})
+    res.status(HTTP_STATUSES.OK_200).send({accessToken: tokens.accessToken})
 })
 
 authRouter.post('/logout', async (req: Request, res: Response) => {

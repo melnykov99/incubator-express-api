@@ -3,10 +3,11 @@ import {usersRepository} from "../repositories/usersRepository";
 import {UserInDB} from "../types/usersTypes";
 import {comparePassword, generatePasswordHash} from "../utils/common/passwordHash";
 import {jwtService} from "../utils/common/jwtService";
-import {JwtToken} from "../types/commonTypes";
+import {AccessRefreshToken, JwtToken} from "../types/commonTypes";
 import {emailAdapter} from "../adapters/email-adapter";
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
+import {JwtPayload} from "jsonwebtoken";
 
 export const authService = {
     /**
@@ -21,10 +22,7 @@ export const authService = {
      * @param loginOrEmail логин или email, который прислали в теле запроса
      * @param password пароль юзера, который прислали в теле запроса
      */
-    async loginUser(loginOrEmail: string, password: string): Promise<{
-        accessToken: JwtToken,
-        refreshToken: JwtToken
-    } | DB_RESULTS.INVALID_DATA> {
+    async loginUser(loginOrEmail: string, password: string): Promise<AccessRefreshToken | DB_RESULTS.INVALID_DATA> {
         const loginUser: UserInDB | DB_RESULTS.NOT_FOUND = await usersRepository.foundUserByLoginOrEmail(loginOrEmail)
         if (loginUser === DB_RESULTS.NOT_FOUND) {
             return DB_RESULTS.INVALID_DATA
@@ -113,11 +111,29 @@ export const authService = {
         await emailAdapter.sendRegistrationMail(email, newConfirmationCode)
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
-    async refreshTokens(refreshToken: string) {
+    /**
+     * Метод обновления пары токенов. Если с токеном что-то не так, то возвращаем DB_RESULTS.INVALID_DATA. Иначе возвращаем новую пару токенов
+     * Если refreshToken не прислали в куки запроса (его значение undefined), то выходим из фнукции
+     * Если токен не прошел верификацию (невалидный или истек), то выходим из функции
+     * Если по этому токену не получается найти юзера (токен не присвоен какому-то юзеру), то выходимиз функции
+     * Когда все проверки прошли формируем новую пару токенов.
+     * Обновляем refreshToken у юзера в БД и возвращаем пару токенов.
+     * @param refreshToken присланный в запросе refreshToken
+     */
+    async refreshTokens(refreshToken: string): Promise<DB_RESULTS.INVALID_DATA | AccessRefreshToken> {
         if (refreshToken === undefined) {
             return DB_RESULTS.INVALID_DATA
         }
-
-        return
+        const verifyCheckResult: DB_RESULTS.INVALID_DATA | JwtPayload = await jwtService.verifyRefreshToken(refreshToken)
+        if (verifyCheckResult === DB_RESULTS.INVALID_DATA) {
+            return DB_RESULTS.INVALID_DATA
+        }
+        const foundUser: DB_RESULTS.NOT_FOUND | UserInDB = await usersRepository.foundUserByRefreshToken(refreshToken)
+        if (foundUser === DB_RESULTS.NOT_FOUND) {
+            return DB_RESULTS.INVALID_DATA
+        }
+        const tokens: AccessRefreshToken = await jwtService.createAuthTokens(verifyCheckResult.userId)
+        await usersRepository.updateRefreshToken(verifyCheckResult.userId, tokens.refreshToken)
+        return tokens
     }
 }
