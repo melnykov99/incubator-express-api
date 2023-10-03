@@ -135,5 +135,20 @@ export const authService = {
         const tokens: AccessRefreshToken = await jwtService.createAuthTokens(verifyCheckResult.userId)
         await usersRepository.updateRefreshToken(verifyCheckResult.userId, tokens.refreshToken)
         return tokens
+    },
+    async logout(refreshToken: string): Promise<DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        if (refreshToken === undefined) {
+            return DB_RESULTS.INVALID_DATA
+        }
+        const verifyCheckResult: DB_RESULTS.INVALID_DATA | JwtPayload = await jwtService.verifyRefreshToken(refreshToken)
+        if (verifyCheckResult === DB_RESULTS.INVALID_DATA) {
+            return DB_RESULTS.INVALID_DATA
+        }
+        const foundUser: DB_RESULTS.NOT_FOUND | UserInDB = await usersRepository.foundUserByRefreshToken(refreshToken)
+        if (foundUser === DB_RESULTS.NOT_FOUND) {
+            return DB_RESULTS.INVALID_DATA
+        }
+        await usersRepository.updateRefreshToken(verifyCheckResult.userId, 'undefined')
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
     }
 }

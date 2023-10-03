@@ -67,9 +67,14 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
     res.cookie('refreshToken', tokens.refreshToken, {httpOnly: true, secure: true})
     res.status(HTTP_STATUSES.OK_200).send({accessToken: tokens.accessToken})
 })
-
+// роут выхода юзера из ЛК. Делаем refreshToken неактуальным. При логине выдадим новый.
 authRouter.post('/logout', async (req: Request, res: Response) => {
-
+    const logoutResult: DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.logout(req.cookies.refreshToken)
+    if (logoutResult === DB_RESULTS.INVALID_DATA) {
+        res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+        return
+    }
+    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 
 /**
