@@ -3,7 +3,7 @@ import {RequestWithBody} from "../types/requestGenerics";
 import {LoginUser} from "../dto/auth/LoginUser";
 import {validator} from "../validators/validator";
 import {emailResendingValidation, loginValidation} from "../validators/authValidation";
-import {DB_RESULTS, HTTP_STATUSES} from "../utils/common/constants";
+import {AUTH, HTTP_STATUSES} from "../utils/common/constants";
 import {authService} from "../services/authService";
 import {jwtAuth} from "../middlewares/jwtAuth";
 import {usersValidation} from "../validators/usersValidation";
@@ -18,8 +18,8 @@ export const authRouter = Router()
 //авторизация созданного и подтвержденного пользователя. Возвращаем refreshToken в куках и accessToken в теле ответа.
 authRouter.post('/login', validator(loginValidation), async (req: RequestWithBody<LoginUser>, res: Response) => {
     const {loginOrEmail, password} = req.body
-    const tokens: AccessRefreshToken | DB_RESULTS.INVALID_DATA = await authService.loginUser(loginOrEmail, password)
-    if (tokens === DB_RESULTS.INVALID_DATA) {
+    const tokens: AccessRefreshToken | AUTH.USER_NOT_FOUND | AUTH.UNCONFIRMED_USER | AUTH.INVALID_PASSWORD = await authService.loginUser(loginOrEmail, password)
+    if (tokens === AUTH.USER_NOT_FOUND || tokens === AUTH.UNCONFIRMED_USER || tokens === AUTH.INVALID_PASSWORD) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return
     }
@@ -30,8 +30,8 @@ authRouter.post('/login', validator(loginValidation), async (req: RequestWithBod
 // регистрация пользователя. Создание записи в БД и отправка письма с кодом на почту для подтверждения
 authRouter.post('/registration', validator(usersValidation), async (req: RequestWithBody<CreateUser>, res: Response) => {
     const {login, password, email} = req.body
-    const registrationResult: DB_RESULTS.SUCCESSFULLY_COMPLETED | DB_RESULTS.UNSUCCESSFULL = await authService.registrationUser(login, password, email)
-    if (registrationResult === DB_RESULTS.UNSUCCESSFULL) {
+    const registrationResult: AUTH.USER_NOT_CREATED | AUTH.USER_CREATED = await authService.registrationUser(login, password, email)
+    if (registrationResult === AUTH.USER_NOT_CREATED) {
         res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400)
         return
     }
@@ -40,8 +40,8 @@ authRouter.post('/registration', validator(usersValidation), async (req: Request
 
 // подтверждение пользователя. Проверяем код из тела запроса
 authRouter.post('/registration-confirmation', async (req: RequestWithBody<RegistrationConfirmation>, res: Response) => {
-    const confirmationResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.UNSUCCESSFULL | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.confirmationUser(req.body.code)
-    if (confirmationResult === DB_RESULTS.SUCCESSFULLY_COMPLETED) {
+    const confirmationResult: AUTH.USER_NOT_FOUND | AUTH.USER_ALREADY_CONFIRMED | AUTH.CONFIRMATION_CORE_EXPIRED | AUTH.SUCCESSFUL_CONFIRMATION = await authService.confirmationUser(req.body.code)
+    if (confirmationResult === AUTH.SUCCESSFUL_CONFIRMATION) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         return
     }
@@ -50,8 +50,8 @@ authRouter.post('/registration-confirmation', async (req: RequestWithBody<Regist
 
 // повторная отправка письма с кодом подтверждения на email пользователя.
 authRouter.post('/registration-email-resending', validator(emailResendingValidation), async (req: RequestWithBody<RegistrationEmailResending>, res: Response) => {
-    const resendingResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.registrationEmailResending(req.body.email)
-    if (resendingResult === DB_RESULTS.SUCCESSFULLY_COMPLETED) {
+    const resendingResult: AUTH.USER_NOT_FOUND | AUTH.USER_ALREADY_CONFIRMED | AUTH.SUCCESSFUL_RESENDING = await authService.registrationEmailResending(req.body.email)
+    if (resendingResult === AUTH.SUCCESSFUL_RESENDING) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         return
     }
@@ -59,8 +59,8 @@ authRouter.post('/registration-email-resending', validator(emailResendingValidat
 })
 // роут для выдачи новой пары токенов
 authRouter.post('/refresh-token', async (req: Request, res: Response) => {
-    const tokens: DB_RESULTS.INVALID_DATA | AccessRefreshToken = await authService.refreshTokens(req.cookies.refreshToken)
-    if (tokens === DB_RESULTS.INVALID_DATA) {
+    const tokens: AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND | AccessRefreshToken = await authService.refreshTokens(req.cookies.refreshToken)
+    if (tokens === AUTH.REFRESHTOKEN_IS_MISSING || tokens === AUTH.REFRESHTOKEN_FAILED_VERIFICATION || tokens === AUTH.USER_NOT_FOUND) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return
     }
@@ -69,12 +69,12 @@ authRouter.post('/refresh-token', async (req: Request, res: Response) => {
 })
 // роут выхода юзера из ЛК. Делаем refreshToken неактуальным. При логине выдадим новый.
 authRouter.post('/logout', async (req: Request, res: Response) => {
-    const logoutResult: DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED = await authService.logout(req.cookies.refreshToken)
-    if (logoutResult === DB_RESULTS.INVALID_DATA) {
-        res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
+    const logoutResult: AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND | AUTH.SUCCESSFUL_LOGOUT = await authService.logout(req.cookies.refreshToken)
+    if (logoutResult === AUTH.SUCCESSFUL_LOGOUT) {
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         return
     }
-    res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
+    res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
 })
 
 /**

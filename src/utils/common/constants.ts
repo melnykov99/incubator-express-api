@@ -24,3 +24,21 @@ export enum DB_RESULTS {
     "INVALID_DATA" = "the data sent is wrong",
     "UNSUCCESSFULL" = "Unfortunate. Something went wrong"
 }
+
+/**
+ * Константы auth операций
+ */
+export enum AUTH {
+    "USER_NOT_FOUND" = "such user was not found",
+    "UNCONFIRMED_USER" = "this user did not confirm email",
+    "USER_ALREADY_CONFIRMED" = "user has already been confirmed",
+    "CONFIRMATION_CORE_EXPIRED" = "confirmation code has expired",
+    "SUCCESSFUL_CONFIRMATION" = "user confirmation was successful",
+    "INVALID_PASSWORD" = "entered password is incorrect",
+    "USER_NOT_CREATED" = "user is not created",
+    "USER_CREATED" = "user created",
+    "SUCCESSFUL_RESENDING" = "repeated mail sent",
+    "REFRESHTOKEN_IS_MISSING" = "the token is missing from the request cookie",
+    "REFRESHTOKEN_FAILED_VERIFICATION" = "refresh token failed verification. Expired or invalid.",
+    "SUCCESSFUL_LOGOUT" = "successful logout"
+}

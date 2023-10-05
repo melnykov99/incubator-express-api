@@ -1,7 +1,7 @@
 import {UserInDB} from "../../types/usersTypes";
 import jwt, {JwtPayload} from 'jsonwebtoken'
 import {JwtToken} from "../../types/commonTypes";
-import {DB_RESULTS} from "./constants";
+import {AUTH} from "./constants";
 
 /**
  * Функция для проверки типа токена. Проверяем соответствует ли он типу JwtToken
@@ -53,11 +53,11 @@ export const jwtService = {
      * Декодированный токен имеет такой вид { userId: '1696191387712', iat: 1696361688, exp: 1696361708 }
      * @param token
      */
-    async verifyRefreshToken(token: string): Promise<JwtPayload | DB_RESULTS.INVALID_DATA> {
+    async verifyRefreshToken(token: string): Promise<JwtPayload | AUTH.REFRESHTOKEN_FAILED_VERIFICATION> {
        try {
            return jwt.verify(token, process.env.JWT_REFRESH_SECRET!) as JwtPayload
        } catch (error) {
-           return DB_RESULTS.INVALID_DATA
+           return AUTH.REFRESHTOKEN_FAILED_VERIFICATION
        }
     }
 }
