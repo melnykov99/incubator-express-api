@@ -51,7 +51,8 @@ export const usersRepository = {
         }
     },
     /**
-     * находим юзера в БД по id. Если не находим, то возвращаем константу DB_RESULTS.NOT_FOUND
+     * находим юзера в БД по id и возвращаем его в формате UserOutput.
+     * Если не находим, то возвращаем константу DB_RESULTS.NOT_FOUND
      * @param id id юзера
      */
     async getUserById(id: string): Promise<UserOutput | DB_RESULTS.NOT_FOUND> {
@@ -63,7 +64,7 @@ export const usersRepository = {
                 createdAt: 1
             }
         })
-        if (!foundUser) {
+        if (foundUser === null) {
             return DB_RESULTS.NOT_FOUND
         }
         return foundUser
@@ -134,19 +135,8 @@ export const usersRepository = {
      * @param id id юзера которому нужно добавить/обновить refreshToken
      * @param refreshToken refreshToken, котоорый нужно добавить/обновить
      */
-    async updateRefreshToken(id: string, refreshToken: string): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+    async updateRefreshToken(id: string, refreshToken: string | undefined): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.usersCollection.updateOne({id: id}, {$set: {refreshToken}})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
-    /**
-     * Метод для поиска юзера по refreshToken. Используется для того, чтобы определить валидный ли токен, принадлежит ли он какому-то юзеру
-     * @param refreshToken присланный refreshToken
-     */
-    async foundUserByRefreshToken(refreshToken: string): Promise<DB_RESULTS.NOT_FOUND | UserInDB> {
-        const foundUser: UserInDB | null = await db.usersCollection.findOne({refreshToken: refreshToken})
-        if (foundUser === null) {
-            return DB_RESULTS.NOT_FOUND
-        }
-        return foundUser
-    }
 }

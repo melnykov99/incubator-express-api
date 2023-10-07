@@ -7,7 +7,7 @@ export type UserInDB = {
     confirmationCode: string,
     expirationDate: Date,
     isConfirmed: boolean,
-    refreshToken?: string
+    refreshToken?: string | undefined
 }
 export type UserOutput = {
     id: string,
