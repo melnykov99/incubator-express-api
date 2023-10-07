@@ -42,3 +42,13 @@ export enum AUTH {
     "REFRESHTOKEN_FAILED_VERIFICATION" = "refresh token failed verification. Expired or invalid.",
     "SUCCESSFUL_LOGOUT" = "successful logout"
 }
+
+/**
+ * Константы для commentsService и commentsRouter
+ */
+export enum COMMENTS {
+    "NOt_FOUND" = "such comments was not found",
+    "NOT_OWNER" = "only the owner can change the comment",
+    "SUCCESSFUL_UPDATE" = "comment was successfully changed",
+    "SUCCESSFUL_DELETE" = "comment was successfully deleted"
+}

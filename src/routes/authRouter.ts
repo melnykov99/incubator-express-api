@@ -26,7 +26,6 @@ authRouter.post('/login', validator(loginValidation), async (req: RequestWithBod
     res.cookie('refreshToken', tokens.refreshToken, {httpOnly: true, secure: true})
     res.status(HTTP_STATUSES.OK_200).send({accessToken: tokens.accessToken})
 })
-
 // регистрация пользователя. Создание записи в БД и отправка письма с кодом на почту для подтверждения
 authRouter.post('/registration', validator(usersValidation), async (req: RequestWithBody<CreateUser>, res: Response) => {
     const {login, password, email} = req.body
@@ -37,7 +36,6 @@ authRouter.post('/registration', validator(usersValidation), async (req: Request
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
-
 // подтверждение пользователя. Проверяем код из тела запроса
 authRouter.post('/registration-confirmation', async (req: RequestWithBody<RegistrationConfirmation>, res: Response) => {
     const confirmationResult: AUTH.USER_NOT_FOUND | AUTH.USER_ALREADY_CONFIRMED | AUTH.CONFIRMATION_CORE_EXPIRED | AUTH.SUCCESSFUL_CONFIRMATION = await authService.confirmationUser(req.body.code)
@@ -47,7 +45,6 @@ authRouter.post('/registration-confirmation', async (req: RequestWithBody<Regist
     }
     res.status(HTTP_STATUSES.BAD_REQUEST_400).send({"errorsMessages": [authErrors.confirmationCode]})
 })
-
 // повторная отправка письма с кодом подтверждения на email пользователя.
 authRouter.post('/registration-email-resending', validator(emailResendingValidation), async (req: RequestWithBody<RegistrationEmailResending>, res: Response) => {
     const resendingResult: AUTH.USER_NOT_FOUND | AUTH.USER_ALREADY_CONFIRMED | AUTH.SUCCESSFUL_RESENDING = await authService.registrationEmailResending(req.body.email)
@@ -76,7 +73,6 @@ authRouter.post('/logout', async (req: Request, res: Response) => {
     }
     res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
 })
-
 /**
  * Роут для проверки токена. Проверяем токен в мидлваре jwtAuth. Если токен валидный, то в req.user будет вся информация из БД о юзере
  * Никуда не обращаемся, просто выводим нужные данные из req в ответе

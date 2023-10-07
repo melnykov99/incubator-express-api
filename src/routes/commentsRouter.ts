@@ -1,5 +1,5 @@
 import {Response, Router} from "express";
-import {DB_RESULTS, HTTP_STATUSES} from "../utils/common/constants";
+import {COMMENTS, HTTP_STATUSES} from "../utils/common/constants";
 import {RequestWithParams, RequestWithParamsAndBody} from "../types/requestGenerics";
 import {GetCommentById} from "../dto/comments/GetCommentById";
 import {UpdateDeleteCommentById} from "../dto/comments/UpdateDeleteCommentById";
@@ -12,32 +12,32 @@ import {CommentOutput} from "../types/commentsTypes";
 
 export const commentsRouter = Router()
 commentsRouter.put('/:commentId', jwtAuth, validator(commentsValidation), async (req: RequestWithParamsAndBody<UpdateDeleteCommentById, UpdateComment>, res: Response) => {
-    const updateResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED = await commentsService.updateCommentById(req.params.commentId, req.user.id, req.body.content)
-    if (updateResult === DB_RESULTS.NOT_FOUND) {
+    const updateResult: COMMENTS.NOt_FOUND | COMMENTS.NOT_OWNER | COMMENTS.SUCCESSFUL_UPDATE = await commentsService.updateCommentById(req.params.commentId, req.user.id, req.body.content)
+    if (updateResult === COMMENTS.NOt_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
     }
-    if (updateResult === DB_RESULTS.INVALID_DATA) {
+    if (updateResult === COMMENTS.NOT_OWNER) {
         res.sendStatus(HTTP_STATUSES.FORBIDDEN_403)
         return
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 commentsRouter.delete('/:commentId', jwtAuth, async (req: RequestWithParams<UpdateDeleteCommentById>, res: Response) => {
-    const deleteResult: DB_RESULTS.NOT_FOUND | DB_RESULTS.INVALID_DATA | DB_RESULTS.SUCCESSFULLY_COMPLETED = await commentsService.deleteCommentById(req.params.commentId, req.user.id)
-    if (deleteResult === DB_RESULTS.NOT_FOUND) {
+    const deleteResult: COMMENTS.NOt_FOUND | COMMENTS.NOT_OWNER | COMMENTS.SUCCESSFUL_DELETE = await commentsService.deleteCommentById(req.params.commentId, req.user.id)
+    if (deleteResult === COMMENTS.NOt_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
     }
-    if (deleteResult === DB_RESULTS.INVALID_DATA) {
+    if (deleteResult === COMMENTS.NOT_OWNER) {
         res.sendStatus(HTTP_STATUSES.FORBIDDEN_403)
         return
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
 commentsRouter.get('/:id', async (req: RequestWithParams<GetCommentById>, res: Response) => {
-    const foundComment: DB_RESULTS.NOT_FOUND | CommentOutput = await commentsService.getCommentById(req.params.id)
-    if (foundComment === DB_RESULTS.NOT_FOUND) {
+    const foundComment: COMMENTS.NOt_FOUND | CommentOutput = await commentsService.getCommentById(req.params.id)
+    if (foundComment === COMMENTS.NOt_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
         return
     }
