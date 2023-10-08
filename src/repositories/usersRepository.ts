@@ -2,7 +2,7 @@ import {db} from "./db";
 import {UserInDB, UserOutput, UserViewModel} from "../types/usersTypes";
 import {DeleteResult} from "mongodb";
 import {DB_RESULTS} from "../utils/common/constants";
-import {PagSortValues} from "../types/commonTypes";
+import {JwtToken, PagSortValues} from "../types/commonTypes";
 import {paginationAndSorting} from "../utils/common/paginationAndSorting";
 import {searchLoginEmailDefinition} from "../utils/users/searchLoginEmailDefinition";
 
@@ -131,12 +131,21 @@ export const usersRepository = {
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
     /**
-     * Метод для добавляения/обновления refreshToken у юзера
+     * Метод для добавляения refreshToken у юзера. С помощью метода push добавляем refreshToken в массив refreshTokens
      * @param id id юзера которому нужно добавить/обновить refreshToken
      * @param refreshToken refreshToken, котоорый нужно добавить/обновить
      */
-    async updateRefreshToken(id: string, refreshToken: string | undefined): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
-        await db.usersCollection.updateOne({id: id}, {$set: {refreshToken}})
+    async addRefreshToken(id: string, refreshToken: JwtToken): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
+        await db.usersCollection.updateOne({id: id}, {$push: {refreshTokens: refreshToken}})
         return DB_RESULTS.SUCCESSFULLY_COMPLETED
     },
+    /**
+     * Метод для удаления refreshToken у юзера из массива refreshTokens.
+     * Используется при запросе logout
+     * @param id id сотрудника у которого нужно удалить refreshToken
+     * @param refreshToken refreshToken, который нужно убрать из массива
+     */
+    async deleteRefreshToken(id: string, refreshToken: JwtToken) {
+        await db.usersCollection.updateOne({id: id}, {$pull: {refreshTokens: refreshToken}})
+    }
 }

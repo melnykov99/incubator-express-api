@@ -1,3 +1,5 @@
+import {JwtToken} from "./commonTypes";
+
 export type UserInDB = {
     id: string,
     login: string,
@@ -7,7 +9,7 @@ export type UserInDB = {
     confirmationCode: string,
     expirationDate: Date,
     isConfirmed: boolean,
-    refreshToken?: string | undefined
+    refreshTokens?: [JwtToken]
 }
 export type UserOutput = {
     id: string,

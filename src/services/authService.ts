@@ -58,7 +58,7 @@ export const authService = {
             return AUTH.INVALID_PASSWORD
         }
         const tokens: { accessToken: JwtToken, refreshToken: JwtToken } = await jwtService.createAuthTokens(loginUser)
-        await usersRepository.updateRefreshToken(loginUser.id, tokens.refreshToken)
+        await usersRepository.addRefreshToken(loginUser.id, tokens.refreshToken)
         return tokens
     },
     /**
@@ -156,17 +156,17 @@ export const authService = {
 
             default:
                 const tokens: AccessRefreshToken = await jwtService.createAuthTokens(checkRefreshTokenResult.foundUser)
-                await usersRepository.updateRefreshToken(checkRefreshTokenResult.verifyCheckResult.userId, tokens.refreshToken)
+                await usersRepository.addRefreshToken(checkRefreshTokenResult.verifyCheckResult.userId, tokens.refreshToken)
                 return tokens
         }
     },
     /**
-     * При выходе затираем refreshToken. Вместо него в БД ставим строку 'undefined'
+     * При запросе logout удаляем refreshToken из массива refreshTokens у юзера. Чтобы по этому токену нельзя было выполнять запросы.
      * Если рефреш токен не прислали или его не удается верифицировать или юзер по этому рефреш токену не найден, то выходим из функции
-     * Если с токеном всё ок, то обновляем его в БД на 'undefined'
+     * Если с токеном всё ок, то удаляем его из БД.
      * @param refreshToken refreshToken, который нужно затереть
      */
-    async logout(refreshToken: string): Promise<AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND | AUTH.SUCCESSFUL_LOGOUT> {
+    async logout(refreshToken: JwtToken): Promise<AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND | AUTH.SUCCESSFUL_LOGOUT> {
         const checkRefreshTokenResult: AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND |
             { verifyCheckResult: JwtPayload, foundUser: UserOutput } = await checkRefreshToken(refreshToken)
 
@@ -177,7 +177,7 @@ export const authService = {
                 return checkRefreshTokenResult;
 
             default:
-                await usersRepository.updateRefreshToken(checkRefreshTokenResult.verifyCheckResult.userId, undefined);
+                await usersRepository.deleteRefreshToken(checkRefreshTokenResult.verifyCheckResult.userId, refreshToken);
                 return AUTH.SUCCESSFUL_LOGOUT;
         }
     }
