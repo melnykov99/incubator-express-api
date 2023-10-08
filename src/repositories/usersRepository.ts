@@ -145,7 +145,15 @@ export const usersRepository = {
      * @param id id сотрудника у которого нужно удалить refreshToken
      * @param refreshToken refreshToken, который нужно убрать из массива
      */
-    async deleteRefreshToken(id: string, refreshToken: JwtToken) {
+    async deleteRefreshToken(id: string, refreshToken: JwtToken): Promise<DB_RESULTS.SUCCESSFULLY_COMPLETED> {
         await db.usersCollection.updateOne({id: id}, {$pull: {refreshTokens: refreshToken}})
+        return DB_RESULTS.SUCCESSFULLY_COMPLETED
+    },
+    async getUserByRefreshToken(refreshToken: JwtToken) {
+        const foundUser: UserInDB | null = await db.usersCollection.findOne({refreshTokens: refreshToken})
+        if (foundUser === null) {
+            return DB_RESULTS.NOT_FOUND
+        }
+        return foundUser
     }
 }

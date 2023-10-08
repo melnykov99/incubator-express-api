@@ -1,4 +1,4 @@
-import {UserOutput} from "../../types/usersTypes";
+import {UserInDB} from "../../types/usersTypes";
 import jwt, {JwtPayload} from 'jsonwebtoken'
 import {JwtToken} from "../../types/commonTypes";
 import {AUTH} from "./constants";
@@ -25,7 +25,7 @@ export const jwtService = {
      * Проверяем токен на нужный формат. jwt всегда разделен на 3 части точками. Если будет неверный формат, то появится ошибка.
      * @param user объект пользователя, который логинится
      */
-    async createAuthTokens(user: UserOutput): Promise<{ accessToken: JwtToken, refreshToken: JwtToken }> {
+    async createAuthTokens(user: UserInDB): Promise<{ accessToken: JwtToken, refreshToken: JwtToken }> {
         const accessToken = jwt.sign({userId: user.id}, process.env.JWT_ACCESS_SECRET!, {expiresIn: '10s'})
         const refreshToken = jwt.sign({userId: user.id}, process.env.JWT_REFRESH_SECRET!, {expiresIn: '20s'})
         assertsJwtToken(accessToken)

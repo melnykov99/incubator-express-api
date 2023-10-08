@@ -1,6 +1,6 @@
 import {AUTH, DB_RESULTS} from "../utils/common/constants";
 import {usersRepository} from "../repositories/usersRepository";
-import {UserInDB, UserOutput} from "../types/usersTypes";
+import {UserInDB} from "../types/usersTypes";
 import {comparePassword, generatePasswordHash} from "../utils/common/passwordHash";
 import {jwtService} from "../utils/common/jwtService";
 import {AccessRefreshToken, JwtToken} from "../types/commonTypes";
@@ -17,8 +17,8 @@ import {JwtPayload} from "jsonwebtoken";
  * Если с токеном всё ок, то возвращаем verifyCheckResult (декодированный токен) и найденного юзера
  * @param refreshToken refreshToken из куки
  */
-async function checkRefreshToken(refreshToken: string): Promise<AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND |
-    { verifyCheckResult: JwtPayload, foundUser: UserOutput }> {
+async function checkRefreshToken(refreshToken: JwtToken): Promise<AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND |
+    { verifyCheckResult: JwtPayload, foundUser: UserInDB }> {
     if (refreshToken === undefined) {
         return AUTH.REFRESHTOKEN_IS_MISSING
     }
@@ -26,7 +26,7 @@ async function checkRefreshToken(refreshToken: string): Promise<AUTH.REFRESHTOKE
     if (verifyCheckResult === AUTH.REFRESHTOKEN_FAILED_VERIFICATION) {
         return AUTH.REFRESHTOKEN_FAILED_VERIFICATION
     }
-    const foundUser: DB_RESULTS.NOT_FOUND | UserOutput = await usersRepository.getUserById(verifyCheckResult.userId)
+    const foundUser: DB_RESULTS.NOT_FOUND | UserInDB = await usersRepository.getUserByRefreshToken(refreshToken)
     if (foundUser === DB_RESULTS.NOT_FOUND) {
         return AUTH.USER_NOT_FOUND
     }
@@ -145,7 +145,7 @@ export const authService = {
      */
     async refreshTokens(refreshToken: JwtToken): Promise<AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND | AccessRefreshToken> {
         const checkRefreshTokenResult: AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND |
-            { verifyCheckResult: JwtPayload, foundUser: UserOutput } = await checkRefreshToken(refreshToken)
+            { verifyCheckResult: JwtPayload, foundUser: UserInDB } = await checkRefreshToken(refreshToken)
 
         switch (checkRefreshTokenResult) {
             case AUTH.REFRESHTOKEN_IS_MISSING:
@@ -168,7 +168,7 @@ export const authService = {
      */
     async logout(refreshToken: JwtToken): Promise<AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND | AUTH.SUCCESSFUL_LOGOUT> {
         const checkRefreshTokenResult: AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND |
-            { verifyCheckResult: JwtPayload, foundUser: UserOutput } = await checkRefreshToken(refreshToken)
+            { verifyCheckResult: JwtPayload, foundUser: UserInDB } = await checkRefreshToken(refreshToken)
 
         switch (checkRefreshTokenResult) {
             case AUTH.REFRESHTOKEN_IS_MISSING:
