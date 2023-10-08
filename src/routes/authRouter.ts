@@ -52,7 +52,7 @@ authRouter.post('/registration-email-resending', validator(emailResendingValidat
         res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
         return
     }
-    res.status(HTTP_STATUSES.BAD_REQUEST_400).send({"errorsMessages": [authErrors.email]})
+    res.status(HTTP_STATUSES.BAD_REQUEST_400).send({"errorsMessages": [authErrors.emailResending]})
 })
 // роут для выдачи новой пары токенов
 authRouter.post('/refresh-token', async (req: Request, res: Response) => {
