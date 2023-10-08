@@ -140,11 +140,10 @@ export const authService = {
      * Если refreshToken не прислали в куки запроса (его значение undefined), то выходим из фнукции
      * Если токен не прошел верификацию (невалидный или истек), то выходим из функции
      * Если по этому токену не получается найти юзера (токен не присвоен какому-то юзеру), то выходимиз функции
-     * Когда все проверки прошли формируем новую пару токенов.
-     * Обновляем refreshToken у юзера в БД и возвращаем пару токенов.
+     * Когда все проверки прошли формируем новую пару токенов. Удаляем старый токен из БД. Добавляем новый
      * @param refreshToken присланный в запросе refreshToken
      */
-    async refreshTokens(refreshToken: string): Promise<AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND | AccessRefreshToken> {
+    async refreshTokens(refreshToken: JwtToken): Promise<AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND | AccessRefreshToken> {
         const checkRefreshTokenResult: AUTH.REFRESHTOKEN_IS_MISSING | AUTH.REFRESHTOKEN_FAILED_VERIFICATION | AUTH.USER_NOT_FOUND |
             { verifyCheckResult: JwtPayload, foundUser: UserOutput } = await checkRefreshToken(refreshToken)
 
@@ -156,6 +155,7 @@ export const authService = {
 
             default:
                 const tokens: AccessRefreshToken = await jwtService.createAuthTokens(checkRefreshTokenResult.foundUser)
+                await usersRepository.deleteRefreshToken(checkRefreshTokenResult.verifyCheckResult.userId, refreshToken)
                 await usersRepository.addRefreshToken(checkRefreshTokenResult.verifyCheckResult.userId, tokens.refreshToken)
                 return tokens
         }

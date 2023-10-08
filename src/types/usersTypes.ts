@@ -11,6 +11,17 @@ export type UserInDB = {
     isConfirmed: boolean,
     refreshTokens?: [JwtToken]
 }
+export type UserAccountData = {
+    login: string,
+    email: string,
+    passwordHash: string,
+    createdAt: string
+}
+export type UserRegistrationData = {
+    confirmationCode: string,
+    expirationDate: Date,
+    isConfirmed: boolean,
+}
 export type UserOutput = {
     id: string,
     login: string,
