@@ -13,7 +13,7 @@ import {JwtPayload} from "jsonwebtoken";
 /**
  * Метод для проверки refreshToken. Если токен не прислан в куки, то выходим из функции, возвращая AUTH.REFRESHTOKEN_IS_MISSING
  * Далее проверяем токен. Если он истек или невалидный, то выходим из функции и возвращаем AUTH.REFRESHTOKEN_FAILED_VERIFICATION
- * Далее ищем юзера по закодированному в токене userId
+ * Далее ищем юзера по refreshToken
  * Если с токеном всё ок, то возвращаем verifyCheckResult (декодированный токен) и найденного юзера
  * @param refreshToken refreshToken из куки
  */
