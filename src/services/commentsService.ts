@@ -9,7 +9,7 @@ export const commentsService = {
      * Если id пользователя который хочет изменить комментарий не совпадает с тем id, что лежит в объекте комментария
      * То возвращаем COMMENTS.NOT_OWNER. Пользователь не может изменить чужой коммент
      * Иначе обновляем комментарий и возвращаем константу об успешном выполнении
-     * @param commentId id комментария, который нужно удалить. Получаем в jwtAuth
+     * @param commentId id комментария, который нужно удалить. Получаем в accessTokenAuth
      * @param userId id юзера, который хочет удалить комментарий
      * @param content новый текст комментария
      */
@@ -29,7 +29,7 @@ export const commentsService = {
      * Если комментарий не нашли, то вернем COMMENTS.NOt_FOUND
      * Если id пользователя который хочет удалить комментарий не совпадает с тем id, что лежит в объекте комментария
      * То возвращаем COMMENTS.NOT_OWNER. Пользователь не может удалить чужой коммент
-     * @param commentId id комментария, который нужно удалить. Получаем в jwtAuth
+     * @param commentId id комментария, который нужно удалить. Получаем в accessTokenAuth
      * @param userId id юзера, который хочет удалить комментарий
      */
     async deleteCommentById(commentId: string, userId: string): Promise<COMMENTS.NOt_FOUND | COMMENTS.NOT_OWNER | COMMENTS.SUCCESSFUL_DELETE> {

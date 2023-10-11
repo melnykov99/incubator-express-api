@@ -6,12 +6,12 @@ import {UpdateDeleteCommentById} from "../dto/comments/UpdateDeleteCommentById";
 import {UpdateComment} from "../dto/comments/UpdateComment";
 import {validator} from "../validators/validator";
 import {commentsValidation} from "../validators/commentsValidation";
-import {jwtAuth} from "../middlewares/jwtAuth";
+import {accessTokenAuth} from "../middlewares/jwtAuth";
 import {commentsService} from "../services/commentsService";
 import {CommentOutput} from "../types/commentsTypes";
 
 export const commentsRouter = Router()
-commentsRouter.put('/:commentId', jwtAuth, validator(commentsValidation), async (req: RequestWithParamsAndBody<UpdateDeleteCommentById, UpdateComment>, res: Response) => {
+commentsRouter.put('/:commentId', accessTokenAuth, validator(commentsValidation), async (req: RequestWithParamsAndBody<UpdateDeleteCommentById, UpdateComment>, res: Response) => {
     const updateResult: COMMENTS.NOt_FOUND | COMMENTS.NOT_OWNER | COMMENTS.SUCCESSFUL_UPDATE = await commentsService.updateCommentById(req.params.commentId, req.user.id, req.body.content)
     if (updateResult === COMMENTS.NOt_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)
@@ -23,7 +23,7 @@ commentsRouter.put('/:commentId', jwtAuth, validator(commentsValidation), async 
     }
     res.sendStatus(HTTP_STATUSES.NO_CONTENT_204)
 })
-commentsRouter.delete('/:commentId', jwtAuth, async (req: RequestWithParams<UpdateDeleteCommentById>, res: Response) => {
+commentsRouter.delete('/:commentId', accessTokenAuth, async (req: RequestWithParams<UpdateDeleteCommentById>, res: Response) => {
     const deleteResult: COMMENTS.NOt_FOUND | COMMENTS.NOT_OWNER | COMMENTS.SUCCESSFUL_DELETE = await commentsService.deleteCommentById(req.params.commentId, req.user.id)
     if (deleteResult === COMMENTS.NOt_FOUND) {
         res.sendStatus(HTTP_STATUSES.NOT_FOUND_404)

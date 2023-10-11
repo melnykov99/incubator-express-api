@@ -5,7 +5,7 @@ import {validator} from "../validators/validator";
 import {emailResendingValidation, loginValidation} from "../validators/authValidation";
 import {AUTH, HTTP_STATUSES} from "../utils/common/constants";
 import {authService} from "../services/authService";
-import {jwtAuth} from "../middlewares/jwtAuth";
+import {accessTokenAuth} from "../middlewares/jwtAuth";
 import {usersValidation} from "../validators/usersValidation";
 import {CreateUser} from "../dto/users/CreateUser";
 import {RegistrationConfirmation} from "../dto/auth/RegistrationConfirmation";
@@ -74,10 +74,10 @@ authRouter.post('/logout', async (req: Request, res: Response) => {
     res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
 })
 /**
- * Роут для проверки токена. Проверяем токен в мидлваре jwtAuth. Если токен валидный, то в req.user будет вся информация из БД о юзере
+ * Роут для проверки токена. Проверяем токен в мидлваре accessTokenAuth. Если токен валидный, то в req.user будет вся информация из БД о юзере
  * Никуда не обращаемся, просто выводим нужные данные из req в ответе
  */
-authRouter.get('/me', jwtAuth, async (req: Request, res: Response) => {
+authRouter.get('/me', accessTokenAuth, async (req: Request, res: Response) => {
     const user: { [key: string]: string } = {
         email: req.user.email,
         login: req.user.login,

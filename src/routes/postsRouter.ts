@@ -15,7 +15,7 @@ import {validator} from "../validators/validator";
 import {postsValidation} from "../validators/postsValidation";
 import {basicAuth} from "../middlewares/basicAuth";
 import {GetPostsWithQuery} from "../dto/posts/GetPostsWithQuery";
-import {jwtAuth} from "../middlewares/jwtAuth";
+import {accessTokenAuth} from "../middlewares/jwtAuth";
 import {GetCommentsByPostId} from "../dto/posts/GetCommentsByPostId";
 import {CreateCommentByPostId} from "../dto/posts/CreateCommentByPostId";
 import {commentsValidation} from "../validators/commentsValidation";
@@ -74,7 +74,7 @@ postsRouter.get('/:postId/comments', async (req: RequestWithParamsAndQuery<GetCo
     }
     res.status(HTTP_STATUSES.OK_200).send(foundComments)
 })
-postsRouter.post('/:postId/comments', jwtAuth, validator(commentsValidation), async (req: RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>, res: Response) => {
+postsRouter.post('/:postId/comments', accessTokenAuth, validator(commentsValidation), async (req: RequestWithParamsAndBody<GetCommentsByPostId, CreateCommentByPostId>, res: Response) => {
     const postId: string = req.params.postId
     const {content} = req.body
     const {id, login} = req.user

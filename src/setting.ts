@@ -8,6 +8,7 @@ import {usersRouter} from "./routes/usersRouter";
 import {authRouter} from "./routes/authRouter";
 import {commentsRouter} from "./routes/commentsRouter";
 import cookieParser from "cookie-parser";
+import {securityRouter} from "./routes/securityRouter";
 
 export const app = express()
 
@@ -23,3 +24,4 @@ app.use('/posts', postsRouter)
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)
 app.use('/comments', commentsRouter)
+app.use('/security', securityRouter)

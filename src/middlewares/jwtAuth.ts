@@ -5,7 +5,7 @@ import {usersService} from "../services/usersService";
 import {UserOutput} from "../types/usersTypes";
 
 /**
- * мидлавара jwt авторизации
+ * мидлавара jwt авторизации через accessToken в headers.authorization
  * Если в headers.authorization ничего не преедали. то сразу прерываем запрос и возвращаем 401
  * У нас bearer авторизация, поэтому в headers.authorization будет строка вида bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
  * Поэтому сплитим и в токен кладем вторую часть строки
@@ -17,7 +17,7 @@ import {UserOutput} from "../types/usersTypes";
  * @param res
  * @param next
  */
-export const jwtAuth = async (req: Request, res: Response, next: NextFunction) => {
+export const accessTokenAuth = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
         res.sendStatus(HTTP_STATUSES.UNAUTHORIZED_401)
         return
