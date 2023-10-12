@@ -32,4 +32,5 @@ describe('DELETE ALL DATA', () => {
             .set('Authorization', 'Basic YWRtaW46cXdlcnR5')
             .expect(HTTP_STATUSES.OK_200, {pagesCount: 0, page: 1, pageSize: 10, totalCount: 0, items: []})
     })
+    //Еще есть коллекция с комментариями, но комментарии запрашиваем к конкретному посту. Посты все удалили.
 })
